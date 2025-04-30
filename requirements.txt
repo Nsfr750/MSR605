@@ -1,0 +1,7 @@
+# Core dependencies
+pyserial>=3.5  # For MSR605 communication
+
+# GUI dependencies
+tk>=8.6  # For GUI interface (usually comes with Python)
+
+# Note: sqlite3 is included with Python standard library
