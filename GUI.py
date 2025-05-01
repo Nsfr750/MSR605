@@ -110,9 +110,12 @@ If you find this software useful, consider:
 - Reporting bugs and suggesting features
 - Supporting the development through donations
 
-https://github.com/Nsfr750
-https://paypal.me/3dmega
-https://www.patreon.com/Nsfr750"""
+Social Links
+
+- [Patreon](https://www.patreon.com/Nsfr750)
+- [GitHub](https://github.com/Nsfr750)
+- [Discord](https://discord.gg/BvvkUEP9)
+- [Payapal](https://paypal.me/3dmega)"""
         showinfo("Sponsor", sponsor_text)
 
     def export_database_to_csv(self):

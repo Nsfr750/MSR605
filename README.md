@@ -88,3 +88,10 @@ Contributions are welcome! Please feel free to submit pull requests or report is
 
 ## License
 GNU General Public License v3
+
+## Social Links
+
+- [Patreon](https://www.patreon.com/Nsfr750)
+- [GitHub](https://github.com/Nsfr750)
+- [Discord](https://discord.gg/BvvkUEP9)
+- [Payapal](https://paypal.me/3dmega)
