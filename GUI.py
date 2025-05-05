@@ -113,7 +113,7 @@ If you find this software useful, consider:
 Social Links
 
 - [Patreon](https://www.patreon.com/Nsfr750)
-- [GitHub](https://github.com/Nsfr750)
+- [GitHub](https://github.com/sponsors/Nsfr750)
 - [Discord](https://discord.gg/BvvkUEP9)
 - [Payapal](https://paypal.me/3dmega)"""
         showinfo("Sponsor", sponsor_text)
@@ -667,7 +667,7 @@ Social Links
         if (self.__connected == True or self.__msr != None):
             self.close_connection()
         
-        showinfo("Bye", "See ya later ;)")
+        showinfo("Bye Bye")
         root.destroy()
         
         
