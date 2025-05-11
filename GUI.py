@@ -6,13 +6,55 @@ import os
 from tkinter import *
 from tkinter import ttk
 from tkinter.messagebox import *
-from tkinter import filedialog
+from tkinter import filedialog, simpledialog
 import sqlite3
 
+# Sponsor Class
+class Sponsor:
+    def show_sponsor_window(self):
+        sponsor_root = Toplevel()
+        sponsor_root.geometry("300x200")
+        sponsor_root.title("Sponsor")
+
+        title_label = tk.Label(sponsor_root, text="Support Us", font=("Arial", 16))
+        title_label.pack(pady=10)
+
+        def open_patreon():
+            import webbrowser
+            webbrowser.open("https://www.patreon.com/Nsfr750")
+
+        def open_github():
+            import webbrowser
+            webbrowser.open("https://github.com/sponsors/Nsfr750")
+
+        def open_discord():
+            import webbrowser
+            webbrowser.open("https://discord.gg/BvvkUEP9")
+
+        def open_paypal():
+            import webbrowser
+            webbrowser.open("https://paypal.me/3dmega")
+
+        # Create and place buttons
+        patreon_button = tk.Button(sponsor_root, text="Join the Patreon!", command=open_patreon)
+        patreon_button.pack(pady=5)
+
+        github_button = tk.Button(sponsor_root, text="GitHub", command=open_github)
+        github_button.pack(pady=5)
+
+        discord_button = tk.Button(sponsor_root, text="Join on Discord", command=open_discord)
+        discord_button.pack(pady=5)
+
+        paypal_button = tk.Button(sponsor_root, text="Pay me a Coffee", command=open_paypal)
+        paypal_button.pack(pady=5)
+
+        sponsor_root.mainloop()
 
 class GUI(Frame):    
     def __init__(self, parent):
         Frame.__init__(self, parent)
+
+
         
         self.__coercivityRadioBtnValue = StringVar()
         self.__coercivityRadioBtnValue.set('hi')
@@ -66,7 +108,9 @@ class GUI(Frame):
             self.__db_conn.commit()
             
             print(f"Database initialized at: {db_path}")
-            
+            if hasattr(self, 'status_var'):
+                self.status_var.set(f'Database: Connected ({db_path})')
+    
         except sqlite3.Error as e:
             showerror("Database Error", f"Failed to initialize database: {str(e)}")
         except OSError as e:
@@ -81,7 +125,7 @@ class GUI(Frame):
 
 A GUI application for reading, writing, and managing magnetic stripe cards.
 
-Copyright © 2025 Nsfr750
+Copyright 2025 Nsfr750
 License: GNU General Public License v3"""
         showinfo("About", about_text)
     
@@ -117,6 +161,7 @@ Social Links
 - [Discord](https://discord.gg/BvvkUEP9)
 - [Payapal](https://paypal.me/3dmega)"""
         showinfo("Sponsor", sponsor_text)
+        Sponsor().show_sponsor_window()
 
     def export_database_to_csv(self):
         try:
@@ -187,78 +232,100 @@ Social Links
            
         #Calls main Window Menu along with a .configure -> Shows the menu
         m = self.main_window_menu()
-        
-          
-        tracks = Frame(root)     
-        tracks.pack(side = LEFT)
-        
-        #Track One
-        trackOneFrame = Frame(tracks, padx = 10, pady = 10)     
-        trackOneFrame.grid(row = 0, column = 0)       
-        Label(trackOneFrame, text="Track 1", padx = 10, pady = 10).pack(side = LEFT)    
-        self.__trackOneEntry = Text(trackOneFrame, bd = 1, width = 50, height = 3)
-        self.__trackOneEntry.pack(side = RIGHT)
-        
-        #Track Two
-        trackTwoFrame = Frame(tracks, padx = 10, pady = 10)     
-        trackTwoFrame.grid(row = 1, column = 0)       
-        Label(trackTwoFrame, text="Track 2", padx = 10, pady = 10).pack(side = LEFT)    
-        self.__trackTwoEntry = Text(trackTwoFrame, bd = 1, width = 50, height = 3)
-        self.__trackTwoEntry.pack(side = RIGHT)
-        
-        #Track Three
-        trackThreeFrame = Frame(tracks, padx = 10, pady = 10)   
-        trackThreeFrame.grid(row = 2, column = 0)     
-        Label(trackThreeFrame, text="Track 3", padx = 10, pady = 10).pack(side = LEFT)    
-        self.__trackThreeEntry = Text(trackThreeFrame, bd = 1, width = 50, height = 3)
-        self.__trackThreeEntry.pack(side = RIGHT)
-        
-        
-        
-        #Displays if you're connected to the MSR605
-        self.__connectedLabelIndicator = Label(tracks, text = "MSR605 IS NOT CONNECTED", fg = 'red', padx = 10, pady = 10, font=('Helvetica', 14, 'underline'))
-        self.__connectedLabelIndicator.grid(row = 3, column = 0)     
-        
-        Button(tracks, text="Connect to MSR605", command = self.connect_to_msr605).grid(row = 4, column = 0)
-        Button(tracks, text="Close connection to MSR605", command = self.close_connection).grid(row = 5, column = 0)
-        Button(tracks, text="Reset MSR605", command = self.reset).grid(row = 6, column = 0)  
-        
-        
-        buttons = Frame(root)     
-        buttons.pack(side = RIGHT)
-        
-        
-        #Coercivity Radio Buttons
-        coercivityRadioButtons = Frame(buttons, padx = 10, pady = 10)
-        coercivityRadioButtons.pack(side = TOP, padx = 20)
-        Label(coercivityRadioButtons, text="SET COERCIVITY", padx = 10, pady = 10, font=('Helvetica', 10, 'underline')).pack(side = TOP)    
-        Radiobutton(coercivityRadioButtons, text="HI-CO", variable=self.__coercivityRadioBtnValue, value="hi", command = self.coercivity_change).pack(side=TOP)
-        Radiobutton(coercivityRadioButtons, text="LOW-CO", variable=self.__coercivityRadioBtnValue, value="low", command = self.coercivity_change).pack(side=TOP)
-        
-        #Read-Write-Erase Buttons
-        readWriteEraseButtons = Frame(buttons, padx = 10, pady = 10)
-        readWriteEraseButtons.pack(side = TOP, padx = 20)
-        Label(readWriteEraseButtons, text="READ/WRITE\n/ERASE CARDS", padx = 10, pady = 10, font=('Helvetica', 10, 'underline')).pack(side = TOP)    
-        Button(readWriteEraseButtons, text="READ CARD", command = self.read_card).pack(side=TOP)
-        Button(readWriteEraseButtons, text="DECODE CARD", command = self.decode_card).pack(side=TOP)
-        Button(readWriteEraseButtons, text="WRITE CARD", command = self.write_card).pack(side=TOP)
-        Button(readWriteEraseButtons, text="ERASE CARD", command = self.erase_card).pack(side=TOP)
 
-        ledButtons = Frame(buttons, padx = 10, pady = 10)
-        ledButtons.pack(side = TOP, padx = 20)
-        Label(ledButtons, text="LED OPTIONS", padx = 10, pady = 10, font=('Helvetica', 10, 'underline')).pack(side = TOP)    
-        Button(ledButtons, text="ALL ON", command = lambda: self.led_change("on")).pack(side=TOP)
-        Button(ledButtons, text="ALL OFF", command = lambda: self.led_change("off")).pack(side=TOP)
-        Button(ledButtons, text="GREEN ON", command = lambda: self.led_change("green")).pack(side=TOP)
-        Button(ledButtons, text="YELLOW ON", command = lambda: self.led_change("yellow")).pack(side=TOP)
-        Button(ledButtons, text="RED ON", command = lambda: self.led_change("red")).pack(side=TOP)
-        
-        testButtons = Frame(buttons, padx = 10, pady = 10)
-        testButtons.pack(side = TOP, padx = 20)
-        Label(testButtons, text="MSR605 TESTS", padx = 10, pady = 10, font=('Helvetica', 10, 'underline')).pack(side = TOP)    
-        Button(testButtons, text="COMMUNICATION TEST", command = self.communication_test).pack(side=TOP)
-        Button(testButtons, text="SENSOR TEST", command = self.sensor_test).pack(side=TOP)
-        Button(testButtons, text="RAM TEST", command = self.ram_test).pack(side=TOP)
+        # Use root as the parent for tracks and buttons (revert change)
+        tracks = Frame(root)
+        tracks.pack(side=LEFT)
+
+        # --- STATUS BAR ---
+        self.status_var = StringVar()
+        self.status_var.set('Database: Connecting...')
+        self.status_bar = Label(root, textvariable=self.status_var, bd=1, relief=SUNKEN, anchor=W)
+        self.status_bar.pack(side=BOTTOM, fill=X)
+
+        # Track One
+        trackOneFrame = Frame(tracks, padx=10, pady=10)
+        trackOneFrame.grid(row=0, column=0)
+        Label(trackOneFrame, text="Track 1", padx=10, pady=10).pack(side=LEFT)
+        self.__trackOneEntry = Text(trackOneFrame, bd=1, width=50, height=3)
+        self.__trackOneEntry.pack(side=RIGHT)
+
+        # Track Two
+        trackTwoFrame = Frame(tracks, padx=10, pady=10)
+        trackTwoFrame.grid(row=1, column=0)
+        Label(trackTwoFrame, text="Track 2", padx=10, pady=10).pack(side=LEFT)
+        self.__trackTwoEntry = Text(trackTwoFrame, bd=1, width=50, height=3)
+        self.__trackTwoEntry.pack(side=RIGHT)
+
+        # Track Three
+        trackThreeFrame = Frame(tracks, padx=10, pady=10)
+        trackThreeFrame.grid(row=2, column=0)
+        Label(trackThreeFrame, text="Track 3", padx=10, pady=10).pack(side=LEFT)
+        self.__trackThreeEntry = Text(trackThreeFrame, bd=1, width=50, height=3)
+        self.__trackThreeEntry.pack(side=RIGHT)
+
+        # Displays if you're connected to the MSR605
+        self.__connectedLabelIndicator = Label(tracks, text="MSR605 IS NOT CONNECTED", fg='red', padx=10, pady=10, font=('Helvetica', 14, 'underline'))
+        self.__connectedLabelIndicator.grid(row=3, column=0)
+
+        Button(tracks, text="Connect to MSR605", command=self.connect_to_msr605).grid(row=4, column=0)
+        Button(tracks, text="Close connection to MSR605", command=self.close_connection).grid(row=5, column=0)
+        Button(tracks, text="Reset MSR605", command=self.reset).grid(row=6, column=0)
+
+        buttons = Frame(root)
+        buttons.pack(side=RIGHT, fill=Y)
+
+        # Coercivity Radio Buttons (remains at top)
+        coercivityRadioButtons = Frame(buttons, padx=10, pady=10)
+        coercivityRadioButtons.pack(side=TOP, padx=20, anchor=N)
+        Label(coercivityRadioButtons, text="SET COERCIVITY", padx=10, pady=10, font=('Helvetica', 10, 'underline')).pack(side=TOP)
+        Radiobutton(coercivityRadioButtons, text="HI-CO", variable=self.__coercivityRadioBtnValue, value="hi", command=self.coercivity_change).pack(side=TOP)
+        Radiobutton(coercivityRadioButtons, text="LOW-CO", variable=self.__coercivityRadioBtnValue, value="low", command=self.coercivity_change).pack(side=TOP)
+
+        # Button columns for better layout
+        buttonColumns = Frame(buttons)
+        buttonColumns.pack(side=TOP, fill=BOTH, expand=True)
+
+        # Column 0: Read/Write/Erase, LED
+        col0 = Frame(buttonColumns)
+        col0.grid(row=0, column=0, sticky=N)
+        readWriteEraseButtons = Frame(col0, padx=10, pady=10)
+        readWriteEraseButtons.pack(side=TOP, padx=10, pady=10, anchor=N)
+        Label(readWriteEraseButtons, text="READ/WRITE\n/ERASE CARDS", padx=10, pady=10, font=('Helvetica', 10, 'underline')).pack(side=TOP)
+        Button(readWriteEraseButtons, text="READ CARD", command=self.read_card).pack(side=TOP)
+        Button(readWriteEraseButtons, text="DECODE CARD", command=self.decode_card).pack(side=TOP)
+        Button(readWriteEraseButtons, text="WRITE CARD", command=self.write_card).pack(side=TOP)
+        Button(readWriteEraseButtons, text="ERASE CARD", command=self.erase_card).pack(side=TOP)
+
+        ledButtons = Frame(col0, padx=10, pady=10)
+        ledButtons.pack(side=TOP, padx=10, pady=10, anchor=N)
+        Label(ledButtons, text="LED OPTIONS", padx=10, pady=10, font=('Helvetica', 10, 'underline')).pack(side=TOP)
+        Button(ledButtons, text="ALL ON", command=lambda: self.led_change("on")).pack(side=TOP)
+        Button(ledButtons, text="ALL OFF", command=lambda: self.led_change("off")).pack(side=TOP)
+        Button(ledButtons, text="GREEN ON", command=lambda: self.led_change("green")).pack(side=TOP)
+        Button(ledButtons, text="YELLOW ON", command=lambda: self.led_change("yellow")).pack(side=TOP)
+        Button(ledButtons, text="RED ON", command=lambda: self.led_change("red")).pack(side=TOP)
+
+        # Column 1: Tests, Advanced Tools
+        col1 = Frame(buttonColumns)
+        col1.grid(row=0, column=1, sticky=N)
+        testButtons = Frame(col1, padx=10, pady=10)
+        testButtons.pack(side=TOP, padx=10, pady=10, anchor=N)
+        Label(testButtons, text="MSR605 TESTS", padx=10, pady=10, font=('Helvetica', 10, 'underline')).pack(side=TOP)
+        Button(testButtons, text="COMMUNICATION TEST", command=self.communication_test).pack(side=TOP)
+        Button(testButtons, text="SENSOR TEST", command=self.sensor_test).pack(side=TOP)
+        Button(testButtons, text="RAM TEST", command=self.ram_test).pack(side=TOP)
+
+        advancedFrame = Frame(col1, padx=10, pady=10)
+        advancedFrame.pack(side=TOP, padx=10, pady=10, anchor=N)
+        Label(advancedFrame, text="ADVANCED TRACK TOOLS", padx=10, pady=10, font=('Helvetica', 10, 'underline')).pack(side=TOP)
+        Button(advancedFrame, text="Set Leading Zero", command=self.set_leading_zero_gui).pack(side=TOP, fill=X)
+        Button(advancedFrame, text="Clear Leading Zero", command=lambda: self.set_leading_zero_gui(enable=False)).pack(side=TOP, fill=X)
+        Button(advancedFrame, text="Check Leading Zero", command=self.check_leading_zero_gui).pack(side=TOP, fill=X)
+        Button(advancedFrame, text="Select BPI", command=self.select_bpi_gui).pack(side=TOP, fill=X)
+        Button(advancedFrame, text="Set BPC", command=self.set_bpc_gui).pack(side=TOP, fill=X)
+        Button(advancedFrame, text="Read Raw Data", command=self.read_raw_data_gui).pack(side=TOP, fill=X)
+        Button(advancedFrame, text="Write Raw Data", command=self.write_raw_data_gui).pack(side=TOP, fill=X)
 
     
            
@@ -390,9 +457,9 @@ Social Links
             self.__trackTwoEntry.delete(1.0, END)
             self.__trackThreeEntry.delete(1.0, END)
             
-            self.__trackOneEntry.insert(END, self.__tracks[0])
-            self.__trackTwoEntry.insert(END, self.__tracks[1])
-            self.__trackThreeEntry.insert(END, self.__tracks[2])
+            self.__trackOneEntry.insert(END, self.__tracks[0] if self.__tracks[0] is not None else "")
+            self.__trackTwoEntry.insert(END, self.__tracks[1] if self.__tracks[1] is not None else "")
+            self.__trackThreeEntry.insert(END, self.__tracks[2] if self.__tracks[2] is not None else "")
         
             if (self.__autoSaveDatabase.get() == True):
                 
@@ -522,28 +589,164 @@ Social Links
         if (self.__connected == False or self.__msr == None):
             showerror("Connect Error", "The MSR605 is not connected")
             return None
-            
+
+        import io
+        import sys
+        import parser
+        output = io.StringIO()
+        old_stdout = sys.stdout
         try:
-            # Capture stdout to get the decoded data
-            import io
-            import sys
-            old_stdout = sys.stdout
-            sys.stdout = output = io.StringIO()
-            
-            # Decode the tracks
-            self.__msr.decode_tracks()
-            
-            # Get the captured output
+            sys.stdout = output
+            tracks = self.__msr.read_card()
+        except cardReaderExceptions.CardReadError as e:
             sys.stdout = old_stdout
-            decoded_data = output.getvalue()
-            
-            # Show the decoded data in a message box
-            showinfo("Decoded Card Data", decoded_data)
-            
-        except cardReaderExceptions.DecodeError as e:
             self.exception_error_reset("Decode Error", e)
             print(e)
+            showerror("Decode Error", f"Failed to decode card: {e}")
+            return None
+        except Exception as e:
+            sys.stdout = old_stdout
+            print(e)
+            showerror("Decode Error", f"Unexpected error: {e}")
+            return None
+        finally:
+            sys.stdout = old_stdout
+        decoded_data = output.getvalue()
+        if not decoded_data.strip():
+            showwarning("Decode Warning", "No card data was decoded. Please try again.")
+            return
+        # Parse the tracks using parser.py
+        parsed = parser.parse_all_tracks(tracks)
+        info = []
+        if parsed['track1']:
+            t1 = parsed['track1']
+            details = [
+                f"Track 1:",
+                f"  Card Number : {t1.get('card_number','')}",
+                f"  Name        : {t1.get('name','')}",
+                f"  Expiration  : {t1.get('expiration','')}",
+                f"  Raw         : {t1.get('raw','')}",
+            ]
+            if 'error' in t1:
+                details.append(f"  Error       : {t1['error']}")
+            info.append('\n'.join(details))
+        if parsed['track2']:
+            t2 = parsed['track2']
+            details = [
+                f"Track 2:",
+                f"  Card Number : {t2.get('card_number','')}",
+                f"  Expiration  : {t2.get('expiration','')}",
+                f"  Service Code: {t2.get('service_code','')}",
+                f"  Raw         : {t2.get('raw','')}",
+            ]
+            if 'error' in t2:
+                details.append(f"  Error       : {t2['error']}")
+            info.append('\n'.join(details))
+        if parsed['track3']:
+            t3 = parsed['track3']
+            details = [
+                f"Track 3:",
+                f"  Raw         : {t3.get('raw','')}",
+                f"  Hex         : {t3.get('hex','')}",
+                f"  Length      : {t3.get('length','')}",
+                f"  Printable   : {t3.get('printable','')}",
+            ]
+            if 'error' in t3:
+                details.append(f"  Error       : {t3['error']}")
+            info.append('\n'.join(details))
+        showinfo("Decoded Card Data", '\n\n'.join(info))
+
+
             
+    def set_leading_zero_gui(self, enable=True):
+        if self.__connected == False or self.__msr == None:
+            showerror("Connect Error", "The MSR605 is not connected")
+            return
+        track = simpledialog.askinteger("Set Leading Zero", "Enter track (1, 2, or 3):", minvalue=1, maxvalue=3)
+        if track is None:
+            return
+        try:
+            self.__msr.set_leading_zero(track=track, enable=enable)
+            showinfo("Success", f"Leading zero {'set' if enable else 'cleared'} for track {track}.")
+        except Exception as e:
+            showerror("Error", str(e))
+
+    def check_leading_zero_gui(self):
+        if self.__connected == False or self.__msr == None:
+            showerror("Connect Error", "The MSR605 is not connected")
+            return
+        track = simpledialog.askinteger("Check Leading Zero", "Enter track (1, 2, or 3):", minvalue=1, maxvalue=3)
+        if track is None:
+            return
+        try:
+            result = self.__msr.check_leading_zero(track=track)
+            showinfo("Leading Zero", f"Track {track}: {'SET' if result else 'NOT SET'}")
+        except Exception as e:
+            showerror("Error", str(e))
+
+    def select_bpi_gui(self):
+        if self.__connected == False or self.__msr == None:
+            showerror("Connect Error", "The MSR605 is not connected")
+            return
+        track = simpledialog.askinteger("Select BPI", "Enter track (1, 2, or 3):", minvalue=1, maxvalue=3)
+        if track is None:
+            return
+        bpi = simpledialog.askinteger("Select BPI", "Enter BPI (75 or 210):", minvalue=75, maxvalue=210)
+        if bpi not in (75, 210):
+            showerror("Error", "BPI must be 75 or 210")
+            return
+        try:
+            self.__msr.select_bpi(track=track, bpi=bpi)
+            showinfo("Success", f"BPI {bpi} set for track {track}.")
+        except Exception as e:
+            showerror("Error", str(e))
+
+    def set_bpc_gui(self):
+        if self.__connected == False or self.__msr == None:
+            showerror("Connect Error", "The MSR605 is not connected")
+            return
+        track = simpledialog.askinteger("Set BPC", "Enter track (1, 2, or 3):", minvalue=1, maxvalue=3)
+        if track is None:
+            return
+        bpc = simpledialog.askinteger("Set BPC", "Enter BPC (5, 7, or 8):", minvalue=5, maxvalue=8)
+        if bpc not in (5, 7, 8):
+            showerror("Error", "BPC must be 5, 7, or 8")
+            return
+        try:
+            self.__msr.set_bpc(track=track, bpc=bpc)
+            showinfo("Success", f"BPC {bpc} set for track {track}.")
+        except Exception as e:
+            showerror("Error", str(e))
+
+    def read_raw_data_gui(self):
+        if self.__connected == False or self.__msr == None:
+            showerror("Connect Error", "The MSR605 is not connected")
+            return
+        track = simpledialog.askinteger("Read Raw Data", "Enter track (1, 2, or 3):", minvalue=1, maxvalue=3)
+        if track is None:
+            return
+        try:
+            data = self.__msr.read_raw_data(track=track)
+            showinfo("Raw Data", f"Track {track} raw data:\n{data}")
+        except Exception as e:
+            showerror("Error", str(e))
+
+    def write_raw_data_gui(self):
+        if self.__connected == False or self.__msr == None:
+            showerror("Connect Error", "The MSR605 is not connected")
+            return
+        track = simpledialog.askinteger("Write Raw Data", "Enter track (1, 2, or 3):", minvalue=1, maxvalue=3)
+        if track is None:
+            return
+        data = simpledialog.askstring("Write Raw Data", "Enter raw data (as ASCII string):")
+        if data is None:
+            return
+        try:
+            self.__msr.write_raw_data(track=track, data=data.encode())
+            showinfo("Success", f"Raw data written to track {track}.")
+        except Exception as e:
+            showerror("Error", str(e))
+
     def ram_test(self):
         if (self.__connected == False or self.__msr == None):
             showerror("Connect Error", "The MSR605 is not connected")
@@ -649,11 +852,7 @@ Social Links
         except sqlite3.Error as e:
             showerror("Database Error", f"Failed to view database: {str(e)}")
         except Exception as e:
-            showerror("Error", f"An error occurred: {str(e)}")
-            
-        
-        
-        
+            showerror("Error", f"An error occurred: {str(e)}")       
         
     def on_exit(self):
         # Close database connection
