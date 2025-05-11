@@ -49,22 +49,8 @@ HI_OR_LOW_CO = b'\x64'
 
 
 class CardReader():
-    """Allows interfacing with the MSR605 using the serial module
-        
-        I have not implemented all the functionality described in the MSR605 programming
-        manual, here is what I have not implemented:
-            
-            - Set leading zero, Check leading zero, Select BPI, Read raw data, Write raw
-              data, Set BPC
-              
-            This functionality wasn't added because I didn't require it but can easily be
-            implemented if you follow the programming manual
-        
-        Attributes:
-            A lot of constants lol
-    """
-    
-    
+    """Allows interfacing with the MSR605 using the serial module"""
+      
     
     def __init__(self):
         """Connects to the MSR605 using pyserial (serial connection)
@@ -115,6 +101,84 @@ class CardReader():
         
         print ("\nCONNECTED TO MSR605")
         
+        
+    def set_leading_zero(self, track=1, enable=True):
+        """
+        Set or clear leading zero for a track.
+        track: 1, 2, or 3
+        enable: True to set, False to clear
+        """
+        cmd = b'\x1bL' + bytes([track]) + (b'1' if enable else b'0')
+        self.__serialConn.write(cmd)
+        resp = self.__serialConn.read(1)
+        if resp != b'\x0d':
+            raise Exception('Failed to set leading zero')
+
+    def check_leading_zero(self, track=1):
+        """
+        Check if leading zero is set for a track.
+        Returns True if set, False otherwise.
+        """
+        cmd = b'\x1bM' + bytes([track])
+        self.__serialConn.write(cmd)
+        resp = self.__serialConn.read(2)
+        # Expecting: b'1\r' or b'0\r'
+        if resp[1:] != b'\r':
+            raise Exception('Invalid response from check_leading_zero')
+        return resp[0:1] == b'1'
+
+    def select_bpi(self, track=1, bpi=210):
+        """
+        Select BPI (Bits Per Inch) for a track.
+        bpi: 75 or 210
+        """
+        if bpi not in (75, 210):
+            raise ValueError('BPI must be 75 or 210')
+        cmd = b'\x1bB' + bytes([track]) + (b'1' if bpi == 210 else b'0')
+        self.__serialConn.write(cmd)
+        resp = self.__serialConn.read(1)
+        if resp != b'\x0d':
+            raise Exception('Failed to set BPI')
+
+    def read_raw_data(self, track=1):
+        """
+        Read raw data from a track.
+        Returns the raw bytes read from the track.
+        """
+        cmd = b'\x1bR' + bytes([track])
+        self.__serialConn.write(cmd)
+        # Read until carriage return (\r)
+        data = b''
+        while True:
+            c = self.__serialConn.read(1)
+            if c == b'\r':
+                break
+            data += c
+        return data
+
+    def write_raw_data(self, track=1, data=b''):
+        """
+        Write raw data to a track.
+        data: bytes to write (should be properly formatted for the device)
+        """
+        cmd = b'\x1bW' + bytes([track]) + data + b'\r'
+        self.__serialConn.write(cmd)
+        resp = self.__serialConn.read(1)
+        if resp != b'\x0d':
+            raise Exception('Failed to write raw data')
+
+    def set_bpc(self, track=1, bpc=7):
+        """
+        Set BPC (Bits Per Character) for a track.
+        bpc: usually 5, 7, or 8 depending on the track
+        """
+        if bpc not in (5, 7, 8):
+            raise ValueError('BPC must be 5, 7, or 8')
+        cmd = b'\x1bC' + bytes([track]) + bytes([bpc])
+        self.__serialConn.write(cmd)
+        resp = self.__serialConn.read(1)
+        if resp != b'\x0d':
+            raise Exception('Failed to set BPC')
         
     def close_serial_connection(self):
         """closes the serial connection to the MSR605
@@ -267,15 +331,15 @@ class CardReader():
         #response from the MSR605
         #goes through what is expected as output from the MSR
         if self.__serialConn.read() != ESCAPE:
-            return cardReaderExceptions.CardReadError("[Datablock] READ ERROR, R/W Data "
+            raise cardReaderExceptions.CardReadError("[Datablock] READ ERROR, R/W Data "
                                             "Field, looking for ESCAPE(\x1B)", None)
         
         if self.__serialConn.read() != b's':
-            return cardReaderExceptions.CardReadError("[Datablock] READ ERROR, R/W Data "
+            raise cardReaderExceptions.CardReadError("[Datablock] READ ERROR, R/W Data "
                                             "Field, looking for s (\x73)", None)
         
         if self.__serialConn.read() != ESCAPE:
-            return cardReaderExceptions.CardReadError("[Carddata] READ ERROR, R/W Data "
+            raise cardReaderExceptions.CardReadError("[Carddata] READ ERROR, R/W Data "
                                             "Field, looking for ESCAPE(\x1B)", None)
         
         
@@ -347,10 +411,9 @@ class CardReader():
             else: #since track 3 requres a ? when writing
                 tracks[2] = '?'
         
-        if self.__serialConn.read() != ESCAPE:
-            raise cardReaderExceptions.CardReadError("[Datablock] READ ERROR, Ending "
-                                                    "Field, looking for ESCAPE(\x1B)",
-                                                    tracks)
+        last_byte = self.__serialConn.read()
+        if last_byte not in (ESCAPE, FILE_SEPERATOR):
+            raise cardReaderExceptions.CardReadError("[Datablock] READ ERROR, Ending Field, looking for ESCAPE(\\x1B) or FILE_SEPERATOR(\\x1C)", tracks)
         
         #this reads the status byte and raises exceptions
         self.status_read()
@@ -1059,7 +1122,7 @@ class CardReader():
         print ("SUCCESSFULLY RETRIEVED THE DEVICE MODEL")
         
         return model
-    
+
     def get_firmware_version(self):
         """This command can get the firmware version of MSR605.
     
@@ -1115,31 +1178,58 @@ class CardReader():
             DecodeError: An error occurred when trying to decode the card data
         """
         try:
+            print("[DEBUG] Starting decode_tracks")
             # First read the card to get the track data
             tracks = self.read_card()
-            
-            # Decode each track's data
+            print(f"[DEBUG] Raw tracks data: {tracks}")
+            if not isinstance(tracks, (list, tuple)):
+                print(f"[ERROR] read_card did not return a list/tuple: {tracks}")
+                raise cardReaderExceptions.DecodeError(f"Failed to decode card data: {str(tracks)}")
             for i, track in enumerate(tracks):
-                if track:  # Only decode non-empty tracks
+                print(f"[DEBUG] Track {i+1} raw: {track}")
+                if track:
                     print(f"Track {i+1} decoded data:")
                     print(f"Raw data: {track}")
-                    # Parse track data based on ISO standards
-                    if i == 0:  # Track 1
-                        # Format: %B1234567890123445^LASTNAME/FIRST^YYMMSSSDDDDDDDDDDDDDDDDD?
-                        parts = track.split('^')
-                        if len(parts) >= 2:
-                            print(f"Card number: {parts[0][2:] if parts[0].startswith('%B') else parts[0]}")
-                            print(f"Cardholder name: {parts[1]}")
-                    elif i == 1:  # Track 2
-                        # Format: ;1234567890123445=YYMMSSSDDDDDDDD?
-                        parts = track.split('=')
-                        if len(parts) >= 1:
-                            print(f"Card number: {parts[0][1:] if parts[0].startswith(';') else parts[0]}")
+                    if i == 0:  # Track 1: %B1234567890123445^DOE/JOHN^YYMMDD...
+                        # Format: %B[card number]^[NAME]^YYMMDD...
+                        try:
+                            if track.startswith('%B'):
+                                parts = track[2:].split('^')
+                                card_number = parts[0] if len(parts) > 0 else ''
+                                name = parts[1].strip() if len(parts) > 1 else ''
+                                exp = parts[2][:4] if len(parts) > 2 else ''
+                                exp_fmt = f"20{exp[0:2]}/{exp[2:4]}" if len(exp) == 4 else ''
+                                print(f"  Card Number      : {card_number}")
+                                print(f"  Cardholder Name  : {name}")
+                                print(f"  Expiration Date  : {exp_fmt}")
+                            else:
+                                print("  Track 1 format not recognized.")
+                        except Exception as e:
+                            print(f"  Track 1 decode error: {e}")
+                    elif i == 1:  # Track 2: ;1234567890123445=YYMMDDSSS...
+                        # Format: ;[card number]=YYMMDDSSS...
+                        try:
+                            if track.startswith(';'):
+                                parts = track[1:].split('=')
+                                card_number = parts[0] if len(parts) > 0 else ''
+                                exp = parts[1][:4] if len(parts) > 1 else ''
+                                exp_fmt = f"20{exp[0:2]}/{exp[2:4]}" if len(exp) == 4 else ''
+                                service_code = parts[1][4:7] if len(parts) > 1 and len(parts[1]) >= 7 else ''
+                                print(f"  Card Number      : {card_number}")
+                                print(f"  Expiration Date  : {exp_fmt}")
+                                print(f"  Service Code     : {service_code}")
+                            else:
+                                print("  Track 2 format not recognized.")
+                        except Exception as e:
+                            print(f"  Track 2 decode error: {e}")
                     elif i == 2:  # Track 3
-                        print("Track 3 data is typically proprietary format")
+                        print("  Track 3 data is typically proprietary format or bank use only.")
                     print()
-            
+            print(f"[DEBUG] Finished decoding tracks. Returning: {tracks}")
             return tracks
             
         except (cardReaderExceptions.CardReadError, Exception) as e:
+            print(f"[DEBUG] Exception in decode_tracks: {e}")
+            import traceback
+            traceback.print_exc()
             raise cardReaderExceptions.DecodeError(f"Failed to decode card data: {str(e)}")
