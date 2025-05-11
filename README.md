@@ -95,3 +95,8 @@ GNU General Public License v3
 - [GitHub](https://github.com/Nsfr750)
 - [Discord](https://discord.gg/BvvkUEP9)
 - [Payapal](https://paypal.me/3dmega)
+
+## ToDo
+
+- Add Logo
+- Add better decode of data
