@@ -9,46 +9,7 @@ from tkinter.messagebox import *
 from tkinter import filedialog, simpledialog
 import sqlite3
 
-# Sponsor Class
-class Sponsor:
-    def show_sponsor_window(self):
-        sponsor_root = Toplevel()
-        sponsor_root.geometry("300x200")
-        sponsor_root.title("Sponsor")
-
-        title_label = tk.Label(sponsor_root, text="Support Us", font=("Arial", 16))
-        title_label.pack(pady=10)
-
-        def open_patreon():
-            import webbrowser
-            webbrowser.open("https://www.patreon.com/Nsfr750")
-
-        def open_github():
-            import webbrowser
-            webbrowser.open("https://github.com/sponsors/Nsfr750")
-
-        def open_discord():
-            import webbrowser
-            webbrowser.open("https://discord.gg/BvvkUEP9")
-
-        def open_paypal():
-            import webbrowser
-            webbrowser.open("https://paypal.me/3dmega")
-
-        # Create and place buttons
-        patreon_button = tk.Button(sponsor_root, text="Join the Patreon!", command=open_patreon)
-        patreon_button.pack(pady=5)
-
-        github_button = tk.Button(sponsor_root, text="GitHub", command=open_github)
-        github_button.pack(pady=5)
-
-        discord_button = tk.Button(sponsor_root, text="Join on Discord", command=open_discord)
-        discord_button.pack(pady=5)
-
-        paypal_button = tk.Button(sponsor_root, text="Pay me a Coffee", command=open_paypal)
-        paypal_button.pack(pady=5)
-
-        sponsor_root.mainloop()
+from sponsor import Sponsor
 
 class GUI(Frame):    
     def __init__(self, parent):
@@ -121,13 +82,8 @@ class GUI(Frame):
 
         
     def show_about(self):
-        about_text = """MSR605 Card Reader/Writer v2.0.1
-
-A GUI application for reading, writing, and managing magnetic stripe cards.
-
-Copyright 2025 Nsfr750
-License: GNU General Public License v3"""
-        showinfo("About", about_text)
+        from about import About
+        About.show_about(self.master)
     
     def show_help(self):
         help_text = """MSR605 Card Reader/Writer Help
@@ -147,21 +103,7 @@ https://github.com/Nsfr750/MSR605"""
         showinfo("Help", help_text)
     
     def show_sponsor(self):
-        sponsor_text = """Support MSR605 Card Reader/Writer
-
-If you find this software useful, consider:
-- Contributing to the project on GitHub
-- Reporting bugs and suggesting features
-- Supporting the development through donations
-
-Social Links
-
-- [Patreon](https://www.patreon.com/Nsfr750)
-- [GitHub](https://github.com/sponsors/Nsfr750)
-- [Discord](https://discord.gg/BvvkUEP9)
-- [Payapal](https://paypal.me/3dmega)"""
-        showinfo("Sponsor", sponsor_text)
-        Sponsor().show_sponsor_window()
+        Sponsor(self.master).show_sponsor()
 
     def export_database_to_csv(self):
         try:
@@ -870,8 +812,10 @@ Social Links
         root.destroy()
         
         
+from version import get_version
+
 root = tk.Tk()
-root.title("MSR605 Reader/Writer v2.0.1")
+root.title(f"MSR605 Reader/Writer {get_version()}")
 root.minsize(700,600)
 gui = GUI(root)
 
