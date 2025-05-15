@@ -1,10 +1,3 @@
 __pycache__
-sample.db
-Departments.csv
-Employees.csv
-sample.accdb
-sample.mdb
-sample.sqlite
-sample.sqlite3
-sample.mvo
-sample.sql
+cardDatabase.db
+cardDatabase.csv
