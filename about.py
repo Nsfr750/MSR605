@@ -19,7 +19,7 @@ class About:
         version = ttk.Label(about_dialog, text=f'Version {get_version()}')
         version.pack()
 
-        description = ttk.Label(about_dialog, text='A powerful GUI application for reading, writing, and managing magnetic stripe cards using the MSR605 hardware.', justify=tk.CENTER)
+        description = ttk.Label(about_dialog, text='A powerful GUI application for reading, writing, and managing\n magnetic stripe cards using the MSR605 hardware.', justify=tk.CENTER)
         description.pack(pady=20)
 
         copyright = ttk.Label(about_dialog, text=' 2025 Nsfr750')
