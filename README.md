@@ -107,4 +107,4 @@ Last Updated: May 15, 2025
 - [Patreon](https://www.patreon.com/Nsfr750)
 - [GitHub](https://github.com/Nsfr750)
 - [Discord](https://discord.gg/BvvkUEP9)
-- [Payapal](https://paypal.me/3dmega)
+- [Paypal](https://paypal.me/3dmega)
