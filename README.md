@@ -6,12 +6,20 @@
 
 ## 🚀 Features
 
+### 🔍 Advanced Functions
+- Dedicated window for advanced card operations
+- Tabbed interface for easy navigation
+- Detailed track data parsing and display
+- Support for multiple encryption standards
+- Enhanced error handling and logging
+
 ### 1. Card Operations
 - 🔍 Read magnetic stripe cards
 - ✍️ Write data to cards
 - 🧹 Erase card data
-- 🔬 Advanced card data decoding
+- 🔬 Advanced card data decoding with detailed field extraction
 - 🛠️ Granular track-level controls
+- 🔐 Support for multiple encryption algorithms (DES, 3DES, AES)
 
 ### 2. Advanced Track Tools
 - Set/Clear/Check Leading Zero
