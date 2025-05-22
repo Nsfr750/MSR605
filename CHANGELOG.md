@@ -5,6 +5,26 @@ All notable changes to the MSR605 Card Reader/Writer project will be documented 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2025-05-22
+
+### Added
+- New Advanced Functions window with dedicated tabs for decoding and decryption
+- Support for multiple encryption algorithms (DES, 3DES, AES)
+- Enhanced track data parsing with detailed field extraction
+- Improved error handling and user feedback
+- Better organization of decryption and decoding functionality
+
+### Changed
+- Moved decode/decrypt functionality to a dedicated module
+- Updated UI for better usability and organization
+- Improved error messages and logging
+- More robust card data parsing
+
+### Fixed
+- Fixed issues with card reading error handling
+- Improved stability during track data processing
+- Better handling of invalid card data formats
+
 ## [2.0.2] - 2025-05-22
 
 ### Added
