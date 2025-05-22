@@ -253,12 +253,23 @@ class GUI(Frame):
     def connect_to_msr605(self):
         """Connect to the MSR605 device."""
         try:
+            # Initialize the MSR605 reader
             self.__msr = CardReader()
+            
+            # Verify the connection was successful
+            if not hasattr(self.__msr, '_CardReader__serialConn') or not self.__msr._CardReader__serialConn.is_open:
+                raise ConnectionError("Failed to establish serial connection to MSR605")
+                
             self.__connected = True
             self.__connectedLabelIndicator.config(text="MSR605 IS CONNECTED", fg='green')
             showinfo("Success", "Successfully connected to MSR605 device")
+            
+            # Reset the device to ensure clean state
+            self.reset()
+            
         except Exception as e:
             self.__connected = False
+            self.__msr = None  # Ensure __msr is None if connection fails
             self.__connectedLabelIndicator.config(text="MSR605 CONNECTION FAILED", fg='red')
             showerror("Connection Error", f"Failed to connect to MSR605: {str(e)}")
     
