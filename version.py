@@ -1,17 +1,17 @@
 """
-Version management for Database Browser application.
+Version management for MSR605 application.
 
 This module provides a centralized version tracking system 
-for the Database Browser project.
+for the MSR605 project.
 """
 
 # Version information follows Semantic Versioning 2.0.0 (https://semver.org/)
 VERSION_MAJOR = 2
 VERSION_MINOR = 0
-VERSION_PATCH = 1
+VERSION_PATCH = 2
 
 # Additional version qualifiers
-VERSION_QUALIFIER = 'beta'  # Could be 'alpha', 'beta', 'rc', or ''
+VERSION_QUALIFIER = 'stable'  # Could be 'alpha', 'beta', 'rc', or ''
 
 def get_version():
     """
