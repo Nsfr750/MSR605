@@ -5,6 +5,26 @@ All notable changes to the MSR605 Card Reader/Writer project will be documented 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.2] - 2025-05-22
+
+### Added
+- Enhanced error handling for card reading operations
+- Improved connection management with better status feedback
+- Added support for individual track reading when full card read fails
+- More detailed error messages for troubleshooting
+
+### Changed
+- Updated UI to show more detailed connection status
+- Improved card reading reliability with retry mechanisms
+- Optimized database operations for better performance
+- Enhanced error recovery during card operations
+
+### Fixed
+- Fixed issue with connection status not updating properly
+- Resolved problems with track data parsing
+- Fixed potential memory leaks in card reading operations
+- Addressed UI responsiveness issues during long operations
+
 ## [2.0.1] - 2025-05-15
 
 ### Added
