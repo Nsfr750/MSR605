@@ -4,7 +4,8 @@
 - [x] Implement core card reading/writing functionality
 - [x] Add database integration for card storage
 - [x] Create user-friendly GUI
-- [ ] Add comprehensive error handling for hardware communication
+- [x] Add comprehensive error handling for hardware communication
+- [x] Implement advanced card data decoding and decryption
 
 ## Medium Priority
 - [ ] Add unit tests for all core functionality
@@ -19,6 +20,8 @@
 - [ ] Create installation package
 
 ## In Progress
+- [ ] Add unit tests for the new advanced functions module
+- [ ] Document the new encryption/decryption API
 - [ ] Performance optimization
 - [ ] Enhanced error recovery
 
