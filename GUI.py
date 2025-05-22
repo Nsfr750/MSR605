@@ -3,15 +3,13 @@
 import tkinter as tk
 import sys, time, cardReaderExceptions, io
 from cardReader import CardReader
-import os
-import parser
 from tkinter import *
-from tkinter import ttk
+from tkinter import ttk, messagebox, filedialog, font
 from tkinter.messagebox import *
-from tkinter import filedialog, simpledialog
-import sqlite3
-
-from sponsor import Sponsor
+import serial, serial.tools.list_ports
+import os, sqlite3, csv
+from datetime import datetime
+from advanced_functions import AdvancedFunctionsFrame
 
 class GUI(Frame):    
     def __init__(self, parent):
@@ -109,96 +107,134 @@ class GUI(Frame):
         except Exception as e:
             showerror("Error", f"Failed to write card: {str(e)}")
     
-    def decode_card(self):
-        """Decode the card data that was read from the MSR605 device."""
-        if not any(self.__tracks):
-            showerror("Error", "No card data to decode. Please read a card first.")
+    def show_advanced_functions(self):
+        """Show the advanced functions window with card data."""
+        if not hasattr(self, '_GUI__tracks') or not any(self.__tracks):
+            showerror("Error", "No track data available. Please read a card first.")
             return
             
-        try:
-            # Create a new window to display the decoded data
-            decode_win = Toplevel()
-            decode_win.title("Decoded Card Data")
-            decode_win.geometry("600x400")
+        if not hasattr(self, '_advanced_window') or not self._advanced_window.winfo_exists():
+            self._advanced_window = Toplevel(self)
+            self._advanced_window.title("Advanced Card Functions")
             
-            # Create a text widget to display the decoded data
-            text_widget = Text(decode_win, wrap=WORD, width=80, height=20)
-            text_widget.pack(padx=10, pady=10, fill=BOTH, expand=True)
+            # Set window size and position
+            window_width = 900
+            window_height = 800
+            screen_width = self._advanced_window.winfo_screenwidth()
+            screen_height = self._advanced_window.winfo_screenheight()
+            center_x = int(screen_width/2 - window_width/2)
+            center_y = int(screen_height/2 - window_height/2)
+            self._advanced_window.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
             
-            # Add scrollbar
-            scrollbar = Scrollbar(decode_win, command=text_widget.yview)
-            scrollbar.pack(side=RIGHT, fill=Y)
-            text_widget.config(yscrollcommand=scrollbar.set)
+            # Create and pack the advanced functions frame
+            self.advanced_frame = AdvancedFunctionsFrame(self._advanced_window, tracks=self.__tracks)
+            self.advanced_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
             
-            # Display decoded data for each track
-            for i, track in enumerate(self.__tracks, 1):
-                if track and not track.startswith("Error"):
-                    text_widget.insert(END, f"=== Track {i} ===\n")
-                    text_widget.insert(END, f"Raw: {track}\n")
-                    
-                    # Basic decoding for track 2 (financial cards)
-                    if i == 2 and '=' in track and ';' in track:
-                        try:
-                            # Extract PAN (Primary Account Number)
-                            pan = track.split(';')[1].split('=')[0]
-                            # Extract expiration date (YYMM)
-                            exp_date = track.split('=')[1][:4]
-                            # Extract service code
-                            service_code = track.split('=')[1][4:7]
-                            
-                            text_widget.insert(END, f"Decoded Track 2:\n")
-                            text_widget.insert(END, f"  PAN: {pan}\n")
-                            text_widget.insert(END, f"  Expiration: {exp_date[2:]}/{exp_date[:2]}\n")
-                            text_widget.insert(END, f"  Service Code: {service_code}\n")
-                        except Exception as e:
-                            text_widget.insert(END, f"  Error decoding Track 2: {str(e)}\n")
-                    
-                    text_widget.insert(END, "\n")
+            # Add a close button at the bottom
+            ttk.Button(
+                self._advanced_window,
+                text="Close",
+                command=self._advanced_window.destroy
+            ).pack(pady=10)
             
-            # Disable text widget for read-only
-            text_widget.config(state=DISABLED)
-            
-            # Add close button
-            Button(decode_win, text="Close", command=decode_win.destroy).pack(pady=10)
-            
-        except Exception as e:
-            showerror("Error", f"Failed to decode card data: {str(e)}")
+            # Handle window close
+            self._advanced_window.protocol("WM_DELETE_WINDOW", self._advanced_window.destroy)
+        else:
+            # Update track data if window already exists
+            self.advanced_frame.set_tracks(self.__tracks)
+            self._advanced_window.lift()
+            self._advanced_window.focus_force()
     
-    def read_card(self):
-        """Read data from a card using the MSR605 device."""
+    def read_card(self, max_retries: int = 2):
+        """
+        Read data from a card using the MSR605 device.
+        
+        Args:
+            max_retries: Maximum number of retry attempts for reading each track
+        """
         if not hasattr(self, '_GUI__msr') or not self.__connected:
             showerror("Error", "MSR605 is not connected")
             return
+        
+        def clean_track_data(track_data: str) -> str:
+            """Clean and validate track data."""
+            if not track_data:
+                return ''
+                
+            # Remove any non-printable characters
+            cleaned = ''.join(char for char in track_data if 32 <= ord(char) <= 126)
+            
+            # Check for common error patterns
+            error_patterns = [
+                'READ ERROR',
+                'ESCAPE(',
+                'ERROR',
+                'FAILED'
+            ]
+            
+            if any(pattern in cleaned.upper() for pattern in error_patterns):
+                return ''
+                
+            return cleaned
             
         try:
             print("\nATTEMPTING TO READ FROM CARD (SWIPE NOW)")
             
             # Reset track data
             self.__tracks = ['', '', '']
+            read_success = False
             
             try:
-                # Try to read all tracks at once
-                tracks = self.__msr.read_card()
-                
-                # Make sure we got a list with 3 tracks
-                if isinstance(tracks, (list, tuple)) and len(tracks) == 3:
-                    self.__tracks = [str(track) if track is not None else '' for track in tracks]
-                else:
-                    raise ValueError("Unexpected track data format")
-                    
-            except cardReaderExceptions.CardReadError as e:
-                # If reading all tracks at once fails, try reading tracks individually
-                print("Reading all tracks at once failed, trying individual tracks...")
-                for i in range(3):
+                # Try to read all tracks at once first
+                for attempt in range(max_retries + 1):
                     try:
-                        track_data = self.__msr.read_track(i + 1)
-                        self.__tracks[i] = str(track_data) if track_data is not None else ''
-                    except (cardReaderExceptions.CardReadError, AttributeError) as e:
-                        self.__tracks[i] = f"Error reading track {i+1}: {str(e)}"
-                        continue
+                        tracks = self.__msr.read_card()
+                        if isinstance(tracks, (list, tuple)) and len(tracks) == 3:
+                            self.__tracks = [
+                                clean_track_data(str(track) if track is not None else '')
+                                for track in tracks
+                            ]
+                            if any(self.__tracks):  # If any track has data
+                                read_success = True
+                                break
+                    except (cardReaderExceptions.CardReadError, Exception) as e:
+                        if attempt == max_retries:
+                            print(f"Final attempt failed: {str(e)}")
+                            raise
+                        time.sleep(0.5)  # Small delay before retry
+                
+                # If reading all tracks failed or returned no data, try individual tracks
+                if not read_success:
+                    print("Reading all tracks at once failed, trying individual tracks...")
+                    for i in range(3):
+                        for attempt in range(max_retries + 1):
+                            try:
+                                track_data = self.__msr.read_track(i + 1)
+                                cleaned_data = clean_track_data(str(track_data) if track_data is not None else '')
+                                if cleaned_data:  # Only update if we got valid data
+                                    self.__tracks[i] = cleaned_data
+                                    read_success = True
+                                break  # Move to next track if successful
+                            except (cardReaderExceptions.CardReadError, AttributeError) as e:
+                                if attempt == max_retries:
+                                    self.__tracks[i] = ''  # Clear track on final failure
+                                    print(f"Failed to read track {i+1}: {str(e)}")
+                                time.sleep(0.5)  # Small delay before retry
+                            
+            except Exception as e:
+                error_msg = f"Error reading card: {str(e)}"
+                print(error_msg)
+                self.exception_error_reset("Read Error", error_msg)
+                return
             
             # Update the UI with the read data
             self.__update_track_entries()
+            
+            # Show appropriate status message
+            if read_success:
+                showinfo("Success", "Card read successfully!")
+            else:
+                showerror("Error", "Failed to read card data. Please try again.")
             
             # Save to database if auto-save is enabled and we have some data
             if self.__autoSaveDatabase.get() and any(self.__tracks):
@@ -517,7 +553,7 @@ https://github.com/Nsfr750/MSR605"""
         readWriteEraseButtons.pack(side=TOP, padx=10, pady=10, anchor=N)
         Label(readWriteEraseButtons, text="READ/WRITE\n/ERASE CARDS", padx=10, pady=10, font=('Helvetica', 10, 'underline')).pack(side=TOP)
         Button(readWriteEraseButtons, text="READ CARD", command=self.read_card).pack(side=TOP)
-        Button(readWriteEraseButtons, text="DECODE CARD", command=self.decode_card).pack(side=TOP)
+        Button(readWriteEraseButtons, text="ADVANCED FUNCTIONS", command=self.show_advanced_functions).pack(side=TOP)
         Button(readWriteEraseButtons, text="DECRYPT CARD", command=self.decrypt_card).pack(side=TOP)
         Button(readWriteEraseButtons, text="WRITE CARD", command=self.write_card).pack(side=TOP)
         Button(readWriteEraseButtons, text="ERASE CARD", command=self.erase_card).pack(side=TOP)
