@@ -2,12 +2,8 @@
 
 ## High Priority
 - [ ] Add project description
-- [ ] Set up development environment
-- [ ] Initialize version control (if not already done)
 
 ## Medium Priority
-- [ ] Add project documentation
-- [ ] Set up testing framework
 - [ ] Implement core functionality
 
 ## Low Priority
@@ -17,3 +13,7 @@
 
 ## Completed
 - [x] Create TO_DO.md
+- [x] Set up development environment
+- [x] Set up testing framework
+
+## 
