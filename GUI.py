@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
 import tkinter as tk
-import sys, time, cardReaderExceptions, cardReader
+import sys, time, cardReaderExceptions, io
+from cardReader import CardReader
 import os
+import parser
 from tkinter import *
 from tkinter import ttk
 from tkinter.messagebox import *
@@ -42,6 +44,256 @@ class GUI(Frame):
         self.init_database()
         
         self.build_main_window()
+    
+    def erase_card(self):
+        """Erase all tracks on the card using the MSR605 device."""
+        if not self.__msr or not self.__connected:
+            showerror("Error", "MSR605 is not connected")
+            return
+            
+        try:
+            # Confirm before erasing
+            if not askyesno("Confirm Erase", "This will erase ALL data on the card. Are you sure?"):
+                return
+                
+            # Erase all three tracks
+            for i in range(3):
+                try:
+                    self.__msr.erase_track(i + 1)
+                except cardReaderExceptions.CardEraseError as e:
+                    showerror("Erase Error", f"Failed to erase track {i+1}: {str(e)}")
+                    return
+            
+            # Clear the track data in memory and UI
+            self.__tracks = ['', '', '']
+            self.__update_track_entries()
+            
+            showinfo("Success", "Card erased successfully!")
+            
+        except Exception as e:
+            showerror("Error", f"Failed to erase card: {str(e)}")
+    
+    def write_card(self):
+        """Write data to a card using the MSR605 device."""
+        if not self.__msr or not self.__connected:
+            showerror("Error", "MSR605 is not connected")
+            return
+            
+        # Get the current track data from the UI
+        self.__tracks = [
+            self.__trackOneEntry.get("1.0", END).strip(),
+            self.__trackTwoEntry.get("1.0", END).strip(),
+            self.__trackThreeEntry.get("1.0", END).strip()
+        ]
+        
+        if not any(self.__tracks):
+            showerror("Error", "No track data to write. Please enter data in at least one track.")
+            return
+            
+        try:
+            # Confirm before writing
+            if not askyesno("Confirm Write", "This will overwrite the card data. Are you sure?"):
+                return
+                
+            # Write each track that has data
+            for i, track_data in enumerate(self.__tracks):
+                if track_data:  # Only write if there's data for this track
+                    try:
+                        self.__msr.write_track(i + 1, track_data)
+                    except cardReaderExceptions.CardWriteError as e:
+                        showerror("Write Error", f"Failed to write track {i+1}: {str(e)}")
+                        return
+            
+            showinfo("Success", "Card written successfully!")
+            
+        except Exception as e:
+            showerror("Error", f"Failed to write card: {str(e)}")
+    
+    def decode_card(self):
+        """Decode the card data that was read from the MSR605 device."""
+        if not any(self.__tracks):
+            showerror("Error", "No card data to decode. Please read a card first.")
+            return
+            
+        try:
+            # Create a new window to display the decoded data
+            decode_win = Toplevel()
+            decode_win.title("Decoded Card Data")
+            decode_win.geometry("600x400")
+            
+            # Create a text widget to display the decoded data
+            text_widget = Text(decode_win, wrap=WORD, width=80, height=20)
+            text_widget.pack(padx=10, pady=10, fill=BOTH, expand=True)
+            
+            # Add scrollbar
+            scrollbar = Scrollbar(decode_win, command=text_widget.yview)
+            scrollbar.pack(side=RIGHT, fill=Y)
+            text_widget.config(yscrollcommand=scrollbar.set)
+            
+            # Display decoded data for each track
+            for i, track in enumerate(self.__tracks, 1):
+                if track and not track.startswith("Error"):
+                    text_widget.insert(END, f"=== Track {i} ===\n")
+                    text_widget.insert(END, f"Raw: {track}\n")
+                    
+                    # Basic decoding for track 2 (financial cards)
+                    if i == 2 and '=' in track and ';' in track:
+                        try:
+                            # Extract PAN (Primary Account Number)
+                            pan = track.split(';')[1].split('=')[0]
+                            # Extract expiration date (YYMM)
+                            exp_date = track.split('=')[1][:4]
+                            # Extract service code
+                            service_code = track.split('=')[1][4:7]
+                            
+                            text_widget.insert(END, f"Decoded Track 2:\n")
+                            text_widget.insert(END, f"  PAN: {pan}\n")
+                            text_widget.insert(END, f"  Expiration: {exp_date[2:]}/{exp_date[:2]}\n")
+                            text_widget.insert(END, f"  Service Code: {service_code}\n")
+                        except Exception as e:
+                            text_widget.insert(END, f"  Error decoding Track 2: {str(e)}\n")
+                    
+                    text_widget.insert(END, "\n")
+            
+            # Disable text widget for read-only
+            text_widget.config(state=DISABLED)
+            
+            # Add close button
+            Button(decode_win, text="Close", command=decode_win.destroy).pack(pady=10)
+            
+        except Exception as e:
+            showerror("Error", f"Failed to decode card data: {str(e)}")
+    
+    def read_card(self):
+        """Read data from a card using the MSR605 device."""
+        if not hasattr(self, '_GUI__msr') or not self.__connected:
+            showerror("Error", "MSR605 is not connected")
+            return
+            
+        try:
+            print("\nATTEMPTING TO READ FROM CARD (SWIPE NOW)")
+            
+            # Reset track data
+            self.__tracks = ['', '', '']
+            
+            try:
+                # Try to read all tracks at once
+                tracks = self.__msr.read_card()
+                
+                # Make sure we got a list with 3 tracks
+                if isinstance(tracks, (list, tuple)) and len(tracks) == 3:
+                    self.__tracks = [str(track) if track is not None else '' for track in tracks]
+                else:
+                    raise ValueError("Unexpected track data format")
+                    
+            except cardReaderExceptions.CardReadError as e:
+                # If reading all tracks at once fails, try reading tracks individually
+                print("Reading all tracks at once failed, trying individual tracks...")
+                for i in range(3):
+                    try:
+                        track_data = self.__msr.read_track(i + 1)
+                        self.__tracks[i] = str(track_data) if track_data is not None else ''
+                    except (cardReaderExceptions.CardReadError, AttributeError) as e:
+                        self.__tracks[i] = f"Error reading track {i+1}: {str(e)}"
+                        continue
+            
+            # Update the UI with the read data
+            self.__update_track_entries()
+            
+            # Save to database if auto-save is enabled and we have some data
+            if self.__autoSaveDatabase.get() and any(self.__tracks):
+                self.__save_to_database()
+                
+            # Show success message if at least one track was read successfully
+            if any(track and not str(track).startswith("Error") for track in self.__tracks):
+                showinfo("Success", "Card read successfully!")
+            else:
+                showerror("Error", "Failed to read any track data from the card")
+                
+        except Exception as e:
+            showerror("Error", f"Failed to read card: {str(e)}")
+            # Reset tracks on error
+            self.__tracks = ['', '', '']
+            self.__update_track_entries()
+    
+    def __update_track_entries(self):
+        """Update the track entry fields with the current track data."""
+        for entry, data in zip([self.__trackOneEntry, self.__trackTwoEntry, self.__trackThreeEntry], self.__tracks):
+            entry.delete(1.0, END)
+            entry.insert(1.0, data)
+    
+    def __save_to_database(self):
+        """Save the current track data to the database."""
+        try:
+            timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+            self.__db_cursor.execute(
+                """
+                INSERT INTO card_reads (timestamp, track1, track2, track3)
+                VALUES (?, ?, ?, ?)
+                """,
+                (timestamp, self.__tracks[0], self.__tracks[1], self.__tracks[2])
+            )
+            self.__db_conn.commit()
+        except Exception as e:
+            showerror("Database Error", f"Failed to save to database: {str(e)}")
+    
+    def coercivity_change(self):
+        """Handle coercivity radio button changes."""
+        if not self.__msr or not self.__connected:
+            return
+            
+        try:
+            if self.__coercivityRadioBtnValue.get() == 'hi':
+                self.__msr.set_hi_coercivity()
+            else:
+                self.__msr.set_lo_coercivity()
+        except Exception as e:
+            showerror("Error", f"Failed to change coercivity: {str(e)}")
+    
+    def connect_to_msr605(self):
+        """Connect to the MSR605 device."""
+        try:
+            self.__msr = CardReader()
+            self.__connected = True
+            self.__connectedLabelIndicator.config(text="MSR605 IS CONNECTED", fg='green')
+            showinfo("Success", "Successfully connected to MSR605 device")
+        except Exception as e:
+            self.__connected = False
+            self.__connectedLabelIndicator.config(text="MSR605 CONNECTION FAILED", fg='red')
+            showerror("Connection Error", f"Failed to connect to MSR605: {str(e)}")
+    
+    def exception_error_reset(self, title, error):
+        """Handle errors during decryption and reset the UI state."""
+        showerror(title, str(error))
+        # Reset any necessary UI elements here if needed
+        self.__tracks = ['', '', '']
+        self.__update_track_entries()
+    
+    def close_connection(self):
+        """Close the connection to the MSR605 device."""
+        if hasattr(self, '__msr') and self.__msr is not None:
+            try:
+                self.__msr.close_serial_connection()
+                self.__connected = False
+                self.__connectedLabelIndicator.config(text="MSR605 IS DISCONNECTED", fg='red')
+                showinfo("Success", "Successfully disconnected from MSR605 device")
+            except Exception as e:
+                showerror("Error", f"Error while disconnecting: {str(e)}")
+            finally:
+                self.__msr = None
+        # No need to show a message when there's no active connection
+        # This prevents the "No active connection to close" message
+    
+    def reset(self):
+        """Reset the MSR605 device."""
+        if self.__msr and self.__connected:
+            try:
+                self.__msr.reset()
+                showinfo("Success", "MSR605 has been reset")
+            except Exception as e:
+                showerror("Error", f"Failed to reset MSR605: {str(e)}")
+        else:
+            showerror("Error", "MSR605 is not connected")
     
     def init_database(self):
         try:
@@ -236,6 +488,7 @@ https://github.com/Nsfr750/MSR605"""
         Label(readWriteEraseButtons, text="READ/WRITE\n/ERASE CARDS", padx=10, pady=10, font=('Helvetica', 10, 'underline')).pack(side=TOP)
         Button(readWriteEraseButtons, text="READ CARD", command=self.read_card).pack(side=TOP)
         Button(readWriteEraseButtons, text="DECODE CARD", command=self.decode_card).pack(side=TOP)
+        Button(readWriteEraseButtons, text="DECRYPT CARD", command=self.decrypt_card).pack(side=TOP)
         Button(readWriteEraseButtons, text="WRITE CARD", command=self.write_card).pack(side=TOP)
         Button(readWriteEraseButtons, text="ERASE CARD", command=self.erase_card).pack(side=TOP)
 
@@ -269,248 +522,6 @@ https://github.com/Nsfr750/MSR605"""
         Button(advancedFrame, text="Read Raw Data", command=self.read_raw_data_gui).pack(side=TOP, fill=X)
         Button(advancedFrame, text="Write Raw Data", command=self.write_raw_data_gui).pack(side=TOP, fill=X)
 
-    
-           
-    def connect_to_msr605(self):        
-        if (self.__connected == True or self.__msr != None):
-            showinfo('Connecting', 'Reconnecting to MSR605')
-            self.close_connection()
-        
-        try:
-            self.__msr = cardReader.CardReader()
-        
-        except cardReaderExceptions.MSR605ConnectError as e:
-            self.__connected = False
-            self.__connectedLabelIndicator.config(text = "MSR605 IS NOT CONNECTED", fg = 'red')
-            showerror("Connect Error", e)
-            print (e)
-        
-        except cardReaderExceptions.CommunicationTestError as e:
-            self.__connected = False
-            self.__connectedLabelIndicator.config(text = "MSR605 IS NOT CONNECTED", fg = 'red')
-            showerror("Communication Error", e)            
-            print (e)
-        
-        else:
-            self.__connected = True
-            self.__connectedLabelIndicator.config(text = "MSR605 IS CONNECTED", fg = 'green')
-            showinfo('MSR605 Initialize', 'MSR605 Successfully Connected')
-            self.init_database()
-    
-    
-    def close_connection(self):
-        if (self.__connected == True or self.__msr != None):
-            self.__msr.close_serial_connection()
-            self.__connected = False
-            self.__connectedLabelIndicator.config(text = "MSR605 IS NOT CONNECTED", fg = 'red')
-            self.__msr = None
-        
-        else:
-            showinfo('Close Connection', 'MSR605 is not connected')
-    
-    def exception_error_reset(self, title, text):
-        showerror(title, text)
-        
-        showinfo("Resetting", "Resetting MSR605 because of error")
-        self.reset()
-        
-        
-    def coercivity_change(self):
-        if (self.__connected == False or self.__msr == None):
-            showerror("Connect Error", "The MSR605 is not connected")
-            return None
-        
-        rdbSelection = self.__coercivityRadioBtnValue.get()        
-        
-        try:
-            if (rdbSelection == 'hi'):            
-                self.__msr.set_hi_co()
-            elif (rdbSelection == 'low'):
-                self.__msr.set_low_co()
-                
-        except cardReaderExceptions.SetCoercivityError as e :
-            self.exception_error_reset("Setting Coercivity Error", e)
-            print (e)            
-        
-        else:
-            showinfo("Setting Coercivity", "Coercivity has been set, now checking Coercivity ")
-            
-            try:
-                coercivity = self.__msr.get_hi_or_low_co()
-            except cardReaderExceptions.GetCoercivityError as e :
-                self.exception_error_reset("Getting Coercivity Error", e)
-                print (e)
-            else:
-                showinfo("Getting Coercivity", "Coercivity has been set to " + coercivity)
-            
-            
-            
-    def read_card(self):
-        if (self.__connected == False or self.__msr == None):
-            showerror("Connect Error", "The MSR605 is not connected")
-            return None
-            
-        try:
-            self.__tracks = self.__msr.read_card()
-        except cardReaderExceptions.CardReadError as e :
-            self.exception_error_reset("Connect Error", e)
-            print (e)
-            
-            self.__trackOneEntry.delete(1.0, END)
-            self.__trackTwoEntry.delete(1.0, END)
-            self.__trackThreeEntry.delete(1.0, END)
-            
-            self.__trackOneEntry.insert(END, e.tracks[0])
-            self.__trackTwoEntry.insert(END, e.tracks[1])
-            self.__trackThreeEntry.insert(END, e.tracks[2])
-            
-            if (self.__autoSaveDatabase.get() == True):
-                
-                if (self.__enableDuplicates.get() == False):
-                    
-                    self.__db_cursor.execute("""SELECT * FROM cards WHERE trackOne=? AND trackTwo=? AND trackThree=?""", (self.__tracks[0], self.__tracks[1], self.__tracks[2]))
-                
-                    result = self.__db_cursor.fetchone()
-
-                    if (result != None):
-                        showinfo("Duplicate", "This card already exists in the Database, please enable Duplicates in the Database dropdown to add it")
-                    
-                    else:
-                        self.__db_cursor.execute("""INSERT INTO cards(trackOne, trackTwo, trackThree) VALUES(?, ?, ?)""", (self.__tracks[0], self.__tracks[1], self.__tracks[2]))                    
-                        self.__db_conn.commit()                
-                else:                
-                    self.__db_cursor.execute("""INSERT INTO cards(trackOne, trackTwo, trackThree) VALUES(?, ?, ?)""", (self.__tracks[0], self.__tracks[1], self.__tracks[2]))                    
-                    self.__db_conn.commit()
-            
-            
-            else:
-                showinfo("Autosave to Database","Autosave is turned off in the Database menu dropdown, please \nselect it if you wish to store the cards that are read in")
-            
-            
-            return None
-    
-        except cardReaderExceptions.StatusError as e :
-            self.exception_error_reset("Connect Error", e)
-            print (e)
-            return None
-        
-        else:
-            self.__trackOneEntry.delete(1.0, END)
-            self.__trackTwoEntry.delete(1.0, END)
-            self.__trackThreeEntry.delete(1.0, END)
-            
-            self.__trackOneEntry.insert(END, self.__tracks[0] if self.__tracks[0] is not None else "")
-            self.__trackTwoEntry.insert(END, self.__tracks[1] if self.__tracks[1] is not None else "")
-            self.__trackThreeEntry.insert(END, self.__tracks[2] if self.__tracks[2] is not None else "")
-        
-            if (self.__autoSaveDatabase.get() == True):
-                
-                if (self.__enableDuplicates.get() == False):
-                    
-                    self.__db_cursor.execute("""SELECT * FROM cards WHERE trackOne=? AND trackTwo=? AND trackThree=?""", (self.__tracks[0], self.__tracks[1], self.__tracks[2]))
-                
-                    result = self.__db_cursor.fetchone()
-                    
-                    if (result != None):
-                        showinfo("Duplicate", "This card already exists in the Database, please enable Duplicates in the Database dropdown to add it")
-                    
-                    else:
-                        self.__db_cursor.execute("""INSERT INTO cards(trackOne, trackTwo, trackThree) VALUES(?, ?, ?)""", (self.__tracks[0], self.__tracks[1], self.__tracks[2]))                    
-                        self.__db_conn.commit()                
-                else:                
-                    self.__db_cursor.execute("""INSERT INTO cards(trackOne, trackTwo, trackThree) VALUES(?, ?, ?)""", (self.__tracks[0], self.__tracks[1], self.__tracks[2]))                    
-                    self.__db_conn.commit()
-            else:
-                showinfo("Autosave to Database","Autosave is turned off in the Database menu dropdown, please \nselect it if you wish to store the cards that are read in")
-            
-                
-    def write_card(self):
-        if (self.__connected == False or self.__msr == None):
-            showerror("Connect Error", "The MSR605 is not connected")
-            return None
-        
-        tracks = [self.__trackOneEntry.get(1.0, END)[:-1], self.__trackTwoEntry.get(1.0, END)[:-1], self.__trackThreeEntry.get(1.0, END)[:-1]]
-
-        showinfo("Swipe Card", "Please swipe card after hitting OK")
-        
-        try:        
-            self.__tracks = self.__msr.write_card(tracks, True)
-        
-        except cardReaderExceptions.CardWriteError as  e :
-            self.exception_error_reset("Write Error", e)
-            print(e)
-            return None
-        
-        except cardReaderExceptions.StatusError as e :
-            self.exception_error_reset("Write Error", e)
-            print(e)
-            return None
-        
-        else:
-            showinfo("Write", "Tracks have been written to the Card")
-        
-    def erase_card(self):
-        if (self.__connected == False or self.__msr == None):
-            showerror("Connect Error", "The MSR605 is not connected")
-            return None
-        
-        showinfo("Erase Card", "Please swipe card after hitting OK")
-        
-        #
-        #
-        #CHECK THIS************
-        #
-        #
-        try:
-            self.__msr.erase_card(7) #all tracks are erased
-        
-        except cardReaderExceptions.EraseCardError as e :
-            self.exception_error_reset("Erase Error", e)
-            print (e)
-            return None
-        
-        else:
-            showinfo("Erase Card", "Successfully Erased Card")
-            
-            
-    def led_change(self, whichLeds):
-        if (self.__connected == False or self.__msr == None):
-            showerror("Connect Error", "The MSR605 is not connected")
-            return None
-       
-        if (whichLeds == "on"):
-            self.__msr.led_on()
-            showinfo("LED'S", "All LED's On")
-            return None
-            
-        elif (whichLeds == "off"):
-            self.__msr.led_off()
-            showinfo("LED'S", "All LED's Off")
-            return None
-        
-        elif (whichLeds == "green"):
-            self.__msr.green_led_on()
-            showinfo("LED'S", "Green LED On")
-            return None
-            
-        elif (whichLeds == "yellow"):
-            self.__msr.yellow_led_on()
-            showinfo("LED'S", "Yellow LED On")
-            return None
-            
-        elif (whichLeds == "red"):
-            self.__msr.red_led_on()
-            showinfo("LED'S", "Red LED On")
-            return None
-            
-    def reset(self):
-        if (self.__connected == False or self.__msr == None):
-            showerror("Reset Error", "The MSR605 is not connected")
-            return None
-        
-        self.__msr.reset()
-        showinfo("Reset", "The MSR605 has been reset")
-    
     def communication_test(self):
         if (self.__connected == False or self.__msr == None):
             showerror("Connect Error", "The MSR605 is not connected")
@@ -518,23 +529,15 @@ https://github.com/Nsfr750/MSR605"""
         
         try:
             self.__msr.communication_test()
-        
-        except cardReaderExceptions.CommunicationTestError as e :
+        except cardReaderExceptions.CommunicationTestError as e:
             self.exception_error_reset("Communication Test Error", e)
-            print (e)
+            print(e)
             return None
-        
         else:
             showinfo("Communication Test", "Communication between your computer and the MSR605 is good")
         
-    def decode_card(self):
-        if (self.__connected == False or self.__msr == None):
-            showerror("Connect Error", "The MSR605 is not connected")
-            return None
-
-        import io
-        import sys
-        import parser
+    def decrypt_card(self):
+        """Decrypt the card data using the decrypt.py module."""
         output = io.StringIO()
         old_stdout = sys.stdout
         try:
