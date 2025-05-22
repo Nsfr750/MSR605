@@ -282,16 +282,35 @@ class GUI(Frame):
     
     def close_connection(self):
         """Close the connection to the MSR605 device."""
-        if hasattr(self, '__msr') and self.__msr is not None:
-            try:
-                self.__msr.close_serial_connection()
+        try:
+            if hasattr(self, '_GUI__msr') and self.__msr is not None:
+                try:
+                    # Try to close the connection gracefully
+                    if hasattr(self.__msr, 'close_serial_connection'):
+                        self.__msr.close_serial_connection()
+                    elif hasattr(self.__msr, 'close'):
+                        self.__msr.close()
+                    
+                    self.__connected = False
+                    self.__connectedLabelIndicator.config(text="MSR605 IS DISCONNECTED", fg='red')
+                    showinfo("Success", "Successfully disconnected from MSR605 device")
+                except Exception as e:
+                    showerror("Error", f"Error while disconnecting: {str(e)}")
+                finally:
+                    self.__msr = None
+                    self.__connected = False
+            else:
+                # If we get here, there was no active connection
                 self.__connected = False
                 self.__connectedLabelIndicator.config(text="MSR605 IS DISCONNECTED", fg='red')
-                showinfo("Success", "Successfully disconnected from MSR605 device")
-            except Exception as e:
-                showerror("Error", f"Error while disconnecting: {str(e)}")
-            finally:
-                self.__msr = None
+        except Exception as e:
+            # Handle any unexpected errors
+            showerror("Error", f"Unexpected error while disconnecting: {str(e)}")
+        finally:
+            # Ensure these are always set on exit
+            self.__connected = False
+            if hasattr(self, '_GUI__connectedLabelIndicator'):
+                self.__connectedLabelIndicator.config(text="MSR605 IS DISCONNECTED", fg='red')
         # No need to show a message when there's no active connection
         # This prevents the "No active connection to close" message
     
