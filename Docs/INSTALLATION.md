@@ -78,4 +78,4 @@ rm -rf MSR605
 ```
 
 ## Support
-For installation issues, contact support@nsfr750.com or open a GitHub issue.
+For installation issues, contact nsfr750@yandex.com or open a GitHub issue.
