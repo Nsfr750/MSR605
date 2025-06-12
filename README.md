@@ -98,7 +98,7 @@ Distributed under the GNU General Public License v3.0. See `LICENSE` for more in
 
 ## 💬 Support
 
-- 📧 Email: support@nsfr750.com
+- 📧 Email: nsfr750@yandex.com
 - 🌐 Website: https://github.com/Nsfr750/MSR605
 - 💸 Support the project: [Sponsor Link](https://github.com/sponsors/Nsfr750)
 
