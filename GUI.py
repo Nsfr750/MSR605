@@ -10,6 +10,7 @@ import serial, serial.tools.list_ports
 import os, sqlite3, csv
 from datetime import datetime
 from advanced_functions import AdvancedFunctionsFrame
+from updates import check_for_updates
 
 class GUI(Frame):    
     def __init__(self, parent):
@@ -25,6 +26,9 @@ class GUI(Frame):
         
         self.__enableDuplicates = BooleanVar()
         self.__enableDuplicates.set(False)
+        
+        # Add menu for update check
+        self.create_menu()
         
         self.__connected = False        
         self.__connectedLabelIndicator = None
@@ -42,6 +46,42 @@ class GUI(Frame):
         self.init_database()
         
         self.build_main_window()
+        
+    def create_menu(self):
+        """Create the application menu."""
+        menubar = Menu(root)
+        
+        # File menu
+        file_menu = Menu(menubar, tearoff=0)
+        file_menu.add_command(label="Exit", command=self.on_exit)
+        
+        # Help menu
+        help_menu = Menu(menubar, tearoff=0)
+        help_menu.add_command(label="Check for Updates", command=self.check_for_updates)
+        help_menu.add_separator()
+        help_menu.add_command(label="About", command=self.show_about)
+        
+        menubar.add_cascade(label="File", menu=file_menu)
+        menubar.add_cascade(label="Help", menu=help_menu)
+        
+        root.config(menu=menubar)
+    
+    def show_about(self):
+        """Show about dialog with version information."""
+        from version import get_version, get_version_info
+        info = get_version_info()
+        messagebox.showinfo(
+            "About",
+            f"MSR605 Reader/Writer\n"
+            f"Version: {get_version()}\n"
+            f"© 2024 MSR605 Project"
+        )
+    
+    def check_for_updates(self):
+        """Check for application updates."""
+        from version import get_version as get_current_version
+        current_version = get_current_version()
+        check_for_updates(parent=root, current_version=current_version)
     
     def erase_card(self):
         """Erase all tracks on the card using the MSR605 device."""
@@ -879,18 +919,35 @@ https://github.com/Nsfr750/MSR605"""
         
         showinfo("Bye Bye")
         root.destroy()
-        
-        
-from version import get_version
-
-root = tk.Tk()
-root.title(f"MSR605 Reader/Writer {get_version()}")
-root.minsize(700,600)
-gui = GUI(root)
-
-root.protocol("WM_DELETE_WINDOW", gui.on_exit)
-root.mainloop() 
 
 
-# Launch the status message after 1 millisecond (when the window is loaded)
-#root.after(1, update_status)
+def main():
+    """Main entry point for the application."""
+    global root
+    root = tk.Tk()
+    root.title(f"MSR605 Reader/Writer {get_version()}")
+    root.minsize(700, 600)
+    
+    def check_updates():
+        """Check for application updates."""
+        try:
+            from version import get_version as get_current_version
+            current_version = get_current_version()
+            check_for_updates(parent=root, current_version=current_version)
+        except Exception as e:
+            print(f"Error checking for updates: {e}")
+    
+    # Check for updates after the main window is initialized
+    root.after(1000, check_updates)
+    
+    gui = GUI(root)
+    root.protocol("WM_DELETE_WINDOW", gui.on_exit)
+    root.mainloop()
+
+
+if __name__ == "__main__":
+    from version import get_version
+    main()
+
+if __name__ == "__main__":
+    main()
