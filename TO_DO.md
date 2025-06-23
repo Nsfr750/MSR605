@@ -50,7 +50,7 @@
 - Web interface for remote access
 
 ## Notes
-- **Current Version**: 2.2.0
+- **Current Version**: 2.1.0
 - **Last Updated**: 2025-06-23
 - **Python Version**: 3.10+
 - **License**: GPL-3.0
