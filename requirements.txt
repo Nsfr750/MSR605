@@ -1,19 +1,21 @@
 # MSR605 Card Reader/Writer Dependencies
-# Last Updated: 2025-05-22
+# Last Updated: 2025-06-23
 
 # Core Dependencies
 pyserial>=3.5,<4.0  # For MSR605 communication
+cryptography>=41.0.0  # For encryption/decryption (AES, DES, 3DES)
 
 # GUI Dependencies
 tk>=8.6  # Included with Python, but version noted for reference
 
 # Development Dependencies
 pytest>=7.0.0  # For running tests
-black>=22.0.0  # Code formatting
-flake8>=4.0.0  # Linting
+black>=24.0.0  # Code formatting
+flake8>=6.0.0  # Linting
+python-dotenv>=1.0.0  # Environment variable management
 
 # Python Version
-python>=3.8,<3.13  # Tested Python versions
+python>=3.10,<3.13  # Tested Python versions
 
 # Note: The following are included in Python standard library:
 # - sqlite3 (database)
@@ -23,3 +25,6 @@ python>=3.8,<3.13  # Tested Python versions
 # - re (regular expressions)
 # - json (data serialization)
 # - time (timing functions)
+# - hashlib (hashing functions)
+# - logging (application logging)
+# - threading (concurrent operations)

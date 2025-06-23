@@ -5,6 +5,24 @@ All notable changes to the MSR605 Card Reader/Writer project will be documented 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- Support for Python 3.12
+- Enhanced error handling for hardware communication
+- New configuration options in `config.ini`
+- Additional test cases for better code coverage
+
+### Changed
+- Updated dependencies to their latest versions
+- Improved documentation and code comments
+- Optimized database operations
+
+### Fixed
+- Minor UI layout issues
+- Fixed potential memory leaks in card reading operations
+- Resolved issues with special character handling
+
 ## [2.1.0] - 2025-05-22
 
 ### Added
