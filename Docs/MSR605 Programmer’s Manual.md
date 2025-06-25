@@ -4,7 +4,7 @@
 
 ## (High & Low Coercivity)
 
-# Programmerís Manual
+# Programmer‚Äôs Manual
 
 Revision B
 
@@ -16,9 +16,9 @@ Table of Contents
 
 SECTION 1 INTRODUCTION.....................................................................3
 
-æ Accessories of MSR605.................................................................................3
+¬æ Accessories of MSR605.................................................................................3
 
-æ Warranty........................................................................................................3
+¬æ Warranty........................................................................................................3
 
 SECTION 2 GENERAL DESCRIPTION...................................................... 4
 
@@ -28,9 +28,9 @@ SECTION 4 SETUP.................................................................
 
 SECTION 5 UTILITIES TEST PROGRAM.................................................. 5
 
-æ System Requirement....................................................................................... 5
+¬æ System Requirement....................................................................................... 5
 
-æ Test Program Installation............................................................................... 5
+¬æ Test Program Installation............................................................................... 5
 
 SECTION 6 COMMAND AND RESPONSE................................................. 6
 
@@ -38,17 +38,17 @@ SECTION 7 DATA FORMAT...........................................................
 
 SECTION 8 COMMUNICATION SEQUENCE........................................... 13
 
-æ MSR 605 INITIALIZATION....................................................................... 13
+¬æ MSR 605 INITIALIZATION....................................................................... 13
 
-æ Write Data to MSR 605................................................................................ 13
+¬æ Write Data to MSR 605................................................................................ 13
 
-æ Read Data to MSR605................................................................................... 14
+¬æ Read Data to MSR605................................................................................... 14
 
 SECTION 9 ADDENDUM........................................................................... 15
 
-æ Write Data to Magnetic Card...................................................................... 15
+¬æ Write Data to Magnetic Card...................................................................... 15
 
-æ Write Raw Data to Magnetic Card.............................................................. 16
+¬æ Write Raw Data to Magnetic Card.............................................................. 16
 
 ```
 2
@@ -66,7 +66,7 @@ stripe ID or transaction card is used, one can find a related use for the versat
 The MSR605 is designed to offer a reading and writing solution of high and/or low coercivity cards that will
 attractively complement an existing system.
 
-æ Accessories of MSR
+¬æ Accessories of MSR
 
 ```
 Make sure all the following accessories are contained in your package:
@@ -75,9 +75,9 @@ Make sure all the following accessories are contained in your package:
 2. Power cord.
 3. Signal cable (USB).
 4. Utility disk (A/P S/W).
-5. Programmerís manual.
+5. Programmer‚Äôs manual.
 
-æ Warranty
+¬æ Warranty
 
 ```
 One year after purchase of MSR605, any alteration and/or erasure or modification of the MSR605 will void the
@@ -121,9 +121,9 @@ Swipe Manual, single direction
 Outline 212Lx64Wx63H mm
 Weight 1.4Kg approx.
 Environment
-Operation -10∫C to 60∫C
+Operation -10¬∫C to 60¬∫C
 10 to 85% humidity, non condensing
-Storage -30∫C to 70∫C
+Storage -30¬∫C to 70¬∫C
 10 to 90% humidity, non condensing
 Performance
 Track 1&3 210bpi
@@ -174,27 +174,27 @@ Every MSR605 comes with a utilities test program disk that includes a Windows ve
 and demonstrate the functionality of the MSR605. In some cases, it can be used as a card reading and writing
 program.
 
-æ System Requirement
+¬æ System Requirement
 
 1. 80286 PC/AT compatibles or later model with color display.
 2. Either the following operating systems: Windows 95,98,2000,XP,VISTA
 3. 256K available conventional memory.
 4. A free serial port (Com 1 or Com 2) with DB9 male connector.
 
-æ Test Program Installation
+¬æ Test Program Installation
 
 ```
 User shall follow the steps below in order to install test program.
 A. Connect MSR605 to USB port, and power on it.
-B. Execute test program from the subdirectory of ëDemo APí (e.g. MSR605.exe)
+B. Execute test program from the subdirectory of ‚ÄòDemo AP‚Äô (e.g. MSR605.exe)
 D. When the test program is first opened, a password dialog box will ask whether you wish a first time
 password.
-D The test program will auto-detect communication port. If there is any errors occurred, itíll appear in the
+D The test program will auto-detect communication port. If there is any errors occurred, it‚Äôll appear in the
 information dialog box after opening the program. User can close the AP by pressing OK button.
-E. If ìNot Find Reader/Writer!î appears in the information dialog box after opening the program, check to
+E. If ‚ÄúNot Find Reader/Writer!‚Äù appears in the information dialog box after opening the program, check to
 see that the USB connector is plugged into the correct USB port and the power cord/connector is also
 attached to USB thus lighting the green LED on the MSR605.
-F. When the test program is opened, youíll see the main window of the READER/WRITER UTILITY
+F. When the test program is opened, you‚Äôll see the main window of the READER/WRITER UTILITY
 PROGRAM.
 From this main window you can activate all functions by clicking the appropriate buttons and following the
 on screen instructions.
@@ -632,7 +632,7 @@ Section 8 Communication Sequence
 
 The examples below assumes data on track1, 2 & 3 to be 01, 23, 45 respectively.
 
-æ MSR605 INITIALIZATION
+¬æ MSR605 INITIALIZATION
 
 ```
 HOST Direction MSR
@@ -656,7 +656,7 @@ Command code: <ESC>a
 HEX code: [1B][61]
 (Reset)
 ```
-æ Write Data to MSR
+¬æ Write Data to MSR
 
 ```
 HOST Direction MSR
@@ -681,7 +681,7 @@ Status =[30] no error
 Status =[31]~[3F] if error
 ```
 
-æ Read Data to MSR
+¬æ Read Data to MSR
 
 ```
 HOST Direction MSR
@@ -712,7 +712,7 @@ Status=[31]~[3F] if error
 
 Section 9 Addendum
 
-æ Write Data to Magnetic Card
+¬æ Write Data to Magnetic Card
 
 The WRITE command:
 Command WRITE
@@ -767,7 +767,7 @@ Status = [30] no error
 Status = [31] ~ [3F] if error
 ```
 
-æ Write Raw Data to Magnetic Card
+¬æ Write Raw Data to Magnetic Card
 
 Converting Card Data Information to Hexadecimal for the Binary Write Function
 Converting track one ASCll information into HEX
@@ -775,12 +775,12 @@ B5 0 0 1 1
 B3 B2 B1 B0 B4 0 1 0 1
 0 0 0 0 0 (sp) 0 @ P
 1 0 0 0 1! 1 A Q
-2 0 0 1 0 ì 2 B R
+2 0 0 1 0 ‚Äú 2 B R
 3 0 0 1 1 # 3 C S
 4 0 1 0 0 $ 4 D T
 5 0 1 0 1 % 5 E U
 6 0 1 1 0 & 6 F V
-7 0 1 1 1 ë 7 G W
+7 0 1 1 1 ‚Äò 7 G W
 8 1 0 0 0 ( 8 H X
 9 1 0 0 1 ) 9 I Y
 A 1 0 1 0 * : J Z
@@ -808,7 +808,7 @@ Data p B3 B2 B1 B
 > 0 1 1 1 0
 ? (*) 1 1 1 1 1
 
-* Note: The ì;î is start sentinel and ì?î is end sentinel of tk2 & 3 of ISO format.
+* Note: The ‚Äú;‚Äù is start sentinel and ‚Äú?‚Äù is end sentinel of tk2 & 3 of ISO format.
 
 
 As an example the following information will be written to the card:
@@ -851,11 +851,11 @@ C 1 1 0 0 0 1 0
 LRC 0 1 0 1 0 1 0
 ```
 Calculate Odd Parity (P column)
-If there is an Even Number of 1ís in the row of data for each character, put a 1 in the P column. Other wise, put a 0 in
+If there is an Even Number of 1‚Äôs in the row of data for each character, put a 1 in the P column. Other wise, put a 0 in
 the column.
 
 
-LRC: If there is an Even Number of 1ís in the column of data for each character, put a 0 in the LRC row. Other wise,
+LRC: If there is an Even Number of 1‚Äôs in the column of data for each character, put a 0 in the LRC row. Other wise,
 put a 0 in the row. The last LRC will be considered as the parity rule of this row.
 
 ```
@@ -958,7 +958,7 @@ C 1 1 0 0 0 1 0
 LRC 0 1 0 1 0 1 0
 ```
 Calculate Odd Parity (P column)
-If there is an Even Number of 1ís in the row of data for each character, put a 1 in the P column. Other wise, put a 0 in
+If there is an Even Number of 1‚Äôs in the row of data for each character, put a 1 in the P column. Other wise, put a 0 in
 
 
 the column.
