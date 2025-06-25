@@ -1,6 +1,4 @@
-```
-Printed on Oct 8, ’
-```
+
 ## Data Transmission Specifications
 
 ## 3S4YR-MVFW(DL)-0** Series
@@ -16,7 +14,7 @@ Rev. A4 Oct. 8, 1999
 ```
 ## Card Business Promotion Division
 
-## © OMRON Corporation 1997-
+## Â© OMRON Corporation 1997-
 
 ## All Rights Reserved.
 
@@ -138,7 +136,7 @@ VI. Character Code Expression Method III
    - 4.23 The Number of Down load Block ( 23 bytes ) 4- ii
    - 4.24 Down load Data ( 2054 bytes ) 4-
    - 4.25 Output port setting (2~16 bytes) 4-
-   - 4.26 Memory size of “USER” information ( 3 bytes ) 4-
+   - 4.26 Memory size of â€œUSERâ€ information ( 3 bytes ) 4-
    - 4.27 Output port setting time ( 4~30 bytes) 4-
    - 4.28 ICC Reference Standard(2 bytes) 4-
    - 4.29 Timer Value for Waiting for Reception (2 bytes) 4-
@@ -176,8 +174,8 @@ iii
 Rev. Date Page Content
 A0 Jun. 6, 97 -- Draft
 I Adds Applicable Card Reader/Writer
-3-3 Adds notice of *6 (“90”)
-3-4 Changes “P0” to deactivate and “P1” to activation.
+3-3 Adds notice of *6 (â€œ90â€)
+3-4 Changes â€œP0â€ to deactivate and â€œP1â€ to activation.
 4-6 Erases default value of 4.20 ( PTS/NAD setting ).
 E-1 Adds using restriction of DL matrix.
 ```
@@ -196,25 +194,25 @@ II Adds EMV 3.0, Errata 1.0 and EMV 3.1.1 in reference standards table.
 ```
 Adds requirement of various ICC standard. (Adds ICC Control
 Information and Version read of ICC control part commands.)
-3-4 Delete “after the time-out.” in the explanation of “C40”, “C41” and “C42”.
-3-4 Changes the positions of *1 to “Q1”,”N1”,”N2”,”N3” and “NA”.
-3-5 Changes the function of “6L” from “to Front” to “to Rear End”.
+3-4 Delete â€œafter the time-out.â€ in the explanation of â€œC40â€, â€œC41â€ and â€œC42â€.
+3-4 Changes the positions of *1 to â€œQ1â€,â€N1â€,â€N2â€,â€N3â€ and â€œNAâ€.
+3-5 Changes the function of â€œ6Lâ€ from â€œto Frontâ€ to â€œto Rear Endâ€.
 3-6,4-
 C-
 ```
 ```
-Deletes ICC setting commands(“CB”) and command parameters.
+Deletes ICC setting commands(â€œCBâ€) and command parameters.
 ```
 ```
 3-12 Changes Error code table(8/8).
 4-2 Changes Return Retry Number from 4 times to 3 times.
-4-8,5-5 Adds “Europay” in ICC reference standard
+4-8,5-5 Adds â€œEuropayâ€ in ICC reference standard
 ```
 ```
 A3 Jun. 7, 99
 ```
 ```
-5-1 Adds “3” in the parameter of Operating Status of Motor.
+5-1 Adds â€œ3â€ in the parameter of Operating Status of Motor.
 1-1,1-3,
 A-
 ```
@@ -303,22 +301,22 @@ IV. Reference Standards
 - ISO 2111: 1985-02-
     Data communication -Basic mode control procedures -
     Code independent information transfer
-- EMV 3.0: June 30 ‘
-    EMV ’96 Integrated Circuit Card Specification for Payment Systems
+- EMV 3.0: June 30 â€˜
+    EMV â€™96 Integrated Circuit Card Specification for Payment Systems
     Part I - Electromechanical Characteristics, Logical Interface, and Transmission Protocols
-- Errata 1.0: Jan 31 ‘
-    EMV ’96: ICC Specifications for Payment Systems
-- EMV 3.1.1: May 31 ‘
-    EMV ’96 Integrated Circuit Card Specification for Payment Systems
+- Errata 1.0: Jan 31 â€˜
+    EMV â€™96: ICC Specifications for Payment Systems
+- EMV 3.1.1: May 31 â€˜
+    EMV â€™96 Integrated Circuit Card Specification for Payment Systems
     Part I - Electromechanical Characteristics, Logical Interface, and Transmission Protocols
 
 
 ##### III
 
 V. Notice for IC card (ICC)
-OMRON standard ICC controller and FW (firm ware) can’t almost execute perfectly all customers ICC(s)
-because ISO standard and also ICC(s) is modified frequently. OMRON should check your customer’s ICC if
-you can get it and it’s specification.
+OMRON standard ICC controller and FW (firm ware) canâ€™t almost execute perfectly all customers ICC(s)
+because ISO standard and also ICC(s) is modified frequently. OMRON should check your customerâ€™s ICC if
+you can get it and itâ€™s specification.
 
 VI. Character Code Expression Method
 -XXH shows the HEX Code.
@@ -379,10 +377,10 @@ Character Code ASCII, Binary
 Error Detector Horizontal Parity Check (BCC) : even
 Vertical Parity Check : even
 Bit Sending Sequence LSB Priority
-*1 The HOST should sent one of “ Initial Reset “ command for transmission speed
+*1 The HOST should sent one of â€œ Initial Reset â€œ command for transmission speed
 setting between the HOST and the C/R right after power turns on or down loading
-processing completed correctly. If the HOST has sent a data except “Initial Reset” command( ex.
-DLE-EOT ), it should send “Initial Reset” command after 15 ms.
+processing completed correctly. If the HOST has sent a data except â€œInitial Resetâ€ command( ex.
+DLE-EOT ), it should send â€œInitial Resetâ€ command after 15 ms.
 ```
 ```
 1.2 Transmission Control Method
@@ -417,7 +415,7 @@ DLE 10H Transparent Mode control code in text
  - BCC is calculation result by an exclusive logic (XOR) from the Text beginning (after STX) to ETX.
 - However, the following are excluded from BCC calculation.
 DLE (10H) added by the Transparent Mode
-DLE (10H) of the Transmission Control Code “ DLE ETX “
+DLE (10H) of the Transmission Control Code â€œ DLE ETX â€œ
 -The BCC Vertical Parity is regarded as the BCC Parity.
 -The maximum transmission delay between each characters from the DLE to ETX, BCC of the HOST or
 the C/R is within 5 sec.
@@ -428,7 +426,7 @@ the C/R is within 5 sec.
 *1 [Transparent Mode]
 If "DLE(10H)" character is used in of the text as a part of command or response, double DLE(10H)
 must be transmitted as below for transmission.
-For details, see ISO 2111 “4. Presentation of data” and “5. Reception of data”.
+For details, see ISO 2111 â€œ4. Presentation of dataâ€ and â€œ5. Reception of dataâ€.
 ```
 ```
 DLE (10H) -> DLE DLE (10H 10H)
@@ -441,9 +439,9 @@ Text data Added DLE ( exclude BCC calculation )
 1.5 Transmission Control Procedure
 1.5.1 Transmission beginning
 Automatic recognition of Transmission speed (baud rate ) between the C/R and the HOST is done by
-one of the “ Initial Reset “ command from the HOST. Therefor , first of all, the HOST should send one of
-the “ Initial Reset “ command after power turns on. If the HOST has sent the data except “Initial Reset”
-command( ex. DLE-EOT ), it should send “Initial Reset” command after 15 ms.
+one of the â€œ Initial Reset â€œ command from the HOST. Therefor , first of all, the HOST should send one of
+the â€œ Initial Reset â€œ command after power turns on. If the HOST has sent the data except â€œInitial Resetâ€
+command( ex. DLE-EOT ), it should send â€œInitial Resetâ€ command after 15 ms.
 ```
 ```
 1.5.2 Normal Operation Sequence
@@ -693,8 +691,8 @@ status 1
 Ignores Ignores Ignores Ignores
 ```
 ```
-While the C/R is processing a command except DL processing, all characters except “ DLE EOT“ from
-HOST are ignored. Also, see Annex E about “DLE EOT” in DL processing.
+While the C/R is processing a command except DL processing, all characters except â€œ DLE EOTâ€œ from
+HOST are ignored. Also, see Annex E about â€œDLE EOTâ€ in DL processing.
 ```
 
 2 Time Chart of Transmission Control Signal Line
@@ -736,10 +734,10 @@ A Command is the text which indicates execution processing to the C/R from the H
 ```
 IDN CMD Command Parameter
 Length 1 2 Variable Length (0-2054 bytes)
-Data “C” See 3.3 For details , see 4
+Data â€œCâ€ See 3.3 For details , see 4
 ```
 ```
-IDN: Indicates code of the command. The code is “C” (43H).
+IDN: Indicates code of the command. The code is â€œCâ€ (43H).
 CMD: Indicates the command. (See 3.3)
 Command Parameter: This is defined as the details of CMD processing. However, there is also CMD
 without Command Parameter.
@@ -751,8 +749,8 @@ the command text which was sent from the HOST to the C/R.
 (1) JDG
 ```
 - The HOST should judge the processing results by the JDG Code in the Response Message.
-- “P” (50H) indicates a positive response which the processing had been completed normally.
-- “N” (4EH) indicates a negative response which the processing had been completed abnormally.
+- â€œPâ€ (50H) indicates a positive response which the processing had been completed normally.
+- â€œNâ€ (4EH) indicates a negative response which the processing had been completed abnormally.
 (2) RCM
 RCM in the Response Message is the same code as the command (CMD) which had been defined
 processing.
@@ -763,7 +761,7 @@ processing.
 ```
 JDG RCM RES Response data
 Length 1 2 2 Variable Length ( 0-320 bytes)
-Data “P” See 3.3 See 3.4.1 For details , see 5
+Data â€œPâ€ See 3.3 See 3.4.1 For details , see 5
 ```
 ```
 (1) RES
@@ -782,7 +780,7 @@ Data “P” See 3.3 See 3.4.1 For details , see 5
 ```
 JDG RCM RES Response data
 Length 1 2 2 Variable Length (0-62 bytes)
-Data “N” See 3.3 See 3.4.2 For details , see 3.
+Data â€œNâ€ See 3.3 See 3.4.2 For details , see 3.
 ```
 ```
 (1) RES
@@ -793,7 +791,7 @@ HOST (See 3.4.2 )
 - Response data is only added as a response when an error occurred and the command is defined
     which is requested Error Track Number(s) or ATR. (See 3.3)
 - Response data is only added as a response when a command is defined which is requested
-    response data when DL processing is executing or new FW loading hasn’t yet completed in DL
+    response data when DL processing is executing or new FW loading hasnâ€™t yet completed in DL
     processing. ( See 3.3 Annex E )
 
 
@@ -826,7 +824,7 @@ Parameters Ref.
 ```
 Response
 Data Ref.
-“00” Initializes the C/R then returns card to takeout position if card
+â€œ00â€ Initializes the C/R then returns card to takeout position if card
 is in the C/R.
 ```
 ```
@@ -837,7 +835,7 @@ Data
 4.1 None -
 ```
 ```
-“01” Initializes the C/R then ejects card through to rear-end if card
+â€œ01â€ Initializes the C/R then ejects card through to rear-end if card
 is in the C/R.
 ```
 ```
@@ -848,7 +846,7 @@ Data
 4.1 None -
 ```
 ```
-“02” Initializes the C/R then holds card in standby position if card is
+â€œ02â€ Initializes the C/R then holds card in standby position if card is
 in the C/R.
 ```
 ```
@@ -859,7 +857,7 @@ Data
 4.1 None -
 ```
 ```
-“04” Initializes the C/R then returns card to takeout position if card
+â€œ04â€ Initializes the C/R then returns card to takeout position if card
 is in the C/R (No shutter control when no card is in).
 ```
 ```
@@ -870,7 +868,7 @@ Data
 4.1 None -
 ```
 ```
-“05” Initializes the C/R then ejects card through to rear-end if card
+â€œ05â€ Initializes the C/R then ejects card through to rear-end if card
 is in the C/R (No shutter control).
 ```
 ```
@@ -885,7 +883,7 @@ Initial Reset
 *
 ```
 ```
-“06” Initializes the C/R then holds card in standby position if card is
+â€œ06â€ Initializes the C/R then holds card in standby position if card is
 in the C/R (No shutter control).
 ```
 ```
@@ -896,9 +894,9 @@ Data
 4.1 None -
 ```
 ```
-Status Sense “10” Reads the C/R condition. None - None -
-“11” Reads sensors status. *2 None - Sensor info. 5.
-“:0” Permits insertion from front and waits infinitely card (w/o mag.
+Status Sense â€œ10â€ Reads the C/R condition. None - None -
+â€œ11â€ Reads sensors status. *2 None - Sensor info. 5.
+â€œ:0â€ Permits insertion from front and waits infinitely card (w/o mag.
 Stripe) insertion. Takes in card then transports to rear standby
 position. *
 ```
@@ -906,14 +904,14 @@ position. *
 None - None -
 ```
 ```
-“:1” Denies card insertion after interrupted card insertion state by
-“:0”, “:2” or “:3”.
+â€œ:1â€ Denies card insertion after interrupted card insertion state by
+â€œ:0â€, â€œ:2â€ or â€œ:3â€.
 ```
 ```
 None - None -
 ```
 ```
-“:2” Permits insertion with mag. Stripe card from front and waits
+â€œ:2â€ Permits insertion with mag. Stripe card from front and waits
 infinitely card insertion. Takes in card then transports to rear
 standby position. *
 ```
@@ -926,7 +924,7 @@ Permission
 /Denial
 ```
 ```
-“:3” Permits insertion from rear waits infinitely card (w/o mag.
+â€œ:3â€ Permits insertion from rear waits infinitely card (w/o mag.
 stripe) insertion. Takes in card then transports to front standby
 position. *3 *
 ```
@@ -934,28 +932,28 @@ position. *3 *
 None - None -
 ```
 ```
-“20” Permits insertion w/o mag. stripe from front and waits. Takes
+â€œ20â€ Permits insertion w/o mag. stripe from front and waits. Takes
 in card then transports to rear standby position.
 ```
 ```
 None - None -
 ```
 ```
-“21” Permits insertion with mag. stripe from front and waits. Takes
+â€œ21â€ Permits insertion with mag. stripe from front and waits. Takes
 in card then transports to rear standby position.
 ```
 ```
 None - None -
 ```
 ```
-“22” Permits insertion w/o mag. stripe from rear and waits. Takes in
+â€œ22â€ Permits insertion w/o mag. stripe from rear and waits. Takes in
 card then transports to front standby position. *
 ```
 ```
 None - None -
 ```
 ```
-“23” Permits insertion w/o mag. stripe from front and waits. Takes
+â€œ23â€ Permits insertion w/o mag. stripe from front and waits. Takes
 in card, then return to take out position temporary and take in
 card immediately and transports to rear standby position.
 ```
@@ -966,14 +964,14 @@ None - None -
 Intake *3 *
 ```
 ```
-“24” Permits insertion with mag. stripe from front and waits. Takes
+â€œ24â€ Permits insertion with mag. stripe from front and waits. Takes
 in card, then return to take out position temporary and take in
 card immediately, and transports to rear standby position.
 ```
 ```
 None - None -
 ```
-*1: First of all, the HOST has to send one of these “Initial Reset” command for automatic recognition of
+*1: First of all, the HOST has to send one of these â€œInitial Resetâ€ command for automatic recognition of
 transmission speed and setting of transmission format (see 1.4 and annex A) between the HOST to the
 C/R. These setting is only valid by one of initial reset command sending from the HOST after power turned
 on.
@@ -982,7 +980,7 @@ After that, card is returned, ejected or held if card exists inside.
 *2: The HOST can get the sensor information, e.g. output status of position sensor after card was took in.
 *3: All tracks read data is implicitly stored in memory after in-take. Then Read data is transmitted after
 processed it by a Read command.
-*4 Monitoring time for Card insertion is specified by “W0”.
+*4 Monitoring time for Card insertion is specified by â€œW0â€.
 *5: The HOST should send the command after it confirms the card have been taken out.
 
 
@@ -1008,33 +1006,33 @@ Data
 Ref.
 ```
 ```
-“30” Transports card to Takeout position of front. None - None -
-“31” Ejects card through to rear end. None - None -
+â€œ30â€ Transports card to Takeout position of front. None - None -
+â€œ31â€ Ejects card through to rear end. None - None -
 ```
 ```
 Return
 ```
 ```
-“32” Transports the MM-sensor card to read start position. None - None -
+â€œ32â€ Transports the MM-sensor card to read start position. None - None -
 Waiting for
 Removal *
 ```
 ```
-“90” Waits for card to be taken out from front taken-out
-position while is specified the monitoring time by “W1”.
+â€œ90â€ Waits for card to be taken out from front taken-out
+position while is specified the monitoring time by â€œW1â€.
 ```
 ```
 None - None -
 ```
 ```
-“40” Re-intakes card to rear standby position from front
+â€œ40â€ Re-intakes card to rear standby position from front
 takeout position.
 ```
 ```
 None - None -
 ```
 ```
-“41” Re-intakes card from front takeout position and ejects to
+â€œ41â€ Re-intakes card from front takeout position and ejects to
 Rear.
 ```
 ```
@@ -1044,7 +1042,7 @@ None - None -
 Re-intake *
 ```
 ```
-“42” Re-intakes card to rear standby position from front
+â€œ42â€ Re-intakes card to rear standby position from front
 takeout position. And sends read data of a lowest track
 number that was able to read correctly during intake.
 ```
@@ -1052,11 +1050,11 @@ number that was able to read correctly during intake.
 Track A 4.2 Mag. Data E 5.
 ```
 ```
-“60” No read operation (only transportation). None - None -
-“61” Reads ISO #1 and sends data. *2 None - Mag. Data D 5.
-“62” Reads ISO #2 and sends data. *2 None - Mag. Data D 5.
-“63” Reads ISO #3 and sends data. *2 None - Mag. Data D 5.
-“68” Reads multiple magnetic tracks and sends the read
+â€œ60â€ No read operation (only transportation). None - None -
+â€œ61â€ Reads ISO #1 and sends data. *2 None - Mag. Data D 5.
+â€œ62â€ Reads ISO #2 and sends data. *2 None - Mag. Data D 5.
+â€œ63â€ Reads ISO #3 and sends data. *2 None - Mag. Data D 5.
+â€œ68â€ Reads multiple magnetic tracks and sends the read
 data of the lowest track number which was read
 correctly. *2 *3 *
 ```
@@ -1064,23 +1062,23 @@ correctly. *2 *3 *
 Track A 4.2 Mag. Data E 5.
 ```
 ```
-“69” Sends the read data in memory by this command. *4 Track B 4.3 Mag. Data D 5.
+â€œ69â€ Sends the read data in memory by this command. *4 Track B 4.3 Mag. Data D 5.
 ```
 ```
 Read
 ```
 ```
-“6A” Sends multi-tracks data in the memory by this command
+â€œ6Aâ€ Sends multi-tracks data in the memory by this command
 and parameter. *2 *
 ```
 ```
 Track A 4.2 Mag. Data F 5.
 ```
 ```
-“71” Writes magnetic data onto ISO #1 track. Mag. Data A 4.4 None -
-“72” Writes magnetic data onto ISO #2 track. Mag. Data A 4.4 None -
-“73” Writes magnetic data onto ISO #3 track. Mag. Data A 4.4 None -
-“78” Sets write data in memory track by track for Multiple
+â€œ71â€ Writes magnetic data onto ISO #1 track. Mag. Data A 4.4 None -
+â€œ72â€ Writes magnetic data onto ISO #2 track. Mag. Data A 4.4 None -
+â€œ73â€ Writes magnetic data onto ISO #3 track. Mag. Data A 4.4 None -
+â€œ78â€ Sets write data in memory track by track for Multiple
 Magnetic tracks (No Write processing).
 ```
 ```
@@ -1089,18 +1087,18 @@ Mag. Data B 4.5 None -
 ```
 Write
 ```
-“79” Writes data of Multiple-Magnetic tracks at one time. Mag. Data C 4.6 Error track *5 5.
-*1: Monitoring time is specified by “W2”.
+â€œ79â€ Writes data of Multiple-Magnetic tracks at one time. Mag. Data C 4.6 Error track *5 5.
+*1: Monitoring time is specified by â€œW2â€.
 *2: In case that read data was memorized in C/R, the HOST can get immediately the read data without card
 transporting. The other hand, in case of no memory of read data , C/R executes re-read according to the
 setting retry number. In case that the retry number was set zero or error is continuing after retry was done,
 the error response is sent.
-*3: The HOST can get only single track data even if multi-track is read by “68” command. Therefore the HOST
-should use together with “69” or “6A” command in case of the other track(s) data reading.
+*3: The HOST can get only single track data even if multi-track is read by â€œ68â€ command. Therefore the HOST
+should use together with â€œ69â€ or â€œ6Aâ€ command in case of the other track(s) data reading.
 For detail of response, see 5.3.
 *4: Multi-read data in memory is transmitted at one time by related command.
 *5: Error Track Number is transmitted to the HOST only when an error occurs.
-*6: RES of positive response is transmitted the “card position” when the response was prepared.
+*6: RES of positive response is transmitted the â€œcard positionâ€ when the response was prepared.
 
 
 (1) Table of Basic Commands (3/3)
@@ -1118,20 +1116,20 @@ Parameters Ref.
 ```
 Response
 Data Ref.
-“Q0” Reads the number of ejected ( captured ) card(s) to
+â€œQ0â€ Reads the number of ejected ( captured ) card(s) to
 rear.
 ```
 ```
 Number of None - Captured No. 5.
 Cards
-Captured “Q1” Initialized number of ejected ( captured ) card(s) to
-rear (“000”). (*1)
+Captured â€œQ1â€ Initialized number of ejected ( captured ) card(s) to
+rear (â€œ000â€). (*1)
 ```
 ```
 None - None -
 ```
 ```
-Cleaning “I0” Cleans head and or sensors with a Cleaning card
+Cleaning â€œI0â€ Cleans head and or sensors with a Cleaning card
 ( back and forth motion is done 3rd. times.)
 ```
 ```
@@ -1142,25 +1140,25 @@ Sensor Level
 Read
 ```
 ```
-“L0” Reads voltage of the C/R sensors. None - Level Info. 5.
+â€œL0â€ Reads voltage of the C/R sensors. None - Level Info. 5.
 ```
 ```
-“R0” Sets the retry number when read error occurred. Retry No. 4.7 None -
-“R1” Sets the retry number when write error occurred. Retry No. 4.7 None -
+â€œR0â€ Sets the retry number when read error occurred. Retry No. 4.7 None -
+â€œR1â€ Sets the retry number when write error occurred. Retry No. 4.7 None -
 ```
 ```
 Retry Number
 Setting
-“R3” Sets the retry number when return error occurred. Retry No. 4.8 None -
-“W0” Sets the monitoring time till card is inserted
-( Relating “20”,”21” and “22” ).
+â€œR3â€ Sets the retry number when return error occurred. Retry No. 4.8 None -
+â€œW0â€ Sets the monitoring time till card is inserted
+( Relating â€œ20â€,â€21â€ and â€œ22â€ ).
 ```
 ```
 Monitor Time 4.9 None -
 ```
 ```
-“W1” Sets the monitoring time till card returned to Front is
-removed (Relating “90”).
+â€œW1â€ Sets the monitoring time till card returned to Front is
+removed (Relating â€œ90â€).
 ```
 ```
 Monitor Time 4.9 None -
@@ -1170,67 +1168,67 @@ Monitor Time
 Setting
 ```
 ```
-“W2” Sets the monitoring time till card is re-in-taken to
-Rear ( Relating “40”,”41” and “42”).
+â€œW2â€ Sets the monitoring time till card is re-in-taken to
+Rear ( Relating â€œ40â€,â€41â€ and â€œ42â€).
 ```
 ```
 Monitor Time 4.9 None -
 ```
 ```
-“N0” Reads information of options installed. None - Option Info. 5.
-“N1” Sets existence of P/F condenser. *1 P/F Condenser
+â€œN0â€ Reads information of options installed. None - Option Info. 5.
+â€œN1â€ Sets existence of P/F condenser. *1 P/F Condenser
 Existence
 ```
 ```
 4.10 None -
 ```
 ```
-“N2” Sets one of magnetic head type within “No Head”,
-“Read-only”, and “Read/Write”. *
+â€œN2â€ Sets one of magnetic head type within â€œNo Headâ€,
+â€œRead-onlyâ€, and â€œRead/Writeâ€. *
 ```
 ```
 Mag. Head Type 4.11 None -
 ```
 ```
-“N3” Sets using of I/O port. *1 I/O Port using 4.12 None -
+â€œN3â€ Sets using of I/O port. *1 I/O Port using 4.12 None -
 ```
 ```
 Option Device
 Read/ Setting
 ```
 ```
-“NA” Erases Version Information in memory and the data
-of Option Information is changed to “No setting”. *
+â€œNAâ€ Erases Version Information in memory and the data
+of Option Information is changed to â€œNo settingâ€. *
 ```
 ```
 None - None -
 ```
 ```
-Version Read “V0” Reads FW version. None - Version Info. 5.
-“V1” Reads FW version of ICC control part. None - Nonvolatile Memory
+Version Read â€œV0â€ Reads FW version. None - Version Info. 5.
+â€œV1â€ Reads FW version of ICC control part. None - Nonvolatile Memory
 FW Version Info.
 ```
 ```
 5.
 ```
 ```
-“P0” Sets deactivation of output port(s). Output Port 4.25 None -
-“P1” Sets activation of output port(s). Output Port 4.25 None -
-“P2” Sets deactivation of designated output port(s) during
+â€œP0â€ Sets deactivation of output port(s). Output Port 4.25 None -
+â€œP1â€ Sets activation of output port(s). Output Port 4.25 None -
+â€œP2â€ Sets deactivation of designated output port(s) during
 the specified time.
 ```
 ```
 Output Port 4.25 None -
 ```
 ```
-“P3” Sets activation of designated output port(s) during
+â€œP3â€ Sets activation of designated output port(s) during
 the specified time.
 ```
 ```
 Output Port 4.25 None -
 ```
 ```
-“P4” Repeats activation and deactivation of designated
+â€œP4â€ Repeats activation and deactivation of designated
 output port(s) according to the specified time.
 ```
 ```
@@ -1240,9 +1238,9 @@ Output Port 4.25 None -
 I/O Port *
 ```
 ```
-“P5” Reads status of input port(s). None - Input Port 5.
-“T0” Deactivation time of output port(s) is set (Relating
-“P2”).
+â€œP5â€ Reads status of input port(s). None - Input Port 5.
+â€œT0â€ Deactivation time of output port(s) is set (Relating
+â€œP2â€).
 ```
 ```
 Output Port
@@ -1252,16 +1250,16 @@ Setting Time
 4.27 None -
 ```
 ```
-“T1” Activation time of output port(s) is set (Relating “P3”). Output Port
+â€œT1â€ Activation time of output port(s) is set (Relating â€œP3â€). Output Port
 Setting Time
 ```
 ```
 4.27 None -
 ```
 ```
-“T2” Deactivation time of output port(s) is set when
+â€œT2â€ Deactivation time of output port(s) is set when
 activation and deactivation is repeated (Relating
-“P4”).
+â€œP4â€).
 ```
 ```
 Output Port
@@ -1275,9 +1273,9 @@ I/O Port Time
 Setting
 ```
 ```
-“T3” Activation time of output port(s) is set when
+â€œT3â€ Activation time of output port(s) is set when
 activation and deactivation is repeated (Relating
-“P4”).
+â€œP4â€).
 ```
 ```
 Output Port
@@ -1287,8 +1285,8 @@ Setting Time
 4.27 None -
 ```
 ```
-“Y0” Reads control information of ICC. None - ICC Control Info. 5.
-“Y1” Sets the reference standard used in commands
+â€œY0â€ Reads control information of ICC. None - ICC Control Info. 5.
+â€œY1â€ Sets the reference standard used in commands
 related to ICC. *
 ```
 ```
@@ -1299,7 +1297,7 @@ Standard
 4.28 None -
 ```
 ```
-“Y2” Sets the monitoring time for waiting for reception
+â€œY2â€ Sets the monitoring time for waiting for reception
 used in commands related to ICC. *
 ```
 ```
@@ -1311,7 +1309,7 @@ Reception
 4.29 None -
 ```
 ```
-“Y3” Sets IFSD control method used in commands related
+â€œY3â€ Sets IFSD control method used in commands related
 to ICC. *
 ```
 ```
@@ -1326,7 +1324,7 @@ ICC Control
 Information
 ```
 ```
-“Y4” Sets TCK control method used in commands related
+â€œY4â€ Sets TCK control method used in commands related
 to ICC. *
 ```
 ```
@@ -1336,8 +1334,8 @@ Method
 ```
 4.31 None -
 ```
-*1 These commands can’t execute under “Insertion permission” ( until the card is taken in after “Insertion
-permission” command was sent. ) In that case, C/R sends the response of sequence error (“Nxx01”).
+*1 These commands canâ€™t execute under â€œInsertion permissionâ€ ( until the card is taken in after â€œInsertion
+permissionâ€ command was sent. ) In that case, C/R sends the response of sequence error (â€œNxx01â€).
 *2 All I/O ports is de-active state after power turns on.
 
 
@@ -1356,115 +1354,115 @@ Parameters Ref.
 ```
 Response
 Data Ref
-“6B” Intakes w/o stripe card from front + Reads *3 Track A 4.2 Mag. Data E 5.
-“6C” Intakes w/o stripe card from front + Reads
+â€œ6Bâ€ Intakes w/o stripe card from front + Reads *3 Track A 4.2 Mag. Data E 5.
+â€œ6Câ€ Intakes w/o stripe card from front + Reads
 + Returns to Front *
 ```
 ```
 Track A 4.2 Mag. Data E 5.
 ```
 ```
-“6D” Intakes w/o stripe card from front + Reads
+â€œ6Dâ€ Intakes w/o stripe card from front + Reads
 + Ejects to Rear end *
 ```
 ```
 Track A 4.2 Mag. Data E 5.
 ```
 ```
-“6E” Intakes with Mag. Stripe card from front + Reads
+â€œ6Eâ€ Intakes with Mag. Stripe card from front + Reads
 *
 ```
 ```
 Track A 4.2 Mag. Data E 5.
 ```
 ```
-“6F” Intakes with Mag. Stripe card from front + Reads
+â€œ6Fâ€ Intakes with Mag. Stripe card from front + Reads
 + Front Return *
 ```
 ```
 Track A 4.2 Mag. Data E 5.
 ```
 ```
-“6G” Intakes with Mag. Stripe card from front + Reads
+â€œ6Gâ€ Intakes with Mag. Stripe card from front + Reads
 + Ejects to Rear end *
 ```
 ```
 Track A 4.2 Mag. Data E 5.
 ```
 ```
-“6H” Intakes from Rear + Reads *3 *4 Track A 4.2 Mag. Data E 5.
-“6I” Intakes from Rear + Reads + Returns to Front
+â€œ6Hâ€ Intakes from Rear + Reads *3 *4 Track A 4.2 Mag. Data E 5.
+â€œ6Iâ€ Intakes from Rear + Reads + Returns to Front
 *3 *
 ```
 ```
 Track A 4.2 Mag. Data E 5.
 ```
 ```
-“6K” Reads + Returns to Front Track A 4.2 Mag. Data E 5.
+â€œ6Kâ€ Reads + Returns to Front Track A 4.2 Mag. Data E 5.
 ```
 ```
 Read
 ```
 ```
-“6L” Reads + Ejects to Rear end Track A 4.2 Mag. Data E 5.
-“7B” Intakes w/o stripe card from front + Writes *3 Mag. Data C 4.6 Err. Track No.*1 5.
-“7C” Intakes w/o stripe card from front + Writes
+â€œ6Lâ€ Reads + Ejects to Rear end Track A 4.2 Mag. Data E 5.
+â€œ7Bâ€ Intakes w/o stripe card from front + Writes *3 Mag. Data C 4.6 Err. Track No.*1 5.
+â€œ7Câ€ Intakes w/o stripe card from front + Writes
 + Returns to Front *
 ```
 ```
 Mag. Data C 4.6 Err. Track No.*1 5.
 ```
 ```
-“7D” Intakes w/o stripe card from front + Writes
+â€œ7Dâ€ Intakes w/o stripe card from front + Writes
 + Ejects to Front *
 ```
 ```
 Mag. Data C 4.6 Err. Track No.*1 5.
 ```
 ```
-“7E” Intakes with Mag. Stripe card from front + Writes
+â€œ7Eâ€ Intakes with Mag. Stripe card from front + Writes
 *
 ```
 ```
 Mag. Data C 4.6 Err. Track No.*1 5.
 ```
 ```
-“7F” Intakes with Mag. Stripe card from front + Writes
+â€œ7Fâ€ Intakes with Mag. Stripe card from front + Writes
 + Returns to Front *
 ```
 ```
 Mag. Data C 4.6 Err. Track No.*1 5.
 ```
 ```
-“7G” Intakes with Mag. Stripe card from front + Writes
+â€œ7Gâ€ Intakes with Mag. Stripe card from front + Writes
 + Ejects to Front *
 ```
 ```
 Mag. Data C 4.6 Err. Track No.*1 5.
 ```
 ```
-“7H” Intakes from Rear + Writes *3 *4 Mag. Data C 4.6 Err. Track No.*1 5.
-“7I” Intakes from Rear + Writes + Returns to Front
+â€œ7Hâ€ Intakes from Rear + Writes *3 *4 Mag. Data C 4.6 Err. Track No.*1 5.
+â€œ7Iâ€ Intakes from Rear + Writes + Returns to Front
 *3 *
 ```
 ```
 Mag. Data C 4.6 Err. Track No.*1 5.
 ```
 ```
-“7K” Writes + Returns to Front Mag. Data C 4.6 Err. Track No.*1 5.
+â€œ7Kâ€ Writes + Returns to Front Mag. Data C 4.6 Err. Track No.*1 5.
 ```
 ```
 Write
 ```
 ```
-“7L” Writes + Ejects to Rear end Mag. Data C 4.6 Err. Track No.*1 5.
-“D0” Designates Front Return when Read is Normal Execution Desig. Data 4.13 None -
-“D1” Designates Front Return when Read is Error Execution Desig. Data 4.13 None -
-“D2” Designates Front Return when Write is Normal Execution Desig. Data 4.13 None -
-“D3” Designates Front Return when Write is Error Execution Desig. Data 4.13 None -
-“D4” Designates Rear Eject when Read is Normal Execution Desig. Data 4.13 None -
-“D5” Designates Rear Eject when Read is Error Execution Desig. Data 4.13 None -
-“D6” Designates Rear Eject when Write is Normal Execution Desig. Data 4.13 None -
+â€œ7Lâ€ Writes + Ejects to Rear end Mag. Data C 4.6 Err. Track No.*1 5.
+â€œD0â€ Designates Front Return when Read is Normal Execution Desig. Data 4.13 None -
+â€œD1â€ Designates Front Return when Read is Error Execution Desig. Data 4.13 None -
+â€œD2â€ Designates Front Return when Write is Normal Execution Desig. Data 4.13 None -
+â€œD3â€ Designates Front Return when Write is Error Execution Desig. Data 4.13 None -
+â€œD4â€ Designates Rear Eject when Read is Normal Execution Desig. Data 4.13 None -
+â€œD5â€ Designates Rear Eject when Read is Error Execution Desig. Data 4.13 None -
+â€œD6â€ Designates Rear Eject when Write is Normal Execution Desig. Data 4.13 None -
 ```
 ```
 Return
@@ -1472,21 +1470,21 @@ Conditions
 Parameters *
 ```
 ```
-“D7” Designates Rear Eject when Write is Error Execution Desig. Data 4.13 None -
-“S0” Sets Transmission Format Change of Magnetic
+â€œD7â€ Designates Rear Eject when Write is Error Execution Desig. Data 4.13 None -
+â€œS0â€ Sets Transmission Format Change of Magnetic
 Data
 ```
 ```
 Transmission Format 4.14 None -
 ```
 ```
-“S1” Sets Format Change of Magnetic Data Mag. Format 4.15 None -
+â€œS1â€ Sets Format Change of Magnetic Data Mag. Format 4.15 None -
 ```
 ```
 Magnetic
 Format
 Change
-Setting “S2” Sets Start Position Change of Write for Start
+Setting â€œS2â€ Sets Start Position Change of Write for Start
 Sentinel (SS)
 ```
 ```
@@ -1494,7 +1492,7 @@ Position Data 4.16 None -
 ```
 *1 Error Track Number is transmitted only when an error occurred.
 *2 The return condition parameters are only effective when the extended commands, read or write ,was used.
-*3 Monitoring time for Card insertion is specified by “W0”.
+*3 Monitoring time for Card insertion is specified by â€œW0â€.
 *4 The HOST should send the command after it confirms the card have been taken out.
 
 
@@ -1515,15 +1513,15 @@ Parameters Ref.
 ```
 Response
 Data Ref.
-ICC Press “C0” Transports to ICC access position and presses ICC
+ICC Press â€œC0â€ Transports to ICC access position and presses ICC
 contact.
 ```
 ```
 None - None -
 ```
 ```
-ICC Release “C1” Releases ICC contact from ICC. None - None -
-ICC Activation “C2” Activates ( Cold Reset ) ICC and sends ATR.
+ICC Release â€œC1â€ Releases ICC contact from ICC. None - None -
+ICC Activation â€œC2â€ Activates ( Cold Reset ) ICC and sends ATR.
 It is impossible to designate the automatic execution of
 PTS by the C/R.
 ```
@@ -1535,14 +1533,14 @@ ICC
 Deactivation
 ```
 ```
-“C3” Deactivates ICC. None - None -
+â€œC3â€ Deactivates ICC. None - None -
 ```
 ```
 ICC Control
 Information *
 ```
 ```
-“C4” Sets the monitoring time for waiting for reception used
+â€œC4â€ Sets the monitoring time for waiting for reception used
 in commands related to ICC.
 ```
 ```
@@ -1557,7 +1555,7 @@ ICC Cold
 Reset
 ```
 ```
-“E0” Activates to ICC. It is possible to set the execution of
+â€œE0â€ Activates to ICC. It is possible to set the execution of
 PTS independently.
 ```
 ```
@@ -1576,7 +1574,7 @@ ICC Warm
 Reset
 ```
 ```
-“E1” Executes warm reset to ICC. It is possible to set the
+â€œE1â€ Executes warm reset to ICC. It is possible to set the
 execution of PTS independently.
 ```
 ```
@@ -1590,11 +1588,11 @@ Inf. *
 ```
 5.
 ```
-*1 ATR information (“C2”,”E0” and “E1”) is transmitted to the HOST only when the ATR information from the
+*1 ATR information (â€œC2â€,â€E0â€ and â€œE1â€) is transmitted to the HOST only when the ATR information from the
 ICC was read correctly. For IC Commands usage, see Annex C and D.
 *2 This command can be used to make compatible with the present version.
-If ICC control information setting command (“C4”) was used, please change the command code from “C4”
-to “Y1”.
+If ICC control information setting command (â€œC4â€) was used, please change the command code from â€œC4â€
+to â€œY1â€.
 
 ```
 (2) Table of Extended Commands
@@ -1609,9 +1607,9 @@ Parameters Ref.
 ```
 Response
 Data Ref.
-ICC Multiple “C5” ICC Press (“C0”)+ ICC Activation (“C2”) NAD setting 4.17 ATR Info. *1 5.
-processing “C6” ICC Deactivation (“C3”)+ ICC Release (“C1”) None - None -
-ICC Cold Reset “G1” Press ICC + ICC Cold Reset (“C0”+”E0”) ATRNAD
+ICC Multiple â€œC5â€ ICC Press (â€œC0â€)+ ICC Activation (â€œC2â€) NAD setting 4.17 ATR Info. *1 5.
+processing â€œC6â€ ICC Deactivation (â€œC3â€)+ ICC Release (â€œC1â€) None - None -
+ICC Cold Reset â€œG1â€ Press ICC + ICC Cold Reset (â€œC0â€+â€E0â€) ATRNAD
 setting
 ```
 ```
@@ -1621,7 +1619,7 @@ Inf. *
 ```
 5.
 ```
-*1 ATR information (“C5” and “G1”) is transmitted to the HOST only when the ATR information from the ICC
+*1 ATR information (â€œC5â€ and â€œG1â€) is transmitted to the HOST only when the ATR information from the ICC
 was read correctly. For ICC Commands usage, see Annex C and D.
 
 
@@ -1645,7 +1643,7 @@ T=
 Transmission
 ```
 ```
-“F0” Sends or receives data between the HOST and the ICC
+â€œF0â€ Sends or receives data between the HOST and the ICC
 using Protocol Type T=0.
 ```
 ```
@@ -1664,7 +1662,7 @@ T=
 Transmission
 ```
 ```
-“F1” Sends or receives data between the HOST and the ICC
+â€œF1â€ Sends or receives data between the HOST and the ICC
 using Protocol Type T=1. This command should be used
 for sending/receiving of data unchained or for
 transmitting the last part of data chained.
@@ -1685,10 +1683,10 @@ T=1 Continuous
 Transmission
 ```
 ```
-“F2” Sends data chained of Protocol Type T=1. This
+â€œF2â€ Sends data chained of Protocol Type T=1. This
 command should be used to send after divided the data
 when the data length to be send is longer than the
-command parameter. “F1” should be used in case that
+command parameter. â€œF1â€ should be used in case that
 sending data length of the last block is within command
 parameter.
 ```
@@ -1708,9 +1706,9 @@ T=1 Continuous
 Receiving
 ```
 ```
-“F3” Receives data chained of Protocol Type T=1. This
+â€œF3â€ Receives data chained of Protocol Type T=1. This
 command should be used for continuous receiving of
-data when response status from the C/R is “21”.
+data when response status from the C/R is â€œ21â€.
 ```
 ```
 None - T=1 Receiving
@@ -1724,7 +1722,7 @@ T=1 interruption
 Completion
 ```
 ```
-“F4” Continuous sending/receiving of Protocol Type T=1 is
+â€œF4â€ Continuous sending/receiving of Protocol Type T=1 is
 forcedly terminated.
 ```
 ```
@@ -1735,7 +1733,7 @@ T=1 Extended
 Transmission
 ```
 ```
-“F6” Sends or receives data between the HOST and the ICC
+â€œF6â€ Sends or receives data between the HOST and the ICC
 using Protocol type T=1. This command should be used
 for sending/ receiving of unchained or chained data
 which is the last block. The command APDU is copied
@@ -1759,10 +1757,10 @@ Continuous
 Transmission
 ```
 ```
-“F7” Sends data chained of Protocol Type T=1. This
+â€œF7â€ Sends data chained of Protocol Type T=1. This
 command should be used to send after divided the data
 when the data to be sent is longer than the command
-parameter. “F6” should be used in case that sending
+parameter. â€œF6â€ should be used in case that sending
 data length of the last block is within command
 parameter. The Command APDU is copied onto the
 information field of an I-block without any change
@@ -1779,7 +1777,7 @@ Data
 5.
 ```
 ```
-PTS Request “F8” Sends or receives PTS request between the HOST and
+PTS Request â€œF8â€ Sends or receives PTS request between the HOST and
 the ICC.
 ```
 ```
@@ -1794,16 +1792,16 @@ Note: For ICC Commands usage, see Annex C and D.
 ```
 3.3.3 Table of Command related Down Load (DLC)
 Command Name (ASCII)CMD Function ParametersCommand Ref. ResponseData Ref.
-DL Start “d0” Designates DL start. No. of DL Block 4.23 None -
-DL Transmission “d1” Sends DL Data ( FW ). DL Data 4.24 None -
-DL Completion “d2” Sends DL completion. None - Ver. Info. in Memory 5.
-Memory Check “c0” Checks SUM and reads FW version in
+DL Start â€œd0â€ Designates DL start. No. of DL Block 4.23 None -
+DL Transmission â€œd1â€ Sends DL Data ( FW ). DL Data 4.24 None -
+DL Completion â€œd2â€ Sends DL completion. None - Ver. Info. in Memory 5.
+Memory Check â€œc0â€ Checks SUM and reads FW version in
 memory.
 ```
 ```
 None - Ver. Info. in Memory 5.
 ```
-USER Info. Read “u0” Reads the user information in memory. USER info. length 4.26 USER Info. Data 5.
+USER Info. Read â€œu0â€ Reads the user information in memory. USER info. length 4.26 USER Info. Data 5.
 Note: For DLC commands usage, see Annex E.
 
 
@@ -1814,18 +1812,18 @@ Response status (RES) of Positive Response Format shows the table below.
 ```
 RES
 (ASCII) Meaning
-“ 00 ” No card is in the C/R.
-“ 01 ” A card is in the Takeout Position.
-“ 02 ” A card is in the C/R.
-“ 04 ” A card is in Read Start Position of the MM Sensor
-“ 10 ” IC Contact is pressed to the ICC.
-“ 11 ” ICC is in the Activation Status.
-“ 20 ” Transmission to the ICC is completed. (with/ without Receiving Data, with SW1 + SW2)
-“ 21 ” Continuous receiving Status from the ICC. (with Receiving Data, without SW1 + SW2)
-“ 22 ” Continuous sending Status to the ICC. (without Receiving Data, without SW1 + SW2)
-“ 23 ” Ends the Completion of ICC Transmission by forcedly interruption.
-“ 30 ” In Down loading.
-“ 31 ” Normal Completion of Down loading, Status of Initial Reset Waiting.
+â€œ 00 â€ No card is in the C/R.
+â€œ 01 â€ A card is in the Takeout Position.
+â€œ 02 â€ A card is in the C/R.
+â€œ 04 â€ A card is in Read Start Position of the MM Sensor
+â€œ 10 â€ IC Contact is pressed to the ICC.
+â€œ 11 â€ ICC is in the Activation Status.
+â€œ 20 â€ Transmission to the ICC is completed. (with/ without Receiving Data, with SW1 + SW2)
+â€œ 21 â€ Continuous receiving Status from the ICC. (with Receiving Data, without SW1 + SW2)
+â€œ 22 â€ Continuous sending Status to the ICC. (without Receiving Data, without SW1 + SW2)
+â€œ 23 â€ Ends the Completion of ICC Transmission by forcedly interruption.
+â€œ 30 â€ In Down loading.
+â€œ 31 â€ Normal Completion of Down loading, Status of Initial Reset Waiting.
 ```
 3.4.2 Status Table of Negative Response (Error Code)
 Response status (RES) of Negative Response Format shows the table below.
@@ -1834,75 +1832,75 @@ Response status (RES) of Negative Response Format shows the table below.
 (1) Error code table (1/8)
 RES
 (ASCII) Sorts of Error Meaning
-“00” Undefined Command
+â€œ00â€ Undefined Command
 Receipt
 ```
 ```
 -- - The HOST used a unwritten Command in specification.
 ```
 ```
-“01” Command Sequence
+â€œ01â€ Command Sequence
 Error
 ```
 ```
 -- - The HOST sent a disable command in the present state.
 ```
 ```
-“02” Command Data Error -- - The HOST sent a wrong data of command parameter.
-“03” Write Track setting Error -- - The HOST designated write for track(s) without write data.
+â€œ02â€ Command Data Error -- - The HOST sent a wrong data of command parameter.
+â€œ03â€ Write Track setting Error -- - The HOST designated write for track(s) without write data.
 Note: Host should be checked the content of command and sequence.
 ```
 
 (2) Error code table (2/8)
 RES
 (ASCII) Sorts of Error Meaning
-“10” Card Jam C/R abnormality
+â€œ10â€ Card Jam C/R abnormality
 *1
 
-- The C/R couldn’t carry the card in the C/R to the correct
+- The C/R couldnâ€™t carry the card in the C/R to the correct
     position.
-- The C/R couldn’t return the card to the take out position due
+- The C/R couldnâ€™t return the card to the take out position due
     to the shutting of insertion mouth.
-- The C/R couldn’t carry the card in-taken from front to the
+- The C/R couldnâ€™t carry the card in-taken from front to the
     correct position.
-“11” Shutter Abnormality C/R abnormality
+â€œ11â€ Shutter Abnormality C/R abnormality
 *1
-- The C/R couldn’t open the shutter.
-- The C/R couldn’t detect the shutter opening due to the trouble
+- The C/R couldnâ€™t open the shutter.
+- The C/R couldnâ€™t detect the shutter opening due to the trouble
 of shutter echo sensor.
 - All condition was to be closed the shutter , but the C/R
-couldn’t close it.
-- The shutter is forcibly closed when shutter is opening by “32”
-(MM card return) or “23”,”24”(intake). Or the C/R couldn’t
+couldnâ€™t close it.
+- The shutter is forcibly closed when shutter is opening by â€œ32â€
+(MM card return) or â€œ23â€,â€24â€(intake). Or the C/R couldnâ€™t
 detect closing condition of shutter due to the trouble of
 shutter echo sensor.
-“12” Sensor Abnormality C/R abnormality
+â€œ12â€ Sensor Abnormality C/R abnormality
 *1
 - Sensor S0 and S4 is shaded when taken in the card was
 carried.
-“13” Motor Abnormality C/R abnormality
+â€œ13â€ Motor Abnormality C/R abnormality
 *1
-- The C/R rotated motor, but the C/R couldn’t detect pulse of
+- The C/R rotated motor, but the C/R couldnâ€™t detect pulse of
 210 bpi encoder to be connected the motor due to the
 encoder trouble.
-- The C/R rotated motor , but Motor didn’t rotate.
-“14” Card Drawn Out C/R abnormality
+- The C/R rotated motor , but Motor didnâ€™t rotate.
+â€œ14â€ Card Drawn Out C/R abnormality
 *1
 - All sensor (S0, S2 and S4) was lighted after card had in-
 taken.
 - The card may be drawn out while waiting to be processed.
-“15” Card Jam
+â€œ15â€ Card Jam
 in Re-intake
 
 ```
 C/R abnormality
 *1
 ```
-- The C/R couldn’t carry the card from the front to the standby
-    position by “40” and “41” (re-intake).
-- The C/R couldn’t carry the card from the front to the standby
-    position by “23” and “24” (intake).
-“16” Card Jam at
+- The C/R couldnâ€™t carry the card from the front to the standby
+    position by â€œ40â€ and â€œ41â€ (re-intake).
+- The C/R couldnâ€™t carry the card from the front to the standby
+    position by â€œ23â€ and â€œ24â€ (intake).
+â€œ16â€ Card Jam at
 the Rear-end
 
 ```
@@ -1912,7 +1910,7 @@ C/R abnormality
 - S4 sensor at the rear is shading after card had ejected.
 
 ```
-“17” 75 bpi encoder
+â€œ17â€ 75 bpi encoder
 abnormality
 ```
 ```
@@ -1920,9 +1918,9 @@ C/R abnormality
 *1
 ```
 - The C/R rotated motor and 210bpi pulse was normality, but
-    the C/R couldn’t detect pulse of 75 bpi encoder to be
+    the C/R couldnâ€™t detect pulse of 75 bpi encoder to be
     connected the motor due to the encoder trouble.
-“18” Power Down
+â€œ18â€ Power Down
 Detection
 *2
 *3
@@ -1936,7 +1934,7 @@ C/R abnormality
     before processing (include initial reset command).
 
 ```
-“19” Waiting Initial Reset
+â€œ19â€ Waiting Initial Reset
 *3
 *4
 ```
@@ -1949,47 +1947,47 @@ reset
     after power turned on.
 - The C/R received a command exclude Initial Reset command
     after the C/R sent the response of Power Down
-    Detection(“19”).
+    Detection(â€œ19â€).
 Note:
-*1: The C/R waits “initial reset “( “00”, “01”, “02”, “04” ,”05” and “06”) command when the HOST received the
+*1: The C/R waits â€œinitial reset â€œ( â€œ00â€, â€œ01â€, â€œ02â€, â€œ04â€ ,â€05â€ and â€œ06â€) command when the HOST received the
 error code.
 *2: When a command is executing exclude initial reset, the response is sent in case that power is restored
 in short time and transmission speed etc. in memory of CPU was memorized.
 *3: For more detail , see Annex G.
-*4: The Host sends “initial reset“ (“00”, “01”, “02”, “04” ,”05” and “06”) command after waiting for 15ms from
+*4: The Host sends â€œinitial resetâ€œ (â€œ00â€, â€œ01â€, â€œ02â€, â€œ04â€ ,â€05â€ and â€œ06â€) command after waiting for 15ms from
 error response reception.
 
 
 (3) Error code table (3/8)
 RES
 (ASCII) Sorts of Error Meaning
-“20” Too Long Card Card abnormality
+â€œ20â€ Too Long Card Card abnormality
 *1
 
 - Longer card is inserted from front and the C/R detect state
     that card width switch is ON , sensor S0 and S2 is shared.
 - Longer card is inserted from rear and the C/R detect state
     that sensor S0, S2 and S4 is shared.
-“21” Too Short Card Card abnormality
+â€œ21â€ Too Short Card Card abnormality
 *1
 - Shorter or with hole(s) card is inserted from front and the C/R
 detect state that sensor S0 and S2 is lighted.
 - Shorter or with hole(s) card is inserted from rear and the C/R
 detect state that sensor S2 and S4 is lighted.
 Notes:
-*1: The C/R waits “return”(“30”) and “initial reset “( “00” and “04” ) command after the HOST received the
+*1: The C/R waits â€œreturnâ€(â€œ30â€) and â€œinitial reset â€œ( â€œ00â€ and â€œ04â€ ) command after the HOST received the
 error code.
 
 (4) Error code table (4/8)
 RES
 (ASCII) Sorts of Error Meaning
-“32” Card Position Change Warning
+â€œ32â€ Card Position Change Warning
 *1
 
 - Card position which is taken in moves.
 
 ```
-“33” Memory Information
+â€œ33â€ Memory Information
 Abnormality
 ```
 ```
@@ -2000,37 +1998,37 @@ Warning
 - The SUM value of in memory. (the number of captured card,
     magnetic head type and existence of P/F condenser ) is
     incorrect. So the information will be destroyed.
-- Host couldn’t set Option Information by “N1”, “N2”, or “N3”.
+- Host couldnâ€™t set Option Information by â€œN1â€, â€œN2â€, or â€œN3â€.
 Notes:
 *1: The HOST can sent a next command after the HOST received the error code.
-*2: In case of this error, HOST should erase Option Information by “NA” command and set all Option
-Information again by “N1”, “N2”, or “N3”.
+*2: In case of this error, HOST should erase Option Information by â€œNAâ€ command and set all Option
+Information again by â€œN1â€, â€œN2â€, or â€œN3â€.
 
 
 (5) Error code table (5/8)
 RES
 (ASCII) Sorts of Error Meaning
-“40” Read Error
+â€œ40â€ Read Error
 ( SS error )
 
 ```
 Card abnormality
 *1
 ```
-- The C/R couldn’t detect SS-code in read data.
+- The C/R couldnâ€™t detect SS-code in read data.
 
 ```
-“41” Read Error
+â€œ41â€ Read Error
 ( ES error )
 ```
 ```
 Card abnormality
 *1
 ```
-- The C/R couldn’t detect ES-code after SS-code in read data.
+- The C/R couldnâ€™t detect ES-code after SS-code in read data.
 
 ```
-“42” Read Error
+â€œ42â€ Read Error
 ( VRC error )
 ```
 ```
@@ -2040,7 +2038,7 @@ Card abnormality
 - The C/R detects that SS code and VRC of next character is
     correct in read data. But VRC of following characters is
     detected Vertical parity error ( VRC error ).
-“43” Read Error
+â€œ43â€ Read Error
 ( LRC error )
 
 ```
@@ -2048,8 +2046,8 @@ Card abnormality
 *1
 ```
 - The C/R detects that the character after ES in read data
-    doesn’t coincide with result of LRC calculation.
-“44” Read Error
+    doesnâ€™t coincide with result of LRC calculation.
+â€œ44â€ Read Error
 ( No Encode )
 
 ```
@@ -2059,7 +2057,7 @@ Card abnormality
 - Total bits to be read magnetic data is less than 20.
 - No of bits to be read of ISO #1 is less than 10.
 - No of bits to be read of ISO #2 or #3 is less than 8.
-“45” Read Error
+â€œ45â€ Read Error
 ( No Data )
 
 ```
@@ -2069,39 +2067,39 @@ Card abnormality
 - The C/R detects that the character after ES is SS and then the
     next character coincide with result of LRC calculation in read
     data. (No data besides SS-ES-LRC)
-“46” Read Error
+â€œ46â€ Read Error
 (Jitter Error)
 
 ```
 Card abnormality
 *1
 ```
-- This error doesn’t become above read error ( “40”-”45” ) but
+- This error doesnâ€™t become above read error ( â€œ40â€-â€45â€ ) but
     there are more than 10bits which is over permission value of
     Jitter in read data.
-“49” Read Track setting
+â€œ49â€ Read Track setting
 Error
--- - Specified track isn’t read.
-“50” Write Error
+-- - Specified track isnâ€™t read.
+â€œ50â€ Write Error
 ( SS error )
 
 ```
 Card abnormality
 *1
 ```
-- The C/R couldn’t detect SS code in verification after write.
+- The C/R couldnâ€™t detect SS code in verification after write.
 
 ```
-“51” Write Error
+â€œ51â€ Write Error
 ( ES error )
 ```
 ```
 Card abnormality
 *1
 ```
-- The C/R couldn’t detect ES code after SS code in verification
+- The C/R couldnâ€™t detect ES code after SS code in verification
     after write.
-“52” Write Error
+â€œ52â€ Write Error
 ( VRC error )
 
 ```
@@ -2111,7 +2109,7 @@ Card abnormality
 - The C/R detects that SS code and VRC of next character is
     correct in verification. But VRC of following characters is
     detected Vertical parity error ( VRC error ).
-“53” Write Error
+â€œ53â€ Write Error
 ( LRC error )
 
 ```
@@ -2119,8 +2117,8 @@ Card abnormality
 *1
 ```
 - The C/R detects that the character after ES in verification
-    doesn’t coincide with result of LRC calculation.
-“54” Write Error
+    doesnâ€™t coincide with result of LRC calculation.
+â€œ54â€ Write Error
 ( No Encode )
 
 ```
@@ -2130,7 +2128,7 @@ Card abnormality
 - Total bits to be read is less than 20 in verification.
 - No of bits to be read of ISO #1 is less than 10.
 - No of bits to be read of ISO #2 or #3 is less than 8.
-“55” Write Error
+â€œ55â€ Write Error
 (Data discordance)
 
 ```
@@ -2138,15 +2136,15 @@ Card abnormality
 *1
 ```
 - The C/R detects that SS, ES VRC and LRC is correct. But the
-    write data doesn’t coincide with read data.
-“56” Write Error
+    write data doesnâ€™t coincide with read data.
+â€œ56â€ Write Error
 ( Jitter error )
 
 ```
 Card abnormality
 *1
 ```
-- This error doesn’t become above write error ( “50”-”55” ) but
+- This error doesnâ€™t become above write error ( â€œ50â€-â€55â€ ) but
     there are more than 10bits which is over permission value of
     Jitter in read data.
 Notes:
@@ -2157,20 +2155,20 @@ HOST received the error code.
 RES
 (ASCII)
 Sorts of Error Meaning
-“60” Card Taken Out
+â€œ60â€ Card Taken Out
 When Re-intake
 
 ```
 Warning
 *1
 ```
-- The HOST sends Re-intake command ( “40”, “41” and “42” )
+- The HOST sends Re-intake command ( â€œ40â€, â€œ41â€ and â€œ42â€ )
     when no card is in mouth of insertion.
 - The card is taken out from mouth of insertion when the card is
     in mouth of insertion and Re-intake command is sent.
 - The card is taken out or held from / in mouth of insertion when
-    the card returned and re-intake by intake command (“23”,”24”)
-“61” Insertion monitoring
+    the card returned and re-intake by intake command (â€œ23â€,â€24â€)
+â€œ61â€ Insertion monitoring
 Time is up
 
 ```
@@ -2179,25 +2177,25 @@ Warning
 ```
 - No card in-takes by intake command during Insertion
     monitoring Time.
-“62” Take-out monitoring
+â€œ62â€ Take-out monitoring
 Time is up
 
 ```
 Warning
 *1
 ```
-- A card isn’t took out from the takeout position during take-out
+- A card isnâ€™t took out from the takeout position during take-out
     monitoring Time.
-“63” Re-intake monitoring
+â€œ63â€ Re-intake monitoring
 Time is up
 
 ```
 Warning
 *1
 ```
-- Card isn’t re-took in by Re-intake command during Re-intake
+- Card isnâ€™t re-took in by Re-intake command during Re-intake
     monitoring Time.
-“64” Card was held at
+â€œ64â€ Card was held at
 takeout position
 during initial reset
 
@@ -2206,7 +2204,7 @@ Warning
 *1
 ```
 - When the card was in mouth of insertion the HOST sent initial
-    reset command (ejects rear or keeps inside ). But the card isn’t
+    reset command (ejects rear or keeps inside ). But the card isnâ€™t
     took in ( e.g. hold by hand )
 Notes:
 *1: The HOST can sends next command continuously after the HOST received the error code.
@@ -2215,15 +2213,15 @@ Notes:
 (7) Error code table (7/8)
 RES
 (ASCII) Sorts of Error Meaning
-“70” FW Imperfection Waits for DL
+â€œ70â€ FW Imperfection Waits for DL
 *1
 
 - The C/R detects SUM value error in memory after power turned
     on.
-- The C/R receives a command in DL exclude “d0” , “d1” and
-    “ d2”.
+- The C/R receives a command in DL exclude â€œd0â€ , â€œd1â€ and
+    â€œ d2â€.
 - FW imperfection is detected in memory after power turns on.
-“71” Initial CMD waiting
+â€œ71â€ Initial CMD waiting
 after FW loading
 completion
 *2
@@ -2234,21 +2232,21 @@ reset
 *3
 ```
 - The HOST sends a command exclude initial reset command
-    after the HOST received “31”( response of normal DL
+    after the HOST received â€œ31â€( response of normal DL
     completion ).
 
 Notes:
-*1: The HOST should send “d0”,”d1” and “d2” according to DL sequence and should execute FW down
+*1: The HOST should send â€œd0â€,â€d1â€ and â€œd2â€ according to DL sequence and should execute FW down
 loading.
-*2:The Host sends “initial reset“ (“00”, “01”, “02”, “04” ,”05” and “06”) command after waiting for 15ms from
+*2:The Host sends â€œinitial resetâ€œ (â€œ00â€, â€œ01â€, â€œ02â€, â€œ04â€ ,â€05â€ and â€œ06â€) command after waiting for 15ms from
 error response reception.
-*3: The C/R waits “initial reset “( “00”, “01”, “02”, “04” ,”05” and “06”) command after the HOST received the
+*3: The C/R waits â€œinitial reset â€œ( â€œ00â€, â€œ01â€, â€œ02â€, â€œ04â€ ,â€05â€ and â€œ06â€) command after the HOST received the
 error code.
 
 (8) Error code table (8/8)
 RES
 (ASCII) Sorts of Error Meaning
-“80” Receiving from ICC is
+â€œ80â€ Receiving from ICC is
 Impossibility
 
 ```
@@ -2257,11 +2255,11 @@ ICC abnormality
 ```
 - The C/R detects that receiving data from the ICC is over buffer
     size of the C/R in execution of T=0,T=1 protocol and PTS.
-- The C/R can’t complete sending and receiving in execution of
+- The C/R canâ€™t complete sending and receiving in execution of
     T=0,T=1 protocol and PTS when monitoring time was up.
 - The C/R aborted ICC process ( ICC reference standard is
-    “EMV3.0 Errata 1.0”.)
-“81” ICC Solenoid
+    â€œEMV3.0 Errata 1.0â€.)
+â€œ81â€ ICC Solenoid
 Abnormality
 
 ```
@@ -2272,7 +2270,7 @@ C/R abnormality
 - impossible to release the contact.
 - Echo sensor of contact unit under pressing is detected OFF.
 - Echo sensor of contact unit under releasing is detected ON.
-“82” ICC Activation
+â€œ82â€ ICC Activation
 Abnormality
 
 ```
@@ -2283,7 +2281,7 @@ ICC abnormality
     processing.
 - The C/R detects that monitoring time was up or parity error
     occurred in processing.
-“84” ICC Communication
+â€œ84â€ ICC Communication
 Abnormality
 
 ```
@@ -2291,9 +2289,9 @@ ICC abnormality
 *3
 ```
 - Monitoring time was up or parity error occurred in T=0 and
-    T=1protocal execution, and the C/R can’t recovers after retry
+    T=1protocal execution, and the C/R canâ€™t recovers after retry
     execution.
-“85” ICC Compulsory
+â€œ85â€ ICC Compulsory
 Abort Reception
 
 ```
@@ -2302,7 +2300,7 @@ ICC abnormality
 ```
 - The C/R receives forced Interruption ( S block: abort request )
     in T=0 and T=1protocal execution.
-“86” ICC Reception Data
+â€œ86â€ ICC Reception Data
 Abnormality
 
 ```
@@ -2311,12 +2309,12 @@ ICC abnormality
 ```
 - The C/R receives invalid block or data in T=0 and T=1protocal
     execution.
-“87” Unsupported ICC ICC abnormality
+â€œ87â€ Unsupported ICC ICC abnormality
 *4
 - The C/R receives unsupported ATR.
 
 ```
-“88” ICC movement in
+â€œ88â€ ICC movement in
 press
 ```
 ```
@@ -2328,13 +2326,13 @@ C/R abnormality
 Notes:
 *1: C/R deactivates automatically. HOST should releases contact and tries again to activate after press
 contact after HOST received the error code.
-*2: The C/R waits “initial reset “( “00”, “01”, “02”, “04” ,”05” and “06”) command after the HOST received the
+*2: The C/R waits â€œinitial reset â€œ( â€œ00â€, â€œ01â€, â€œ02â€, â€œ04â€ ,â€05â€ and â€œ06â€) command after the HOST received the
 error code.
 *3: HOST can sent a next command after HOST received the error code. But the HOST shall activate ICC after
 deactivation.
-*4: If ICC reference standard is “ISO”, C/R doesn’t deactivate automatically. HOST should execute
+*4: If ICC reference standard is â€œISOâ€, C/R doesnâ€™t deactivate automatically. HOST should execute
 deactivate or warm reset after HOST received the error code.
-If ICC reference standard is “EMV3.0 Errata 1.0” or “Europay”, C/R deactivates automatically. HOST
+If ICC reference standard is â€œEMV3.0 Errata 1.0â€ or â€œEuropayâ€, C/R deactivates automatically. HOST
 should tries again to activate after HOST received the error code.
 
 
@@ -2418,7 +2416,7 @@ Meaning
 ##### "3" ISO #3
 
 ```
-Note: Designation of Multiple Track can’t be performed.
+Note: Designation of Multiple Track canâ€™t be performed.
 ```
 ```
 4.4 Magnetic data A (1~104 bytes )
@@ -2482,7 +2480,7 @@ See Annex B
 ```
 4.6 Magnetic Data C (2~105 bytes)
 Magnetic data C is made up track number to be specified and magnetic data to be write.
-When multiple tracks are specified ( in case “4”,”5”,”6” and “7” of data ) , card data corresponded the track
+When multiple tracks are specified ( in case â€œ4â€,â€5â€,â€6â€ and â€œ7â€ of data ) , card data corresponded the track
 of [ ] should be set. And magnetic data of other track(s) should be set by Command ("78") in advance.
 But, magnetic data is able to omit in case that write all track(s) data had already been set.
 ```
@@ -2534,16 +2532,16 @@ command
 Meaning
 Order Length
 (Bytes) Value unit
-"R0" "R1" ÅÅÅÅ Command “Code”
-1 1 “0”-“9” No. “1” “1” Retry no.
+"R0" "R1" Ã…Ã…Ã…Ã… Command â€œCodeâ€
+1 1 â€œ0â€-â€œ9â€ No. â€œ1â€ â€œ1â€ Retry no.
 ```
 ```
 4.8 Return Retry Number ( 2 bytes)
 Data (ASCII) Meaning
 Order
 Length
-(Bytes) Value unit Default value ÅÅÅÅ Command “Code”
-12 “ 00 ”-“ 99 ” No. “ 03 ” Retry no.
+(Bytes) Value unit Default value Ã…Ã…Ã…Ã… Command â€œCodeâ€
+12 â€œ 00 â€-â€œ 99 â€ No. â€œ 03 â€ Retry no.
 ```
 ```
 4.9 Monitoring Time Data (2 bytes)
@@ -2553,9 +2551,9 @@ Meaning
 Order
 Length
 (Bytes) Value unit
-"W0" "W1" “W2” ÅÅÅÅ Command “Code”
+"W0" "W1" â€œW2â€ Ã…Ã…Ã…Ã… Command â€œCodeâ€
 ```
-(^12) “ (^00) ”-“ (^99) ” Seconds “ (^30) ”“ (^30) ”“ (^10) ” Monitoring Time ( "00": Waits infinitely )
+(^12) â€œ (^00) â€-â€œ (^99) â€ Seconds â€œ (^30) â€â€œ (^30) â€â€œ (^10) â€ Monitoring Time ( "00": Waits infinitely )
 Note: For Command details, see 3.3.1 -(1).
 4.10 P/F Condenser Existence (1 byte)
 Designates attaching of the P/F condenser.
@@ -2579,13 +2577,13 @@ Length
 Data
 (ASCII)
 Meaning
-11 “ 0 ”“ 1 ”“ 2 ”
+11 â€œ 0 â€â€œ 1 â€â€œ 2 â€
 Without ISO #1 With ISO #1 read With ISO #1 read/write
 ```
 ```
 ISO #1 head type
 ```
-##### 21 “ 0 ”“ 1 ”“ 2 ”
+##### 21 â€œ 0 â€â€œ 1 â€â€œ 2 â€
 
 ```
 Without ISO #2 With ISO #2 read With ISO #2 read/write
@@ -2593,7 +2591,7 @@ Without ISO #2 With ISO #2 read With ISO #2 read/write
 ```
 ISO #2 head type
 ```
-##### 31 “ 0 ”“ 1 ”“ 2 ”
+##### 31 â€œ 0 â€â€œ 1 â€â€œ 2 â€
 
 ```
 Without ISO #3 With ISO #3 read With ISO #3 read/write
@@ -2625,15 +2623,15 @@ Default value by command
 Order
 Length
 (Bytes) Value
-“D0” “D1” “D2” “D3” “D4” “D5” “D6” “D7”
+â€œD0â€ â€œD1â€ â€œD2â€ â€œD3â€ â€œD4â€ â€œD5â€ â€œD6â€ â€œD7â€
 ```
 ```
 Meaning
 ```
 ```
-ÅÅÅÅCommand “Code”
-11 “0” -- *1 -- *1 -- *1 -- *1 Doesn’t execute
-“1” *1--*1--*1--*1--Executes
+Ã…Ã…Ã…Ã…Command â€œCodeâ€
+11 â€œ0â€ -- *1 -- *1 -- *1 -- *1 Doesnâ€™t execute
+â€œ1â€ *1--*1--*1--*1--Executes
 *1: It shows the setting as default value for each command.
 ```
 ```
@@ -2668,7 +2666,7 @@ HOST. The Parameters (Write Data) of Write Command and the responses of Read Com
 Data) are shown in the table below.
 ```
 ```
-Format "0" (default) “ 1 ” “ 2 ”
+Format "0" (default) â€œ 1 â€ â€œ 2 â€
 designation Only Data SS, Data, ES SS, Data, ES, LRC
 Data length
 Track
@@ -2716,63 +2714,63 @@ ISO #1 ISO #2 ISO #3
 ```
 Meaning
 ```
-##### “^1 ” -- -- -- ISO #1
+##### â€œ^1 â€ -- -- -- ISO #1
 
-##### “ 2 ” -- -- -- ISO #2
+##### â€œ 2 â€ -- -- -- ISO #2
 
 ##### 11
 
-##### “ 3 ” -- -- -- ISO #3
+##### â€œ 3 â€ -- -- -- ISO #3
 
 ```
 Track No.
 ```
 ```
-“ 5 ” -- *1 *1 5 bits
-“ 6 ” -- -- -- 6 bits
-“ 7 ” *1 -- -- 7 bits
+â€œ 5 â€ -- *1 *1 5 bits
+â€œ 6 â€ -- -- -- 6 bits
+â€œ 7 â€ *1 -- -- 7 bits
 ```
 ##### 21
 
 ```
-“ 8 ” -- -- -- 8 bits
+â€œ 8 â€ -- -- -- 8 bits
 ```
 ```
 Character Length
 ```
 ```
-“E” -- -- -- Even Parity
-“O” *1 *1 *1 Odd Parity
+â€œEâ€ -- -- -- Even Parity
+â€œOâ€ *1 *1 *1 Odd Parity
 ```
 ##### 31
 
 ```
-“N” -- -- -- Without Parity
+â€œNâ€ -- -- -- Without Parity
 ```
 ```
 Vertical Parity Calculation
 Method
 ```
 ```
-“ 0 ” *1 *1 *1 Even LRC
-“ 1 ” -- -- -- Even LRC-2
-“ 2 ” -- -- -- Odd LRC
-“ 3 ” -- -- -- CRC
-“ 4 ” -- -- -- CRC-2
-“ 5 ” -- -- -- CRC-3
+â€œ 0 â€ *1 *1 *1 Even LRC
+â€œ 1 â€ -- -- -- Even LRC-2
+â€œ 2 â€ -- -- -- Odd LRC
+â€œ 3 â€ -- -- -- CRC
+â€œ 4 â€ -- -- -- CRC-2
+â€œ 5 â€ -- -- -- CRC-3
 ```
 ##### 41
 
-##### “ 6 ” -- -- -- CRC-4
+##### â€œ 6 â€ -- -- -- CRC-4
 
 ```
 Longitudinal Calculation
 Method *2
 ```
 ```
-5 1 ASCII “sp”“ 0 ”“ 0 ” Top Character
-6 1 ASCII “%”“;”“;” SS Character
-7 1 ASCII “?”“?”“?” ES Character
+5 1 ASCII â€œspâ€â€œ 0 â€â€œ 0 â€ Top Character
+6 1 ASCII â€œ%â€â€œ;â€â€œ;â€ SS Character
+7 1 ASCII â€œ?â€â€œ?â€â€œ?â€ ES Character
 *1: Indicates default value
 *2: LRC/CRC Calculation Method is shown below.
 ```
@@ -2789,7 +2787,7 @@ No. Name Check Range Storage Position Check Code Remarks
 ```
 Combinations of Character Length, Vertical Parity Calculation, and Longitudinal Parity Calculation are
 shown in table below.
-(“O” shows Enabling and “X” shows disabling )
+(â€œOâ€ shows Enabling and â€œXâ€ shows disabling )
 ```
 ```
 Character Longitudinal Calculation Method
@@ -2819,17 +2817,17 @@ value
 Meaning
 ```
 ```
-“ 1 ” -- -- ISO #1
-“ 2 ” -- -- ISO #2
+â€œ 1 â€ -- -- ISO #1
+â€œ 2 â€ -- -- ISO #2
 ```
 ##### 11
 
-##### “ 3 ” -- -- ISO #3
+##### â€œ 3 â€ -- -- ISO #3
 
 ```
 Track No.
 ```
-(^22) “-5”-“ (^22) ” mm “ (^00) ” *1
+(^22) â€œ-5â€-â€œ (^22) â€ mm â€œ (^00) â€ *1
 *1: The standard value (default value) of supplementary Data for Write Start Position of the Start Sentinel
 is 7.4mm. For example, in the case of "05", 5mm + 7.4mm = 12.4mm.
 4.17 Node Address (0 or 2 byte)
@@ -2837,8 +2835,8 @@ Data (ASCII)
 Order
 Length
 (Bytes) Value Default value Meaning
-1 0-1 “ 0 ”-“ 7 ”“ 0 ” NAD (Node Address) of ICC
-0-1 “ 0 ”-“ 7 ”“ 0 ” NAD of C/R
+1 0-1 â€œ 0 â€-â€œ 7 â€â€œ 0 â€ NAD (Node Address) of ICC
+0-1 â€œ 0 â€-â€œ 7 â€â€œ 0 â€ NAD of C/R
 For details, see ISO/IEC 7816-3 Amd.1.
 4.18 PTS/NAD setting (1 or 3 bytes)
 Data(ASCII)
@@ -2847,10 +2845,10 @@ Length
 (Bytes) Value Default
 Value
 Meaning
-11 “ 0 ” -- C/R executes PTS automatically after ATR receiving
-“ 1 ” -- C/R doesn’t executes PTS automatically after ATR receiving
-20~1“ 0 ”~“ 7 ”“ 0 ” NAD (Node Address) of the ICC
-30~1“ 0 ”~“ 7 ”“ 0 ” NAD of C/R
+11 â€œ 0 â€ -- C/R executes PTS automatically after ATR receiving
+â€œ 1 â€ -- C/R doesnâ€™t executes PTS automatically after ATR receiving
+20~1â€œ 0 â€~â€œ 7 â€â€œ 0 â€ NAD (Node Address) of the ICC
+30~1â€œ 0 â€~â€œ 7 â€â€œ 0 â€ NAD of C/R
 
 
 ```
@@ -2941,7 +2939,7 @@ Case 4S.3 Accepted Command with information added *1
 A.5 Case 2 Extended Disable
 A.6 Case 3 Extended Disable
 A.7 Case 4 Extended Disable
-*1: It is enabled to use only when ICC reference standard is only “EMV3.0”.
+*1: It is enabled to use only when ICC reference standard is only â€œEMV3.0â€.
 
 ```
 4.20 T=1(Block Transmission Type) Transmission Data (4~360 bytes)
@@ -3036,10 +3034,10 @@ For details, see ISO/IEC 7816-3.4.9.
 Order Length
 (Bytes)
 Data (ASCII) Meaning
-1 12 “AAAAAAAAAAAA” Type of CPU
-2 2 “AA” Firm Ware version of CPU
-3 6 “000000” ~ ”FFFFFF” SUM Value of CPU ROM
-4 3 “001”~192” Block no. to be down loaded
+1 12 â€œAAAAAAAAAAAAâ€ Type of CPU
+2 2 â€œAAâ€ Firm Ware version of CPU
+3 6 â€œ000000â€ ~ â€FFFFFFâ€ SUM Value of CPU ROM
+4 3 â€œ001â€~192â€ Block no. to be down loaded
 ```
 4.24 Down load Data ( 2054 bytes )
 
@@ -3047,7 +3045,7 @@ Data (ASCII) Meaning
 Order
 Length
 (Bytes) Data Meaning
-11 ‘0’ ‘1’ ‘2’
+11 â€˜0â€™ â€˜1â€™ â€˜2â€™
 Start Block Data Block(s) End Block
 ```
 ```
@@ -3071,52 +3069,52 @@ Length
 Data
 (ASCII)
 Meaning
-“01” Port No.1
-“02” Port No.2
-“03” Port No.3
-“04” Port No.4
-“05” Port No.5
-“06” Port No.6
-“07” Port No.7
+â€œ01â€ Port No.1
+â€œ02â€ Port No.2
+â€œ03â€ Port No.3
+â€œ04â€ Port No.4
+â€œ05â€ Port No.5
+â€œ06â€ Port No.6
+â€œ07â€ Port No.7
 ```
 ##### 12~16
 
 ```
-“08” Port No.8
-Note: Data except “01”-“08” is ignored.
+â€œ08â€ Port No.8
+Note: Data except â€œ01â€-â€œ08â€ is ignored.
 ```
 
-4.26 Memory size of “USER” information ( 3 bytes )
+4.26 Memory size of â€œUSERâ€ information ( 3 bytes )
 Data(ASCII)
 Order Length
 (Bytes) Value unit
 Meaning
 
 ```
-13 “ 001 ”~“ 256 ” Bytes Size of “USER” information. ( size of Response )
+13 â€œ 001 â€~â€œ 256 â€ Bytes Size of â€œUSERâ€ information. ( size of Response )
 ```
 4.27 Output port setting time ( 4~30 bytes)
-The designated I/O port number and time should be set as pair. The order of I/O port number isn’t
+The designated I/O port number and time should be set as pair. The order of I/O port number isnâ€™t
 required.
 The error of setting time is +0 ms to -10 ms.
 Data(ASCII)
 Order Default value by command
 Length
 (Bytes) Value Unit
-“T0” or “T1” “T2” or “T3”
+â€œT0â€ or â€œT1â€ â€œT2â€ or â€œT3â€
 
 ```
 Meaning
 ```
 ```
-1 2 “0x” *1 -- --- -- I/O port number
-2 2 “01”~”99” 100ms “10” “05” Time
-3 2 “0x” *1 -- --- -- I/O port number
-4 2 “01”~”99” 100ms “10” “05” Time
+1 2 â€œ0xâ€ *1 -- --- -- I/O port number
+2 2 â€œ01â€~â€99â€ 100ms â€œ10â€ â€œ05â€ Time
+3 2 â€œ0xâ€ *1 -- --- -- I/O port number
+4 2 â€œ01â€~â€99â€ 100ms â€œ10â€ â€œ05â€ Time
 :: : : : : :
-15 2 “0x” *1 -- --- -- I/O port number
-16 2 “01”~”99” 100ms “10” “05” Time
-*1: Data except “1”-“8” is ignored.
+15 2 â€œ0xâ€ *1 -- --- -- I/O port number
+16 2 â€œ01â€~â€99â€ 100ms â€œ10â€ â€œ05â€ Time
+*1: Data except â€œ1â€-â€œ8â€ is ignored.
 ```
 4.28 ICC Reference Standard(2 bytes)
 
@@ -3129,13 +3127,13 @@ Length
 Data
 (ASCII)
 Meaning
-“00” ISO (default)
-“01” EMV 3.0 Errata 1.0
+â€œ00â€ ISO (default)
+â€œ01â€ EMV 3.0 Errata 1.0
 ```
 ##### 12
 
 ```
-“05” Europay (EMV 3.1.1)
+â€œ05â€ Europay (EMV 3.1.1)
 ```
 4.29 Timer Value for Waiting for Reception (2 bytes)
 Data(ASCII)
@@ -3145,7 +3143,7 @@ Length
 Meaning
 
 ```
-1 2 "06" - ”99” “10” Seconds Timer value of waiting for reception
+1 2 "06" - â€99â€ â€œ10â€ Seconds Timer value of waiting for reception
 from ICC
 ```
 4.30 IFSD Control Method(1 byte)
@@ -3185,11 +3183,11 @@ Order
 Length
 (Bytes) Value Default value Unit
 Meaning
-1 2 "06" - ”99” “10” Seconds Timer value of waiting for reception
+1 2 "06" - â€99â€ â€œ10â€ Seconds Timer value of waiting for reception
 from ICC
-2 2 “00” -- -- Spare
-3 2 “00” -- -- Spare
-4 2 “00” -- -- Spare
+2 2 â€œ00â€ -- -- Spare
+3 2 â€œ00â€ -- -- Spare
+4 2 â€œ00â€ -- -- Spare
 ```
 
 5 Response Data
@@ -3198,7 +3196,7 @@ from ICC
 5.1 Sensor Information (12 bytes)
 Data(ASCII)
 Order Length
-(Bytes) “0” “1” “2” “3”
+(Bytes) â€œ0â€ â€œ1â€ â€œ2â€ â€œ3â€
 Meaning
 ```
 ```
@@ -3259,16 +3257,16 @@ Order Length
 Data
 (ASCII)
 Meaning
-“ 1 ” ISO #1
-“ 2 ” ISO #2
-“ 3 ” ISO #3
-“ 4 ” ISO #1 + ISO #2
-“ 5 ” ISO #1 + ISO #3
-“ 6 ” ISO #2 + ISO #3
+â€œ 1 â€ ISO #1
+â€œ 2 â€ ISO #2
+â€œ 3 â€ ISO #3
+â€œ 4 â€ ISO #1 + ISO #2
+â€œ 5 â€ ISO #1 + ISO #3
+â€œ 6 â€ ISO #2 + ISO #3
 ```
 ##### 11
 
-##### “ 7 ” ISO #1 + ISO #2 + ISO #3
+##### â€œ 7 â€ ISO #1 + ISO #2 + ISO #3
 
 ```
 Read Track Number
@@ -3307,14 +3305,14 @@ Length
 Data
 (ASCII)
 Meaning
-11 “ 1 ”~” 7 ” Designated track number by command. Refer to 4.2.
+11 â€œ 1 â€~â€ 7 â€ Designated track number by command. Refer to 4.2.
 2 0 or 2 result of reading ISO #1
 3 0 or 2 result of reading ISO #2
 4 0 or 2 result of reading ISO #3
 ```
 ```
 None order : none data
-Magnetic data normality : “ 00 ”
+Magnetic data normality : â€œ 00 â€
 Magnetic data abnormality : see 3.4.2
 5 0 or 3 Length ISO #1
 6 0 or 3 Length ISO #2
@@ -3323,7 +3321,7 @@ Magnetic data abnormality : see 3.4.2
 ```
 None designating : none data
 Magnetic data normality : Magnetic Data Length
-Magnetic data abnormality : “ 000 ”
+Magnetic data abnormality : â€œ 000 â€
 8 0~76 Card Data ISO #1
 9 0~37 Card Data ISO #2
 10 0~104 Card Data ISO #3
@@ -3344,16 +3342,16 @@ Length
 ```
 Data
 (ASCII) Meaning
-“^1 ” ISO #1
-“ 2 ” ISO #2
-“^3 ” ISO #3
-“ 4 ” ISO #1 + ISO #2
-“^5 ” ISO #1 + ISO #3
-“ 6 ” ISO #2 + ISO #3
+â€œ^1 â€ ISO #1
+â€œ 2 â€ ISO #2
+â€œ^3 â€ ISO #3
+â€œ 4 â€ ISO #1 + ISO #2
+â€œ^5 â€ ISO #1 + ISO #3
+â€œ 6 â€ ISO #2 + ISO #3
 ```
 ##### 11
 
-##### “ 7 ” ISO #1 + ISO #2 + ISO #3
+##### â€œ 7 â€ ISO #1 + ISO #2 + ISO #3
 
 5.6 Captured Number of Card(s) (3 bytes)
 
@@ -3366,7 +3364,7 @@ Length
 Data
 (ASCII)
 Meaning
-13 “ 000 ”~” 999 ” Captured Number of Card
+13 â€œ 000 â€~â€ 999 â€ Captured Number of Card
 ```
 ### 5.8 Option Information (16 bytes) 5-
 
@@ -3384,11 +3382,11 @@ Length
 Data
 (ASCII) Meaning
 ```
-(^12) “ (^00) ”~” (^50) ” 0.0~5.0V Sensor S0
+(^12) â€œ (^00) â€~â€ (^50) â€ 0.0~5.0V Sensor S0
 2 2 Spare - Extra
-(^32) “ (^00) ”~” (^50) ” 0.0~5.0V Sensor S2
+(^32) â€œ (^00) â€~â€ (^50) â€ 0.0~5.0V Sensor S2
 4 2 Spare - Extra
-(^52) “ (^00) ”~” (^50) ” 0.0~5.0V Sensor S4
+(^52) â€œ (^00) â€~â€ (^50) â€ 0.0~5.0V Sensor S4
 6 2 Spare - Extra
 7 2 Spare - Extra
 8 2 Spare - Extra
@@ -3398,7 +3396,7 @@ Sensor Voltage
 5.8 Option Information (16 bytes)
 Data(ASCII)
 Order Length
-(Bytes) “0” “1” “2” “?”
+(Bytes) â€œ0â€ â€œ1â€ â€œ2â€ â€œ?â€
 Meaning
 
 ```
@@ -3476,16 +3474,16 @@ Length
 Data
 (ASCII)
 Meaning
-112 “AAAAAAAAAAAA” CPU FW type
-22 “AA” CPU FW Version
-36 “ 000000 ”~”FFFFFF” CPU ROM SUM Value
+112 â€œAAAAAAAAAAAAâ€ CPU FW type
+22 â€œAAâ€ CPU FW Version
+36 â€œ 000000 â€~â€FFFFFFâ€ CPU ROM SUM Value
 4 12 Spare Spare
 5 2 Spare Spare
 6 6 Spare Spare
 ```
-(^712) “AAAAAAAAAAAA” FW type in Memory
-82 “AA” FW Version in Memory
-(^98) “ (^00000000) ”~”FFFFFFFF” SUM Value in Memory
+(^712) â€œAAAAAAAAAAAAâ€ FW type in Memory
+82 â€œAAâ€ FW Version in Memory
+(^98) â€œ (^00000000) â€~â€FFFFFFFFâ€ SUM Value in Memory
 
 ### 5.10 ATR (Answer to Reset) Information (2~33 bytes) 5-
 
@@ -3517,15 +3515,15 @@ Order
 Length
 (Bytes)
 Data Meaning
-“ 0 ” Enables to execute protocol type T=0 immediately.
-“ 1 ” Enables to execute protocol type T=1 immediately.
-“P” Needs to select protocol type by PTS Request Commands.
-“N” Incompletion of PTS Execution
+â€œ 0 â€ Enables to execute protocol type T=0 immediately.
+â€œ 1 â€ Enables to execute protocol type T=1 immediately.
+â€œPâ€ Needs to select protocol type by PTS Request Commands.
+â€œNâ€ Incompletion of PTS Execution
 ```
 ##### 11
 
 ```
-“?” Command Parameter is “ No PTS Execution automatically.
+â€œ?â€ Command Parameter is â€œ No PTS Execution automatically.
 2 1 00H-FFH TS Initial Character
 3 1 00H-FFH T0 Format Character
 4 Undefined 00H-FFH TA1~TDn Interface Character
@@ -3582,13 +3580,13 @@ Order Length
 Data
 (ASCII)
 Meaning
-“ 0 ” Enable to execute T=0.
-“ 1 ” Enable to execute T=1.
+â€œ 0 â€ Enable to execute T=0.
+â€œ 1 â€ Enable to execute T=1.
 ```
 ##### 11
 
 ```
-“N” Incompletion PTS Execution.
+â€œNâ€ Incompletion PTS Execution.
 ```
 ### 5.15 Memory Version Information (22 bytes) 5-
 
@@ -3600,10 +3598,10 @@ Order Length
 Data
 (ASCII)
 Meaning
-112 “AAAAAAAAAAAA” FW type in Memory
+112 â€œAAAAAAAAAAAAâ€ FW type in Memory
 ```
-(^22) “AA” FW Version in Memory
-38 “ 00000000 ”~”FFFFFFFF” SUM Value in Memory
+(^22) â€œAAâ€ FW Version in Memory
+38 â€œ 00000000 â€~â€FFFFFFFFâ€ SUM Value in Memory
 
 
 ### 5.16 USER Information in memory (1~256 bytes) 5-
@@ -3633,14 +3631,14 @@ Length
 Data
 (ASCII)
 Meaning
-11 “ 0 ” Input Port No.1 is OFF.
-“ 1 ” Input Port No.1 is ON.
-21 “ 0 ” Input Port No.2 is OFF.
-“ 1 ” Input Port No.2 is ON.
-31 “ 0 ” Input Port No.3 is OFF.
-“ 1 ” Input Port No.3 is ON.
-41 “ 0 ” Input Port No.4 is OFF.
-“ 1 ” Input Port No.4 is ON.
+11 â€œ 0 â€ Input Port No.1 is OFF.
+â€œ 1 â€ Input Port No.1 is ON.
+21 â€œ 0 â€ Input Port No.2 is OFF.
+â€œ 1 â€ Input Port No.2 is ON.
+31 â€œ 0 â€ Input Port No.3 is OFF.
+â€œ 1 â€ Input Port No.3 is ON.
+41 â€œ 0 â€ Input Port No.4 is OFF.
+â€œ 1 â€ Input Port No.4 is ON.
 ```
 ### 5.18 FW Version Information of Nonvolatile Memory(22 bytes) 5-
 
@@ -3653,11 +3651,11 @@ Length
 Data
 (ASCII) Meaning
 ```
-(^112) “AAAAAAAAAAAA” *1 FW type of nonvolatile memory
-22 “AA” *1 FW version of nonvolatile memory
-(^38) “ (^000000) ”~”FFFFFF” *2 FW SUM value of nonvolatile memory
-*1 In case of incomplete program, “_” is indicated. “_” denotes 20H of HEX code.
-*2 In case of incomplete program, “0” is indicated.
+(^112) â€œAAAAAAAAAAAAâ€ *1 FW type of nonvolatile memory
+22 â€œAAâ€ *1 FW version of nonvolatile memory
+(^38) â€œ (^000000) â€~â€FFFFFFâ€ *2 FW SUM value of nonvolatile memory
+*1 In case of incomplete program, â€œ_â€ is indicated. â€œ_â€ denotes 20H of HEX code.
+*2 In case of incomplete program, â€œ0â€ is indicated.
 5.19 ICC Control Information(16 bytes)
 Order
 Length
@@ -3665,18 +3663,18 @@ Length
 Data
 (ASCII)
 Meaning
-“00” ISO (default)
-“01” EMV 3.0 Errata 1.0
+â€œ00â€ ISO (default)
+â€œ01â€ EMV 3.0 Errata 1.0
 
 ##### 12
 
 ```
-“05” Europay (EMV 3.1.1)
-2 2 "06" - ”99” Timer value of waiting for reception from ICC ( Unit: seconds)
+â€œ05â€ Europay (EMV 3.1.1)
+2 2 "06" - â€99â€ Timer value of waiting for reception from ICC ( Unit: seconds)
 31 "0" Requests IFSD automatically.
 "1" Not request IFSD.
 41 "0" Checks TCK.
 "1" Not check TCK.
-5 10 “0” Spare
+5 10 â€œ0â€ Spare
 ```
 
