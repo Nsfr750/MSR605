@@ -5,23 +5,63 @@ All notable changes to the MSR605 Card Reader/Writer project will be documented 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.3.0] - 2025-07-19
 
 ### Added
-- Support for Python 3.12
+
+- Daily log file rotation with automatic cleanup
+- Application icon support
+- Improved menu organization and translations
+- New update checking system with GitHub integration
+- Dark mode support throughout the application
+- Voice control menu in Tools
+- Sponsor information in Help menu
+
+### Changed
+
+- Replaced Pillow with Wand for image processing
+- Updated menu structure for better usability
+- Improved error handling and logging
+- Enhanced translation support for all UI elements
+- Optimized application startup time
+- Updated dependencies to latest stable versions
+
+### Fixed
+
+- Fixed menu translation issues
+- Resolved initialization order in menu system
+- Fixed update checker timestamp parsing
+- Improved cross-platform compatibility
+- Fixed various UI layout issues
+
+## [2.2.0] - 2025-06-15
+
+### Added
+
+- Support for Python 3.12 and 3.13
 - Enhanced error handling for hardware communication
 - New configuration options in `config.ini`
 - Additional test cases for better code coverage
+- Comprehensive documentation in CONTRIBUTING.md and PREREQUISITES.md
+- GitHub CODEOWNERS file for better code review workflow
+- Pre-commit hooks for code quality
+- Sphinx documentation with ReadTheDocs theme
 
 ### Changed
-- Updated dependencies to their latest versions
+
+- Updated all dependencies to their latest stable versions
 - Improved documentation and code comments
 - Optimized database operations
+- Restructured project documentation
+- Enhanced development tooling with pre-commit hooks
+- Improved test coverage reporting
 
 ### Fixed
 - Minor UI layout issues
 - Fixed potential memory leaks in card reading operations
 - Resolved issues with special character handling
+- Fixed compatibility issues with latest PyQt6 and Qt6.6
+- Addressed security vulnerabilities in dependencies
 
 ## [2.1.0] - 2025-05-22
 

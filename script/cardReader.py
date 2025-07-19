@@ -8,9 +8,10 @@
 """
 
 
-import serial, time, sys, cardReaderExceptions
+import serial, time, sys
+from . import cardReaderExceptions
 
-from isoStandardDictionary import isoDictionaryTrackOne, isoDictionaryTrackTwoThree,\
+from .isoStandardDictionary import isoDictionaryTrackOne, isoDictionaryTrackTwoThree,\
         iso_standard_track_check
 
 #These constants are from the MSR605 Programming Manual under 'Section 6 Command and Response'
@@ -52,14 +53,12 @@ class CardReader():
     """Allows interfacing with the MSR605 using the serial module"""
       
     
-    def __init__(self):
-        """Connects to the MSR605 using pyserial (serial connection)
-        
-            Checks the first 256 COM ports, hopefully the MSR605 is connected to
-            one of those ports
+    def __init__(self, port=None):
+        """Initializes the CardReader instance.
         
             Args:
-                None
+                port (str, optional): The COM port to connect to (e.g., 'COM5'). If None,
+                                    the class will try to auto-detect the port.
         
             Returns:
                 Nothing
@@ -67,39 +66,64 @@ class CardReader():
             Raises:
                 MSR605ConnectError: An error occurred when connecting to the MSR605
         """
+        self.__serialConn = None
+        self.__port = port
+    
+    def connect(self):
+        """Connects to the MSR605 using the specified port or auto-detects it.
         
-        print ("\nATTEMPTING TO CONNECT TO MSR605")
+            Raises:
+                MSR605ConnectError: If connection fails
+        """
+        print("\nATTEMPTING TO CONNECT TO MSR605")
         
-        #this looks for the first available COM port, can be changed to look for the MSR
-        for x in range(0, 255):
+        if self.__port:
+            # Try to connect to the specified port
             try:
-
-                self.__serialConn = serial.Serial('COM' + str(x))  # opens the serial port
-            except(serial.SerialException, OSError):
-                pass #continues going through the loop
+                self.__serialConn = serial.Serial(self.__port)
+                print(f"Connected to specified port: {self.__port}")
+            except (serial.SerialException, OSError) as e:
+                raise cardReaderExceptions.MSR605ConnectError(
+                    f"Failed to connect to {self.__port}: {str(e)}"
+                )
+        else:
+            # Auto-detect the port
+            for x in range(1, 256):
+                port = f'COM{x}'
+                try:
+                    self.__serialConn = serial.Serial(port)
+                    print(f"Auto-connected to port: {port}")
+                    self.__port = port
+                    break
+                except (serial.SerialException, OSError):
+                    continue
             
-        #checks to see if the serial connection exists
-        try:
-            self.__serialConn
-        except(NameError, AttributeError):
-            raise cardReaderExceptions.MSR605ConnectError("THE CARD READER IS BEING USED BY "
-                                                          "SOMETHING ELSE OR IT IS NOT PLUGGED IN")
+            if self.__serialConn is None:
+                raise cardReaderExceptions.MSR605ConnectError(
+                    "Could not find MSR605 on any COM port. "
+                    "Please check the connection or specify the port manually."
+                )
 
-
-        #this is in the Programmers Manual under 'Section 8 Communication Sequence', it states
-        #how to properly initialize the MSR605
-        print ("\nINITIALIZING THE MSR605")
-        
-        self.reset()
-        
         try:
+            # Initialize the MSR605
+            print("\nINITIALIZING THE MSR605")
+            
+            # Reset the device
+            self.reset()
+            
+            # Test communication
             self.communication_test()
-        except cardReaderExceptions.CommunicationTestError as e:
-            raise (cardReaderExceptions.CommunicationTestError(e))
             
-        self.reset()
-        
-        print ("\nCONNECTED TO MSR605")
+            # Reset again after communication test
+            self.reset()
+            
+            print("\nCONNECTED TO MSR605")
+            
+        except Exception as e:
+            # Close the connection if initialization fails
+            if self.__serialConn and self.__serialConn.is_open:
+                self.__serialConn.close()
+            raise
         
         
     def set_leading_zero(self, track=1, enable=True):

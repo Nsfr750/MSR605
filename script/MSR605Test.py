@@ -2,7 +2,6 @@
 
 import sys, time, cardReaderExceptions, cardReader
 
-
 #INITIALIZE MSR605
 try:
     msr = cardReader.CardReader()
@@ -15,7 +14,6 @@ except cardReaderExceptions.CommunicationTestError as e:
     
 #RESET MSR605
 msr.reset()
-
 
 time.sleep(1)
 

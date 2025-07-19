@@ -1,0 +1,18 @@
+# Default owners for everything in the repo
+*       @Nsfr750
+
+# Documentation
+/Docs/    @Nsfr750
+
+# Python source files
+/script/    @Nsfr750
+
+# Configuration files
+*.md         @Nsfr750
+*.yaml       @Nsfr750
+*.yml        @Nsfr750
+*.toml       @Nsfr750
+*.ini        @Nsfr750
+
+# GitHub specific
+.github/     @Nsfr750
