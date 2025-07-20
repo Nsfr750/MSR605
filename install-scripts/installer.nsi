@@ -1,15 +1,4 @@
-; NSIS Installer Script for MSR605 Card Reader/Writer
-; Auto-generated with enhanced features for MSR605 Project
-
-; Include Modern UI and other required libraries
-!include "MUI2.nsh"
-!include "FileFunc.nsh"
-!include "LogicLib.nsh"
-!include "x64.nsh"
-!include "WordFunc.nsh"
-!include "WinVer.nsh"
-!include "nsDialogs.nsh"
-!include "Sections.nsh"
+; Minimal NSIS Installer Script for MSR605 Card Reader/Writer
 
 ; --------------------------------
 ; Version Information
@@ -30,22 +19,6 @@
 !define DISCORD_URL "https://discord.gg/BvvkUEP9"
 
 ; --------------------------------
-; Installer Attributes
-; --------------------------------
-Name "${DISPLAY_NAME}"
-OutFile "..\dist\${APPNAME}-v${VERSION}-Setup.exe"
-InstallDir "$PROGRAMFILES64\${APPNAME}"
-InstallDirRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "InstallLocation"
-RequestExecutionLevel admin
-ShowInstDetails show
-ShowUninstDetails show
-BrandingText "${DISPLAY_NAME} v${VERSION}"
-
-; Compression settings
-SetCompressor /SOLID lzma
-SetCompressorDictSize 64
-
-; --------------------------------
 ; Version Info for the installer
 ; --------------------------------
 VIProductVersion "${VERSION}"
@@ -59,29 +32,40 @@ VIAddVersionKey "InternalName" "${APPNAME}"
 VIAddVersionKey "OriginalFilename" "${APPNAME}-v${VERSION}-Setup.exe"
 VIAddVersionKey "ProductVersionString" "${VERSION}"
 
-; --------------------------------
-; Interface Settings
-; --------------------------------
+; Variables
+Var CreateDesktopSC
+Var AssocImages
+Var ReinstallUninstallString
+
+; Modern UI
+!include "MUI2.nsh"
+
+; General settings
+Name "${APPNAME}"
+OutFile "..\dist\${APPNAME}-v${VERSION}-Setup.exe"
+InstallDir "$PROGRAMFILES64\${APPNAME}"
+InstallDirRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "InstallLocation"
+RequestExecutionLevel admin
+
+; UI settings
 !define MUI_ABORTWARNING
-!define MUI_ICON "..\assets\icon.ico"
-!define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
+!define MUI_ICON "${NSISDIR}\Contrib\Graphics\Icons\orange-install.ico"
+!define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\orange-uninstall.ico"
 
 ; Header Images
 !define MUI_HEADERIMAGE
-!define MUI_HEADERIMAGE_BITMAP "${NSISDIR}\Contrib\Graphics\Header\win.bmp"
-!define MUI_HEADERIMAGE_UNBITMAP "${NSISDIR}\Contrib\Graphics\Header\win-uninstall.bmp"
+!define MUI_HEADERIMAGE_BITMAP "${NSISDIR}\Contrib\Graphics\Header\orange.bmp"
+!define MUI_HEADERIMAGE_UNBITMAP "${NSISDIR}\Contrib\Graphics\Header\orange-uninstall-r.bmp"
 !define MUI_HEADERIMAGE_RIGHT
 
 ; Welcome/Finish page
-!define MUI_WELCOMEFINISHPAGE_BITMAP "${NSISDIR}\Contrib\Graphics\Wizard\win.bmp"
-!define MUI_WELCOMEFINISHPAGE_UNBITMAP "${NSISDIR}\Contrib\Graphics\Wizard\win-uninstall.bmp"
-!define MUI_UNWELCOMEFINISHPAGE_BITMAP "${NSISDIR}\Contrib\Graphics\Wizard\win.bmp"
+!define MUI_WELCOMEFINISHPAGE_BITMAP "${NSISDIR}\Contrib\Graphics\Wizard\orange.bmp"
+!define MUI_WELCOMEFINISHPAGE_UNBITMAP "${NSISDIR}\Contrib\Graphics\Wizard\orange-uninstall.bmp"
+!define MUI_UNWELCOMEFINISHPAGE_BITMAP "${NSISDIR}\Contrib\Graphics\Wizard\orange.bmp"
 
 ; Other UI settings
 !define MUI_FINISHPAGE_NOAUTOCLOSE
 !define MUI_UNFINISHPAGE_NOAUTOCLOSE
-!define MUI_ICON "..\assets\icon.ico"
-!define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
 
 ; Modern UI2 settings
 !define MUI_UI_HEADERIMAGE_RIGHT "${NSISDIR}\Contrib\UIs\modern_headerbmp.exe"
@@ -95,49 +79,10 @@ VIAddVersionKey "ProductVersionString" "${VERSION}"
 ; Request DPI awareness for the installer
 ManifestDPIAware true
 
-; --------------------------------
 ; Pages
-; --------------------------------
 !insertmacro MUI_PAGE_WELCOME
-!insertmacro MUI_PAGE_LICENSE "..\LICENSE"
-!insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_DIRECTORY
-
-; Custom page to confirm installation
-Page custom PageReinstall PageLeaveReinstall
-
-; Include nsDialogs for custom pages
-!include "nsDialogs.nsh"
-!include "LogicLib.nsh"
-!include "FileFunc.nsh"
-!include "WinVer.nsh"
-!include "x64.nsh"
-!include "WordFunc.nsh"
-!insertmacro VersionCompare
-
-; Variables
-Var ReinstallUninstallString
-Var CreateDesktopSC
-Var CreateStartMenuSC
-Var InstallForAllUsers
-
 !insertmacro MUI_PAGE_INSTFILES
-
-; Custom finish page with more options
-!define MUI_FINISHPAGE_TITLE "Installation Complete"
-!define MUI_FINISHPAGE_TEXT "${DISPLAY_NAME} has been installed on your computer.\n\nThank you for choosing ${DISPLAY_NAME}!"
-!define MUI_FINISHPAGE_RUN "$INSTDIR\\${APPNAME}.exe"
-!define MUI_FINISHPAGE_RUN_TEXT "Launch ${DISPLAY_NAME}"
-!define MUI_FINISHPAGE_RUN_FUNCTION "LaunchApplication"
-!define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\\README.md"
-!define MUI_FINISHPAGE_SHOWREADME_TEXT "View README"
-!define MUI_FINISHPAGE_LINK "Visit ${DISPLAY_NAME} on GitHub"
-!define MUI_FINISHPAGE_LINK_LOCATION "${WEBSITE}"
-!define MUI_FINISHPAGE_NOREBOOTSUPPORT
-
-; Add a custom finish page action
-!define MUI_PAGE_CUSTOMFUNCTION_SHOW FinishPageShow
-!define MUI_PAGE_CUSTOMFUNCTION_LEAVE FinishPageLeave
 !insertmacro MUI_PAGE_FINISH
 
 ; Uninstaller pages
@@ -145,57 +90,166 @@ Var InstallForAllUsers
 !insertmacro MUI_UNPAGE_INSTFILES
 !insertmacro MUI_UNPAGE_FINISH
 
-; --------------------------------
 ; Languages
-; --------------------------------
 !insertmacro MUI_LANGUAGE "English"
 !insertmacro MUI_LANGUAGE "Italian"
 
-; --------------------------------
-; Variables
-; --------------------------------
-Var ReinstallUninstallString
-Var CreateDesktopSC
-Var AssocImages
-
-; --------------------------------
-; Installer Sections
-; --------------------------------
-Section "!${APPNAME}" SecMain
-  SectionIn RO
+Function .onInit
+  ; Initialize variables
+  StrCpy $CreateDesktopSC 0
+  StrCpy $AssocImages 0
   
-  ; Set output path to the installation directory
+  ; Check if source files exist before installation
+  IfFileExists "X:\GitHub\MSR605\MSR605.exe" exe_found
+    MessageBox MB_OK|MB_ICONSTOP "Error: MSR605.exe not found at X:\GitHub\MSR605\MSR605.exe"
+    Abort
+  exe_found:
+  
+  IfFileExists "X:\GitHub\MSR605\assets\*.*" assets_found
+    MessageBox MB_OK|MB_ICONEXCLAMATION "Warning: assets directory not found at X:\GitHub\MSR605\assets"
+  assets_found:
+  
+  IfFileExists "X:\GitHub\MSR605\README.md" readme_found
+    MessageBox MB_OK|MB_ICONEXCLAMATION "Warning: README.md not found at X:\GitHub\MSR605\README.md"
+  readme_found:
+  
+  IfFileExists "X:\GitHub\MSR605\LICENSE" license_found
+    MessageBox MB_OK|MB_ICONEXCLAMATION "Warning: LICENSE not found at X:\GitHub\MSR605\LICENSE"
+  license_found:
+  
+  IfFileExists "X:\GitHub\MSR605\CHANGELOG.md" changelog_found
+    MessageBox MB_OK|MB_ICONEXCLAMATION "Warning: CHANGELOG.md not found at X:\GitHub\MSR605\CHANGELOG.md"
+  changelog_found:
+  
+  ; Check for previous installation
+  ReadRegStr $R0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "UninstallString"
+  StrCmp $R0 "" done
+  
+  ; If previous installation found, show message
+  MessageBox MB_YESNO|MB_ICONQUESTION "${APPNAME} is already installed. $\n$\nDo you want to uninstall the previous version before continuing with the installation?" IDYES uninst
+  Abort
+  
+  uninst:
+    ClearErrors
+    ExecWait '$R0 _?=$INSTDIR'
+    IfErrors no_remove_uninstaller
+    Delete $R0
+    RMDir $INSTDIR
+    
+  no_remove_uninstaller:
+    IfErrors no_remove_folder
+    RMDir /r $INSTDIR
+    
+  no_remove_folder:
+    IfErrors +2
+    Delete "$DESKTOP\${APPNAME}.lnk"
+    
+  done:
+FunctionEnd
+
+; Installer section
+Section "MainSection" SecMain
+  ; Set output directory
   SetOutPath "$INSTDIR"
   
-  ; Add files
-  File /r "dist\${APPNAME}.exe"
-  File /r "assets\*.*"
-  File "README.md"
-  File "LICENSE"
-  File "CHANGELOG.md"
+  ; Add the main executable with verification
+  SetOutPath "$INSTDIR"
+  File "X:\GitHub\MSR605\dist\MSR605.exe"
+  IfFileExists "$INSTDIR\MSR605.exe" +5
+    MessageBox MB_OK|MB_ICONSTOP "Failed to install MSR605.exe to $INSTDIR"
+    MessageBox MB_OK|MB_ICONINFORMATION "Current directory: $EXEDIR"
+    MessageBox MB_OK|MB_ICONINFORMATION "Source file exists: $\nX:\GitHub\MSR605\dist\MSR605.exe"
+    Abort
+  
+  ; Add assets directory with detailed error checking
+  IfFileExists "X:\GitHub\MSR605\assets\*.*" assets_exist
+    MessageBox MB_OK|MB_ICONEXCLAMATION "Skipping assets: Source directory not found at X:\GitHub\MSR605\assets"
+    Goto skip_assets
+  
+  assets_exist:
+  CreateDirectory "$INSTDIR\assets"
+  IfFileExists "$INSTDIR\assets" +3
+    MessageBox MB_OK|MB_ICONSTOP "Failed to create directory: $INSTDIR\assets"
+    Goto skip_assets
+  
+  SetOutPath "$INSTDIR\assets"
+  File /r "X:\GitHub\MSR605\assets\*.*"
+  IfFileExists "$INSTDIR\assets\*.*" assets_installed
+    MessageBox MB_OK|MB_ICONSTOP "Failed to install assets to $INSTDIR\assets"
+    Goto skip_assets
+    
+  assets_installed:
+  MessageBox MB_OK|MB_ICONINFORMATION "Assets successfully installed to $INSTDIR\assets"
+  
+  skip_assets:
+  
+  ; Set output path back to installation directory
+  SetOutPath "$INSTDIR"
+  
+  ; Add documentation files with detailed verification
+  SetOutPath "$INSTDIR"
+  
+  ; Install README.md
+  IfFileExists "X:\GitHub\MSR605\README.md" readme_exists
+    MessageBox MB_OK|MB_ICONEXCLAMATION "Skipping README.md: Source file not found at X:\GitHub\MSR605\README.md"
+    Goto skip_readme
+  
+  readme_exists:
+  File "X:\GitHub\MSR605\README.md"
+  IfFileExists "$INSTDIR\README.md" readme_installed
+    MessageBox MB_OK|MB_ICONSTOP "Failed to install README.md to $INSTDIR"
+    Goto skip_readme
+  
+  readme_installed:
+  MessageBox MB_OK|MB_ICONINFORMATION "Successfully installed README.md to $INSTDIR"
+  
+  skip_readme:
+  
+  ; Install LICENSE
+  IfFileExists "X:\GitHub\MSR605\LICENSE" license_exists
+    MessageBox MB_OK|MB_ICONEXCLAMATION "Skipping LICENSE: Source file not found at X:\GitHub\MSR605\LICENSE"
+    Goto skip_license
+  
+  license_exists:
+  File "X:\GitHub\MSR605\LICENSE"
+  IfFileExists "$INSTDIR\LICENSE" license_installed
+    MessageBox MB_OK|MB_ICONSTOP "Failed to install LICENSE to $INSTDIR"
+    Goto skip_license
+  
+  license_installed:
+  MessageBox MB_OK|MB_ICONINFORMATION "Successfully installed LICENSE to $INSTDIR"
+  
+  skip_license:
+  
+  ; Install CHANGELOG.md
+  IfFileExists "X:\GitHub\MSR605\CHANGELOG.md" changelog_exists
+    MessageBox MB_OK|MB_ICONEXCLAMATION "Skipping CHANGELOG.md: Source file not found at X:\GitHub\MSR605\CHANGELOG.md"
+    Goto skip_changelog
+  
+  changelog_exists:
+  File "X:\GitHub\MSR605\CHANGELOG.md"
+  IfFileExists "$INSTDIR\CHANGELOG.md" changelog_installed
+    MessageBox MB_OK|MB_ICONSTOP "Failed to install CHANGELOG.md to $INSTDIR"
+    Goto skip_changelog
+  
+  changelog_installed:
+  MessageBox MB_OK|MB_ICONINFORMATION "Successfully installed CHANGELOG.md to $INSTDIR"
+  
+  skip_changelog:
   
   ; Create uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"
   
-  ; Create start menu shortcuts
+  ; Create start menu shortcut
   CreateDirectory "$SMPROGRAMS\${APPNAME}"
   CreateShortCut "$SMPROGRAMS\${APPNAME}\${APPNAME}.lnk" "$INSTDIR\${APPNAME}.exe"
   CreateShortCut "$SMPROGRAMS\${APPNAME}\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
   
-  ; Create desktop shortcut if selected
-  ${If} $CreateDesktopSC == 1
-    CreateShortCut "$DESKTOP\${APPNAME}.lnk" "$INSTDIR\${APPNAME}.exe"
-  ${EndIf}
-  
-  ; Write registry keys for Add/Remove Programs
+  ; Add/Remove Programs entry
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" \
                  "DisplayName" "${APPNAME}"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" \
-                 "UninstallString" '"$INSTDIR\Uninstall.exe" /currentuser'
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" \
-                 "QuietUninstallString" '"$INSTDIR\Uninstall.exe" /S'
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" \
-                 "DisplayIcon" "$INSTDIR\${APPNAME}.exe,0"
+                 "UninstallString" '"$INSTDIR\Uninstall.exe"'
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" \
                  "DisplayVersion" "${VERSION}"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" \
@@ -203,21 +257,19 @@ Section "!${APPNAME}" SecMain
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" \
                  "URLInfoAbout" "${WEBSITE}"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" \
-                 "HelpLink" "${HELP_URL}"
+                 "HelpLink" "${WEBSITE}"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" \
-                 "URLUpdateInfo" "${UPDATE_URL}"
+                 "URLUpdateInfo" "${WEBSITE}"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" \
                  "InstallLocation" "$INSTDIR"
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" \
-                   "NoModify" 1
-  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" \
                    "NoRepair" 1
-  
-  ; Calculate installation size
-  ${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
-  IntFmt $0 "0x%08X" $0
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" \
-                   "EstimatedSize" "$0"
+                   "NoModify" 1
+  
+  ; Set a fixed estimated size (in KB)
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" \
+                   "EstimatedSize" 10240
   
   ; Create uninstaller for the current user
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" \
@@ -291,25 +343,44 @@ FunctionEnd
 ; Uninstaller Section
 ; --------------------------------
 Section "Uninstall"
-  ; Remove files
-  Delete "$INSTDIR\${APPNAME}.exe"
+  ; Remove files and directories
   Delete "$INSTDIR\Uninstall.exe"
+  
+  ; Remove main executable
+  Delete "$INSTDIR\${APPNAME}.exe"
+  
+  ; Remove documentation files
+  Delete "$INSTDIR\README.md"
   Delete "$INSTDIR\LICENSE"
-  Delete "$INSTDIR\README.txt"
   Delete "$INSTDIR\CHANGELOG.md"
   
-  ; Remove directories
+  ; Remove assets directory
   RMDir /r "$INSTDIR\assets"
+  
+  ; Remove installation directory if empty
   RMDir "$INSTDIR"
   
-  ; Remove shortcuts
+  ; Remove start menu shortcuts
   Delete "$SMPROGRAMS\${APPNAME}\${APPNAME}.lnk"
   Delete "$SMPROGRAMS\${APPNAME}\Uninstall.lnk"
   RMDir "$SMPROGRAMS\${APPNAME}"
+  
+  ; Remove desktop shortcut if it exists
   Delete "$DESKTOP\${APPNAME}.lnk"
   
   ; Remove registry keys
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}"
+  
+  ; Remove any file associations
+  DeleteRegKey HKCR "Applications\${APPNAME}.exe"
+  
+  ; Notify the shell that we removed an application
+  System::Call 'shell32.dll::SHChangeNotify(i, i, i, i) v (0x08000000, 0, 0, 0)'
+  
+  ; Show completion message
+  MessageBox MB_ICONINFORMATION|MB_OK "${APPNAME} was successfully removed from your computer."
+  
+  ; Remove registry keys
   DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}"
   DeleteRegKey HKLM "Software\${APPNAME}"
   
@@ -331,34 +402,7 @@ SectionEnd
 ; --------------------------------
 ; Functions
 ; --------------------------------
-Function .onInit
-  ; Initialize variables
-  StrCpy $CreateDesktopSC 0
-  StrCpy $AssocImages 0
-  
-  ; Check for previous installation
-  ReadRegStr $R0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "UninstallString"
-  StrCmp $R0 "" done
-  
-  ; If previous installation found, show message
-  MessageBox MB_YESNO|MB_ICONQUESTION "${APPNAME} is already installed. $\n$\nDo you want to uninstall the previous version before continuing with the installation?" IDYES uninst
-  Abort
-  
-  uninst:
-    ClearErrors
-    ExecWait '$R0 _?=$INSTDIR'
-    IfErrors no_remove_uninstaller
-    Delete $R0
-    RMDir $INSTDIR
-    
-  no_remove_uninstaller:
-    IfErrors no_remove_folder
-    RMDir /r $INSTDIR
-    
-  no_remove_folder:
-  
-  done:
-FunctionEnd
+; Note: The .onInit function is already defined at the beginning of the file
 
 Function LaunchApplication
   ExecShell "" "$INSTDIR\${APPNAME}.exe"

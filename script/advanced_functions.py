@@ -27,6 +27,8 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt, QSize, pyqtSignal, QObject
 from PyQt6.QtGui import QFont, QTextCursor, QIcon
 
+from script.language_manager import LanguageManager
+
 # Import visualization module
 try:
     from .visualization import VisualizationWidget
@@ -43,27 +45,39 @@ logger = logging.getLogger(__name__)
 
 class AdvancedFunctionsWidget(QWidget):
     """Widget containing advanced card data processing functions."""
+    
+    # Signal to request a card read from the parent
+    read_card_requested = pyqtSignal()
 
     def __init__(
-        self, parent: Optional[QWidget] = None, tracks: Optional[List[str]] = None
+        self, 
+        parent: Optional[QWidget] = None, 
+        tracks: Optional[List[str]] = None,
+        language_manager: Optional[LanguageManager] = None
     ):
         """Initialize the advanced functions widget.
 
         Args:
             parent: Parent widget
             tracks: List of track data strings [track1, track2, track3]
+            language_manager: LanguageManager instance for translations
         """
         super().__init__(parent)
         self.tracks = tracks or ["", "", ""]
         self.decryption_result = None
+        self.language_manager = language_manager or LanguageManager()
+        
+        # Connect language change signal if available
+        if hasattr(self.language_manager, 'language_changed'):
+            self.language_manager.language_changed.connect(self.retranslate_ui)
 
         self._setup_ui()
+        self.retranslate_ui()
 
     def _setup_ui(self):
         """Set up the user interface."""
-        # Main layout
         main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(5, 5, 5, 5)
+        self.setLayout(main_layout)
 
         # Create tab widget
         self.tab_widget = QTabWidget()
@@ -77,6 +91,117 @@ class AdvancedFunctionsWidget(QWidget):
         if VISUALIZATION_AVAILABLE:
             self.setup_visualization_tab()
 
+        # Add stretch to push everything to the top
+        main_layout.addStretch()
+        
+    def retranslate_ui(self):
+        """Update all UI text with current translations."""
+        # Tab names
+        if hasattr(self, 'tab_widget'):
+            for i in range(self.tab_widget.count()):
+                tab_text = self.tab_widget.tabText(i)
+                # Map tab text to translation keys
+                translation_map = {
+                    "Decode Card": "adv_tab_decode",
+                    "Decrypt Data": "adv_tab_decrypt",
+                    "Visualization": "adv_tab_visualization"
+                }
+                if tab_text in translation_map:
+                    translated = self.language_manager.translate(
+                        translation_map[tab_text], 
+                        default=tab_text
+                    )
+                    self.tab_widget.setTabText(i, translated)
+        
+        # Decode tab elements
+        if hasattr(self, 'track_label'):
+            self.track_label.setText(self.language_manager.translate(
+                "lbl_select_tracks", 
+                default="Select Tracks to Decode:"
+            ))
+            
+        if hasattr(self, 'track_checks'):
+            for i, check in enumerate(self.track_checks, 1):
+                check.setText(self.language_manager.translate(
+                    f"chk_track_{i}", 
+                    default=f"Track {i}"
+                ))
+        
+        if hasattr(self, 'decode_btn'):
+            self.decode_btn.setText(self.language_manager.translate(
+                "btn_decode_tracks", 
+                default="Decode Selected Tracks"
+            ))
+            
+        if hasattr(self, 'result_group'):
+            self.result_group.setTitle(self.language_manager.translate(
+                "grp_decoded_data", 
+                default="Decoded Data"
+            ))
+        
+        # Decrypt tab elements
+        if hasattr(self, 'key_group'):
+            self.key_group.setTitle(self.language_manager.translate(
+                "grp_encryption_key", 
+                default="Encryption Key"
+            ))
+            
+        if hasattr(self, 'key_label'):
+            self.key_label.setText(self.language_manager.translate(
+                "lbl_key_hex", 
+                default="Key (hex):"
+            ))
+            
+        if hasattr(self, 'key_entry'):
+            self.key_entry.setPlaceholderText(self.language_manager.translate(
+                "placeholder_enter_key", 
+                default="Enter encryption key..."
+            ))
+            
+        if hasattr(self, 'algo_group_ui'):
+            self.algo_group_ui.setTitle(self.language_manager.translate(
+                "grp_algorithm", 
+                default="Algorithm"
+            ))
+            
+        if hasattr(self, 'algorithm_buttons'):
+            for btn in self.algorithm_buttons:
+                algo_name = btn.property("algorithm_name")
+                if algo_name:
+                    btn.setText(self.language_manager.translate(
+                        f"algo_{algo_name.lower().replace('-', '')}", 
+                        default=algo_name
+                    ))
+            
+        if hasattr(self, 'data_group') and isinstance(self.data_group, QGroupBox):
+            self.data_group.setTitle(self.language_manager.translate(
+                "grp_data_decrypt", 
+                default="Data to Decrypt"
+            ))
+            
+        if hasattr(self, 'data_text'):
+            self.data_text.setPlaceholderText(self.language_manager.translate(
+                "placeholder_enter_data", 
+                default="Enter data to decrypt or use 'Load Track Data'..."
+            ))
+            
+        if hasattr(self, 'load_btn'):
+            self.load_btn.setText(self.language_manager.translate(
+                "btn_load_track", 
+                default="Load Track Data"
+            ))
+            
+        if hasattr(self, 'decrypt_btn'):
+            self.decrypt_btn.setText(self.language_manager.translate(
+                "btn_decrypt", 
+                default="Decrypt"
+            ))
+            
+        if hasattr(self, 'results_label'):
+            self.results_label.setText(
+                f"<b>{self.language_manager.translate('lbl_decryption_results', default='Decryption Results:')}</b>"
+            )
+
     def setup_decode_tab(self):
         """Set up the decode tab."""
         # Create decode tab widget
@@ -84,9 +209,9 @@ class AdvancedFunctionsWidget(QWidget):
         decode_layout = QVBoxLayout(decode_tab)
 
         # Track selection
-        track_label = QLabel("Select Tracks to Decode:")
-        track_label.setStyleSheet("font-weight: bold;")
-        decode_layout.addWidget(track_label)
+        self.track_label = QLabel()
+        self.track_label.setStyleSheet("font-weight: bold;")
+        decode_layout.addWidget(self.track_label)
 
         # Track checkboxes
         self.track_checks = []
@@ -95,7 +220,7 @@ class AdvancedFunctionsWidget(QWidget):
         track_frame_layout.setContentsMargins(0, 0, 0, 0)
 
         for i in range(3):
-            check = QCheckBox(f"Track {i+1}")
+            check = QCheckBox()
             check.setChecked(True)
             self.track_checks.append(check)
             track_frame_layout.addWidget(check)
@@ -104,9 +229,9 @@ class AdvancedFunctionsWidget(QWidget):
         decode_layout.addWidget(track_frame)
 
         # Decode button
-        decode_btn = QPushButton("Decode Selected Tracks")
-        decode_btn.clicked.connect(self.decode_selected_tracks)
-        decode_btn.setStyleSheet(
+        self.decode_btn = QPushButton()
+        self.decode_btn.clicked.connect(self.decode_selected_tracks)
+        self.decode_btn.setStyleSheet(
             """
             QPushButton {
                 padding: 8px;
@@ -124,16 +249,16 @@ class AdvancedFunctionsWidget(QWidget):
             }
         """
         )
-        decode_layout.addWidget(decode_btn)
+        decode_layout.addWidget(self.decode_btn)
 
         # Results area
-        result_group = QGroupBox("Decoded Data")
-        result_layout = QVBoxLayout(result_group)
+        self.result_group = QGroupBox()
+        result_layout = QVBoxLayout(self.result_group)
 
         self.decode_text = QTextEdit()
         result_layout.addWidget(self.decode_text)
 
-        decode_layout.addWidget(result_group)
+        decode_layout.addWidget(self.result_group)
         self.decode_text.setReadOnly(True)
         self.decode_text.setStyleSheet(
             """
@@ -157,59 +282,65 @@ class AdvancedFunctionsWidget(QWidget):
         decrypt_layout = QVBoxLayout(decrypt_tab)
 
         # Key input
-        key_group = QGroupBox("Encryption Key")
+        self.key_group = QGroupBox()
         key_layout = QHBoxLayout()
 
-        key_label = QLabel("Key (hex):")
+        self.key_label = QLabel()
         self.key_entry = QLineEdit()
-        self.key_entry.setPlaceholderText("Enter encryption key...")
+        self.key_entry.setPlaceholderText(
+            self.language_manager.translate("placeholder_enter_key", default="Enter encryption key...")
+        )
 
-        key_layout.addWidget(key_label)
+        key_layout.addWidget(self.key_label)
         key_layout.addWidget(self.key_entry)
-        key_group.setLayout(key_layout)
-        decrypt_layout.addWidget(key_group)
+        self.key_group.setLayout(key_layout)
+        decrypt_layout.addWidget(self.key_group)
 
         # Algorithm selection
-        algo_group = QGroupBox("Algorithm")
+        self.algo_group_ui = QGroupBox()
         algo_layout = QHBoxLayout()
 
         self.algo_group = QButtonGroup(self)
-        algorithms = ["DES", "3DES", "AES-128", "AES-192", "AES-256"]
+        self.algorithms = ["DES", "3DES", "AES-128", "AES-192", "AES-256"]
+        self.algorithm_buttons = []
 
-        for i, algo in enumerate(algorithms):
-            radio = QRadioButton(algo)
+        for i, algo in enumerate(self.algorithms):
+            radio = QRadioButton()
+            radio.setProperty("algorithm_name", algo)  # Store the algorithm name
+            self.algorithm_buttons.append(radio)
             if i == 0:  # Default to DES
                 radio.setChecked(True)
             self.algo_group.addButton(radio, i)
             algo_layout.addWidget(radio)
 
-        algo_group.setLayout(algo_layout)
-        decrypt_layout.addWidget(algo_group)
+        self.algo_group_ui.setLayout(algo_layout)
+        decrypt_layout.addWidget(self.algo_group_ui)
 
         # Data to decrypt
-        data_group = QGroupBox("Data to Decrypt")
+        self.data_group = QGroupBox()
         data_layout = QVBoxLayout()
 
         self.data_text = QTextEdit()
-        self.data_text.setPlaceholderText(
-            "Enter data to decrypt or use 'Load Track Data'..."
-        )
+        self.data_text.setPlaceholderText(self.language_manager.translate(
+            "placeholder_enter_data", 
+            default="Enter data to decrypt or use 'Load Track Data'..."
+        ))
         data_layout.addWidget(self.data_text)
 
-        data_group.setLayout(data_layout)
-        decrypt_layout.addWidget(data_group)
+        self.data_group.setLayout(data_layout)
+        decrypt_layout.addWidget(self.data_group)
 
         # Buttons
         btn_frame = QWidget()
         btn_layout = QHBoxLayout(btn_frame)
         btn_layout.setContentsMargins(0, 0, 0, 0)
 
-        load_btn = QPushButton("Load Track Data")
-        load_btn.clicked.connect(self.load_track_data)
+        self.load_btn = QPushButton()
+        self.load_btn.clicked.connect(self.load_track_data)
 
-        decrypt_btn = QPushButton("Decrypt")
-        decrypt_btn.clicked.connect(self.decrypt_data)
-        decrypt_btn.setStyleSheet(
+        self.decrypt_btn = QPushButton()
+        self.decrypt_btn.clicked.connect(self.decrypt_data)
+        self.decrypt_btn.setStyleSheet(
             """
             QPushButton {
                 padding: 8px 16px;
@@ -228,14 +359,16 @@ class AdvancedFunctionsWidget(QWidget):
         """
         )
 
-        btn_layout.addWidget(load_btn)
+        btn_layout.addWidget(self.load_btn)
         btn_layout.addStretch()
-        btn_layout.addWidget(decrypt_btn)
+        btn_layout.addWidget(self.decrypt_btn)
 
         decrypt_layout.addWidget(btn_frame)
 
         # Results area
-        decrypt_layout.addWidget(QLabel("<b>Decryption Results:</b>"))
+        self.results_label = QLabel()
+        self.results_label.setTextFormat(Qt.TextFormat.RichText)
+        decrypt_layout.addWidget(self.results_label)
 
         self.result_text = QTextEdit()
         self.result_text.setReadOnly(True)
@@ -264,28 +397,39 @@ class AdvancedFunctionsWidget(QWidget):
         # Create visualization widget
         self.visualization_widget = VisualizationWidget()
         visualization_layout.addWidget(self.visualization_widget)
+        
+        # Connect the read card signal from visualization widget to our signal
+        self.visualization_widget.read_card_requested.connect(self._on_read_card_requested)
 
         # Add tab
         self.tab_widget.addTab(visualization_tab, "Visualization")
 
     def update_tracks(self, tracks: List[str]):
-        """Update the track data in the widget.
+        """Update the track data in the widget and refresh visualizations.
 
         Args:
             tracks: List of track data strings [track1, track2, track3]
         """
         self.tracks = tracks or ["", "", ""]
-
-        # Update visualization tab if available
-        if hasattr(self, "visualization_widget"):
+        
+        # Update visualization if available
+        if hasattr(self, 'visualization_widget') and self.visualization_widget is not None:
             self.visualization_widget.update_visualizations(self.tracks)
+    
+    def _on_read_card_requested(self):
+        """Handle read card request from visualization widget."""
+        self.read_card_requested.emit()
 
     def load_track_data(self):
         """Load track data into the decrypt text area."""
         selected_tracks = []
         for i, check in enumerate(self.track_checks):
-            if check.isChecked() and i < len(self.tracks):
-                selected_tracks.append(f"Track {i+1}: {self.tracks[i]}")
+            if check.isChecked() and i < len(self.tracks) and self.tracks[i]:
+                track_label = self.language_manager.translate(
+                    f"track_{i+1}", 
+                    default=f"Track {i+1}"
+                )
+                selected_tracks.append(f"{track_label}: {self.tracks[i]}")
 
         self.data_text.clear()
         if selected_tracks:
@@ -308,9 +452,11 @@ class AdvancedFunctionsWidget(QWidget):
         if results:
             self.decode_text.setPlainText("\n\n".join(results))
         else:
-            self.decode_text.setPlainText(
-                "No valid track data found in selected tracks."
+            no_data_msg = self.language_manager.translate(
+                "msg_no_track_data", 
+                default="No valid track data found in selected tracks."
             )
+            self.decode_text.setPlainText(no_data_msg)
 
     def _decode_track(self, track_data: str, track_num: int) -> str:
         """Decode a single track's data.
@@ -325,33 +471,46 @@ class AdvancedFunctionsWidget(QWidget):
         if not track_data:
             return ""
 
-        result = [f"=== Track {track_num} ==="]
+        # Get translated labels
+        track_label = self.language_manager.translate(f"track_{track_num}", default=f"Track {track_num}")
+        card_number_label = self.language_manager.translate("lbl_card_number", default="Card Number")
+        cardholder_label = self.language_manager.translate("lbl_cardholder", default="Cardholder")
+        last_name_label = self.language_manager.translate("lbl_last_name", default="Last Name")
+        expiration_label = self.language_manager.translate("lbl_expiration", default="Expiration")
+        service_code_label = self.language_manager.translate("lbl_service_code", default="Service Code")
+        raw_data_label = self.language_manager.translate("lbl_raw_data", default="Raw Data")
+
+        result = [f"=== {track_label} ==="]
 
         # Try to parse track data based on format
         if track_num == 1 and "^" in track_data:
             # Track 1 format: %B1234567890123456^CARDHOLDER/NAME^YYMM...
             parts = track_data[2:].split("^")
             if len(parts) >= 3:
-                result.append(f"Card Number: {parts[0]}")
-                result.append(f"Cardholder: {parts[1].split('/')[0].strip()}")
+                result.append(f"{card_number_label}: {parts[0]}")
+                result.append(f"{cardholder_label}: {parts[1].split('/')[0].strip()}")
                 if len(parts[1].split("/")) > 1:
-                    result.append(f"Last Name: {parts[1].split('/')[1].strip()}")
+                    result.append(f"{last_name_label}: {parts[1].split('/')[1].strip()}")
                 if len(parts[2]) >= 4:
-                    result.append(f"Expiration: {parts[2][2:4]}/{parts[2][:2]}")
+                    exp_month = parts[2][2:4]
+                    exp_year = parts[2][:2]
+                    result.append(f"{expiration_label}: {exp_month}/{exp_year}")
                 if len(parts[2]) >= 7:
-                    result.append(f"Service Code: {parts[2][4:7]}")
+                    result.append(f"{service_code_label}: {parts[2][4:7]}")
         elif track_num in (2, 3) and "=" in track_data:
             # Track 2/3 format: ;1234567890123456=YYMM...
             parts = track_data[1:].split("=")
             if len(parts) >= 2:
-                result.append(f"Card Number: {parts[0][:16]}")
+                result.append(f"{card_number_label}: {parts[0][:16]}")
                 if len(parts[1]) >= 4:
-                    result.append(f"Expiration: {parts[1][2:4]}/{parts[1][:2]}")
+                    exp_month = parts[1][2:4]
+                    exp_year = parts[1][:2]
+                    result.append(f"{expiration_label}: {exp_month}/{exp_year}")
                 if len(parts[1]) >= 7:
-                    result.append(f"Service Code: {parts[1][4:7]}")
+                    result.append(f"{service_code_label}: {parts[1][4:7]}")
 
         # Add raw data
-        result.append(f"\nRaw Data: {track_data}")
+        result.append(f"\n{raw_data_label}: {track_data}")
         return "\n".join(result)
 
     def decrypt_data(self):
@@ -361,20 +520,32 @@ class AdvancedFunctionsWidget(QWidget):
         data = self.data_text.toPlainText().strip()
 
         if not key or not data:
-            QMessageBox.critical(self, "Error", "Both key and data are required")
+            error_title = self.language_manager.translate("error_title", default="Error")
+            error_msg = self.language_manager.translate(
+                "error_key_and_data_required", 
+                default="Both key and data are required"
+            )
+            QMessageBox.critical(self, error_title, error_msg)
             return
 
         try:
             # TODO: Implement actual decryption using the decrypt.py module
             # For now, just show a placeholder
-            result = f"Decrypted with {algorithm} and key {key}\n\n{data}"
-
+            decrypted_with = self.language_manager.translate(
+                "msg_decrypted_with", 
+                default="Decrypted with {algorithm} and key {key}"
+            ).format(algorithm=algorithm, key=key)
+            
+            result = f"{decrypted_with}\n\n{data}"
             self.result_text.setPlainText(result)
 
         except Exception as e:
-            QMessageBox.critical(
-                self, "Decryption Error", f"Failed to decrypt data: {str(e)}"
-            )
+            error_title = self.language_manager.translate("error_decryption_failed", default="Decryption Error")
+            error_msg = self.language_manager.translate(
+                "error_decryption_failed_msg", 
+                default="Failed to decrypt data: {error}"
+            ).format(error=str(e))
+            QMessageBox.critical(self, error_title, error_msg)
 
 
 # Example usage
@@ -384,11 +555,14 @@ if __name__ == "__main__":
     # Apply a stylesheet for consistent look
     app.setStyle("Fusion")
 
+    # Initialize language manager
+    language_manager = LanguageManager()
+    
     # Sample track data for testing
     sample_tracks = [
         "%B1234567890123456^CARDHOLDER/NAME^24051010000000000000?",
-        ";1234567890123456=24051010000000000000?",
-        ";1234567890123456=24051010000000000000?",
+        ";1234567890123456=24051010000000000?",
+        ";1234567890123456=24051010000000000?",
     ]
 
     window = QWidget()
@@ -396,7 +570,8 @@ if __name__ == "__main__":
 
     layout = QVBoxLayout(window)
 
-    frame = AdvancedFunctionsWidget(window, tracks=sample_tracks)
+    # Initialize with language manager
+    frame = AdvancedFunctionsWidget(window, tracks=sample_tracks, language_manager=language_manager)
     layout.addWidget(frame)
 
     window.resize(800, 700)

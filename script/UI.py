@@ -203,8 +203,7 @@ class GUI(QMainWindow):
                 geometry_hex = settings.get("geometry")
                 if geometry_hex:
                     try:
-                        geometry = QByteArray.fromHex(geometry_hex.encode())
-                        self.restoreGeometry(geometry)
+                        self.restoreGeometry(QByteArray.fromHex(bytes(geometry_hex, 'utf-8')))
                         self.logger.info("Restored window geometry")
                     except Exception as e:
                         self.logger.error(f"Error restoring window geometry: {e}")
@@ -213,8 +212,7 @@ class GUI(QMainWindow):
                 state_hex = settings.get("windowState")
                 if state_hex:
                     try:
-                        state = QByteArray.fromHex(state_hex.encode())
-                        self.restoreState(state)
+                        self.restoreState(QByteArray.fromHex(bytes(state_hex, 'utf-8')))
                         self.logger.info("Restored window state")
                     except Exception as e:
                         self.logger.error(f"Error restoring window state: {e}")
@@ -228,6 +226,65 @@ class GUI(QMainWindow):
             self.__enable_duplicates = False
             self.__coercivity = "hi"
             self.logger.info("Using default settings due to error")
+
+        print(
+            f"  Loaded settings - auto_save: {self.__auto_save_database}, "
+            f"allow_duplicates: {self.__enable_duplicates}, "
+            f"coercivity: {self.__coercivity}"
+        )
+
+        # Window geometry and state are already handled in the try block above
+        # This is just for backward compatibility with old settings format
+        if hasattr(self, "restoreGeometry") and settings.get("geometry"):
+            try:
+                geometry = QByteArray.fromHex(settings.get("geometry").encode())
+                self.restoreGeometry(geometry)
+                print(f"  Restored window geometry from old format")
+            except Exception as e:
+                self.logger.error(f"Error restoring window geometry from old format: {e}")
+                
+        if hasattr(self, "restoreState") and settings.get("windowState"):
+            try:
+                state = QByteArray.fromHex(settings.get("windowState").encode())
+                self.restoreState(state)
+                print(f"  Restored window state from old format")
+            except Exception as e:
+                self.logger.error(f"Error restoring window state from old format: {e}")
+
+    def retranslate_ui(self):
+        """Retranslate the UI elements based on the current language."""
+        self.logger.info("Retranslating UI elements...")
+        
+        # Update window title with version
+        version = get_version()
+        self.setWindowTitle(self.language_manager.translate("app_title").format(version=version))
+        
+        # Update tab names
+        if hasattr(self, 'tabs'):
+            self.tabs.setTabText(0, self.language_manager.translate("tab_read"))
+            self.tabs.setTabText(1, self.language_manager.translate("tab_write"))
+            self.tabs.setTabText(2, self.language_manager.translate("tab_database"))
+            self.tabs.setTabText(3, self.language_manager.translate("tab_settings"))
+        
+        # Update Read tab elements
+        if hasattr(self, 'read_button'):
+            self.read_button.setText(self.language_manager.translate("btn_read_card"))
+        
+        if hasattr(self, 'advanced_button'):
+            self.advanced_button.setText(self.language_manager.translate("btn_advanced_functions"))
+        
+        if hasattr(self, 'status_label'):
+            self.status_label.setText(self.language_manager.translate("lbl_status_ready"))
+        
+        # Update status bar message if connected
+        if hasattr(self, 'statusBar') and hasattr(self, '_GUI__connected') and self._GUI__connected:
+            port = getattr(self, 'port_combo', None)
+            if port and hasattr(port, 'currentText'):
+                self.statusBar().showMessage(
+                    self.language_manager.translate("status_connected").format(port=port.currentText())
+                )
+        
+        self.logger.info("UI retranslation complete")
 
         print(
             f"  Loaded settings - auto_save: {self.__auto_save_database}, "
@@ -704,10 +761,20 @@ class GUI(QMainWindow):
         tracks_group.setLayout(tracks_layout)
         layout.addWidget(tracks_group)
 
+        # Add buttons layout
+        button_layout = QHBoxLayout()
+
         # Add read button
-        self.read_button = QPushButton("Read Card")
+        self.read_button = QPushButton(self.language_manager.translate("btn_read_card"))
         self.read_button.clicked.connect(self.read_card)
-        layout.addWidget(self.read_button)
+        button_layout.addWidget(self.read_button)
+
+        # Add Advanced Functions button
+        self.advanced_button = QPushButton(self.language_manager.translate("btn_advanced_functions"))
+        self.advanced_button.clicked.connect(self.show_advanced_functions)
+        button_layout.addWidget(self.advanced_button)
+
+        layout.addLayout(button_layout)
 
         # Add status label
         self.status_label = QLabel("Ready to read card...")
@@ -805,6 +872,50 @@ class GUI(QMainWindow):
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to set coercivity: {str(e)}")
 
+    def show_advanced_functions(self):
+        """Show the advanced functions dialog."""
+        try:
+            from .advanced_functions import AdvancedFunctionsWidget
+            
+            # Create and show the advanced functions dialog
+            dialog = QDialog(self)
+            dialog.setWindowTitle("Advanced Functions")
+            dialog.setMinimumSize(800, 600)
+            
+            # Create the advanced functions widget with language manager
+            advanced_widget = AdvancedFunctionsWidget(
+                parent=dialog, 
+                tracks=self.__tracks,
+                language_manager=self.language_manager
+            )
+            
+            # Connect the read_card_requested signal to the read_card method
+            advanced_widget.read_card_requested.connect(self.read_card)
+            
+            # Set up the layout
+            layout = QVBoxLayout(dialog)
+            layout.addWidget(advanced_widget)
+            
+            # Add close button
+            button_box = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
+            button_box.rejected.connect(dialog.reject)
+            layout.addWidget(button_box)
+            
+            dialog.exec()
+            
+        except ImportError as e:
+            QMessageBox.critical(
+                self, 
+                "Error", 
+                f"Failed to load advanced functions: {str(e)}\n\nMake sure all required dependencies are installed."
+            )
+        except Exception as e:
+            QMessageBox.critical(
+                self, 
+                "Error", 
+                f"An error occurred: {str(e)}"
+            )
+
     def read_card(self):
         """Read data from a magnetic stripe card."""
         if not self.__connected or self.__msr is None:
@@ -817,8 +928,9 @@ class GUI(QMainWindow):
         QApplication.processEvents()  # Update the UI
 
         try:
-            # Read the card
-            tracks = self.__msr.read_tracks()
+            # Read the card using the correct method
+            result = self.__msr.read_card()
+            tracks = result.get('tracks', ["", "", ""])
 
             # Update the track displays
             for i in range(3):
@@ -838,6 +950,7 @@ class GUI(QMainWindow):
         except Exception as e:
             self.status_label.setText("Error reading card")
             QMessageBox.critical(self, "Read Error", f"Failed to read card: {str(e)}")
+            self.logger.error(f"Error reading card: {str(e)}", exc_info=True)
 
     def write_card(self):
         """Write data to a magnetic stripe card."""

@@ -17,7 +17,7 @@ from dataclasses import dataclass
 
 from . import cardReaderExceptions
 from .card_formats import CardFormat, CardFormatManager, TrackSpecification
-from .isoStandardDictionary import iso_standard_track_check
+from .isoStandardDictionary import iso_standard_track_check, iso_standard_track_check_legacy
 
 # These constants are from the MSR605 Programming Manual under 'Section 6 Command and Response'
 # I thought it would be easier if I used constants rather than putting hex in the code
@@ -1150,145 +1150,102 @@ class CardReader:
 
     # ***************************************************
     #
-    #     Data Processing (lol idk what to call these)
+    #     Data Processing Methods
     #
     # ***************************************************
 
-    def read_until(self, endCharacter, trackNum, compareToISO):
-        """This reads from the serial COM port and continues to read until it reaches
-            the end character (endCharacter)
-
-
-        Args:
-            endCharacter: this is character (like a delimiter), the function returns all
-                            the data up to this character, ex: ESCAPE, 's'
-
-
-            trackNum: this is an integer between 1 and 3, the # represents a track #, it
-                        is used to check if the track data fits the ISO standard, it is
-                        sorta canonicalized, used in the iso_standard_track_check function
-
-            compareToISO: this is a boolean that if True will use the trackNum provided and
-                            compare the data provided with the ISO Standard for Magnetic Strip
-                            cards, if False the ISO Standard check will not be run
-
-
-        Returns:
-            A string that contains all the data of a track upto a certain character
-
-            ex of track #1:
-                A1234568^John Snow^           0123,
-
-        Raises:
-            Nothing
-        """
-
-        # counter
-        i = 0
-
-        # track 3 can contain more characters than track 1 or 2, it being 107 characters
-        # this is just a small check, doesn't need to be there but i thought might as well
-        # conform to the ISO standard and make sure we don't have an infinite loop
-        if trackNum == 1:
-            cond = 79
-        elif trackNum == 2:
-            cond = 40
-        else:
-            cond = 107
-
-        string = ""
-
-        while i < cond:
-            strCompare = self.__serialConn.read()
-            str = strCompare.decode()
-
-            # only runs the ISO checks if required
-            if compareToISO:
-                # checks if the track data is valid based on the track data
-                if not (
-                    strCompare == ESCAPE
-                    or strCompare == FILE_SEPERATOR
-                    or strCompare == ACKNOWLEDGE
-                    or strCompare == START_OF_HEADING
-                    or strCompare == START_OF_TEXT
-                    or strCompare == END_OF_TEXT
-                ):
-
-                    if iso_standard_track_check(str, trackNum) == False:
-                        continue
-
-            # if the special End of Line character is read, usually is the control character (ex: ESCAPE)
-
-            if isinstance(endCharacter, bytes):
-                if str == endCharacter.decode():
-                    return string
-
-            else:
-                if str == endCharacter:
-                    return string
-
-            if strCompare != ESCAPE:
-                string += str  # keeps accumlating the track data
-
-            i += 1
-
-        # some cards i tried didn't follow the format/standard they were suppposed to, so rather than
-        # adding special cases, i just return the data
-        return string
-
     def status_read(self):
-        """This reads the Status Byte of the response from the MSR605
-
+        """Reads the status byte from the MSR605 after a command.
+        
+        Raises:
+            StatusError: If the status byte indicates an error
+        """
+        # Read the status byte (should be after ESC)
+        status_byte = self.__serialConn.read(1)
+        
+        if not status_byte:
+            raise cardReaderExceptions.StatusError("No status byte received")
+            
+        # Convert status byte to int for comparison
+        status = status_byte[0]
+        
+        # Check status byte
+        if status == 0x30:  # 0x30 = '0' in ASCII = OK
+            return
+        elif status == 0x31:  # 0x31 = '1' in ASCII = Read/Write error
+            raise cardReaderExceptions.StatusError("Read/Write error")
+        elif status == 0x32:  # 0x32 = '2' in ASCII = Command format error
+            raise cardReaderExceptions.StatusError("Command format error")
+        elif status == 0x34:  # 0x34 = '4' in ASCII = Invalid command
+            raise cardReaderExceptions.StatusError("Invalid command")
+        elif status == 0x39:  # 0x39 = '9' in ASCII = Invalid card swipe in write mode
+            raise cardReaderExceptions.StatusError("Invalid card swipe in write mode")
+        else:
+            raise cardReaderExceptions.StatusError(f"Unknown status: 0x{status:02X}")
+            
+    def read_until(self, endCharacter, trackNum, compareToISO):
+        """Reads from the serial COM port until it reaches the end character.
 
         Args:
-           None
+            endCharacter: Character (like a delimiter) that marks the end of the data.
+                         Can be a single character or bytes (for special characters like ESC).
+            trackNum: Integer between 1 and 3 representing the track number.
+            compareToISO: Boolean to enable ISO standard character validation.
 
         Returns:
-           Nothing
+            str: The accumulated track data up to the end character.
 
-        Raises:
-            StatusError: An error occurred when the MSR605 was performing the function you
-                            requested
+        Example:
+            For track #1: "A1234568^John Snow^           0123,"
         """
-
-        # reads in the Status Byte
-        status = (self.__serialConn.read()).decode()
-        print("STATUS: ", status)
-        # checks what the stauts byte coorelates with, based off of the info provided from the
-        # MSR605  programming manual
-        if status == "0":
-            print("CARD SUCCESSFULLY READ")
-
-        elif status == "1":
-            print("[Datablock] Error: 1(0x30h), 'Error, Write, or read error'")
-            raise cardReaderExceptions.StatusError(
-                "[Datablock] Error, 'Error, Write, or read error'", 1
-            )
-
-        elif status == "2":
-            print("[Datablock] Error: 2(0x32h), 'Command format error'")
-            raise cardReaderExceptions.StatusError(
-                "[Datablock] Error, 'Command format error'", 2
-            )
-
-        elif status == "4":
-            print("[Datablock] Error: 4(0x34h), 'Invalid command'")
-            raise cardReaderExceptions.StatusError(
-                "[Datablock] Error, 'Invalid command'", 4
-            )
-
-        elif status == "9":
-            print(
-                "[Datablock] Error: 9(0x39h), 'Invalid card swipe when in write MODE'"
-            )
-            raise cardReaderExceptions.StatusError(
-                "[Datablock] Error, 'Invalid card swipe when in write " "mode'", 9
-            )
-
+        # Set maximum characters per track based on ISO standard
+        max_chars = {1: 79, 2: 40, 3: 107}.get(trackNum, 107)
+        result = []
+        
+        # Convert endCharacter to bytes if it's a string
+        if isinstance(endCharacter, str):
+            end_byte = endCharacter.encode('ascii')
         else:
-            print("UNKNOWN STATUS: " + status)
-
-        return None
+            end_byte = endCharacter
+            
+        for _ in range(max_chars):
+            # Read a single byte
+            char_byte = self.__serialConn.read(1)
+            if not char_byte:  # No more data
+                break
+                
+            # Check if this byte is the end character
+            if char_byte == end_byte:
+                break
+                
+            # Handle special control characters
+            if char_byte == b'\x1b':  # ESC
+                # Check if the next byte is the end character
+                next_byte = self.__serialConn.read(1)
+                if next_byte == end_byte:
+                    break
+                elif next_byte:  # If there was a next byte but it's not our end character
+                    # Store the byte to be processed in the next iteration
+                    char_byte = next_byte
+                    # Continue to process this byte in the normal flow
+                    continue
+                continue
+                
+            try:
+                # Try to decode as ASCII
+                char = char_byte.decode('ascii')
+                
+                # Skip control characters except for the ones we specifically handle
+                if ord(char) < 32 and char not in ('\n', '\r', '\t'):
+                    continue
+                    
+                result.append(char)
+                
+            except UnicodeDecodeError:
+                # If we can't decode the byte, skip it
+                continue
+            
+        return ''.join(result)
 
     # ***********************
     #
