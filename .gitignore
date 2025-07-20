@@ -110,3 +110,5 @@ MSR605.bat
 # Local configuration
 config/settings.json
 config/*.json
+install-scripts/build_config.py
+build_config.py
