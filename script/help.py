@@ -1,17 +1,17 @@
 """
 Help dialog for the MSR605 application.
 """
-from PyQt6.QtWidgets import (
-    QDialog, QVBoxLayout, QTextBrowser, QDialogButtonBox, QLabel
-)
+
+from PyQt6.QtWidgets import QDialog, QVBoxLayout, QTextBrowser, QDialogButtonBox, QLabel
 from PyQt6.QtCore import Qt
+
 
 class HelpDialog(QDialog):
     """A dialog that displays help information for the MSR605 application."""
-    
+
     def __init__(self, parent=None, language_manager=None):
         """Initialize the help dialog.
-        
+
         Args:
             parent: The parent widget
             language_manager: An instance of LanguageManager for translations
@@ -20,22 +20,23 @@ class HelpDialog(QDialog):
         self.language_manager = language_manager
         self.setWindowTitle(self.translate("dlg_help_title"))
         self.setMinimumSize(600, 500)
-        
+
         # Initialize UI
         self.setup_ui()
-        
+
         # Connect language changed signal if language_manager is provided
         if self.language_manager:
             self.language_manager.language_changed.connect(self.retranslate_ui)
-    
+
     def setup_ui(self):
         """Set up the user interface."""
         layout = QVBoxLayout(self)
-        
+
         # Create text browser for help content
         self.text_browser = QTextBrowser()
         self.text_browser.setOpenExternalLinks(True)
-        self.text_browser.setStyleSheet("""
+        self.text_browser.setStyleSheet(
+            """
             QTextBrowser {
                 background-color: #2d2d2d;
                 color: #e0e0e0;
@@ -80,36 +81,41 @@ class HelpDialog(QDialog):
             li {
                 margin-bottom: 5px;
             }
-        """)
-        
+        """
+        )
+
         # Add a close button
         self.button_box = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
         self.button_box.rejected.connect(self.reject)
-        
+
         layout.addWidget(self.text_browser)
         layout.addWidget(self.button_box)
-        
+
         # Set the help content
         self.retranslate_ui()
-    
+
     def retranslate_ui(self):
         """Retranslate the UI elements."""
-        if hasattr(self, 'text_browser'):
+        if hasattr(self, "text_browser"):
             self.text_browser.setHtml(self.get_help_content())
-        
-        if hasattr(self, 'button_box'):
+
+        if hasattr(self, "button_box"):
             self.button_box.clear()
-            close_button = self.button_box.addButton(QDialogButtonBox.StandardButton.Close)
+            close_button = self.button_box.addButton(
+                QDialogButtonBox.StandardButton.Close
+            )
             close_button.setText(self.translate("btn_close"))
-    
+
     def get_help_content(self):
         """Get the help content in the current language."""
         # Try to get the help content from translations
         if self.language_manager:
-            help_content = self.language_manager.translate('help_content')
-            if help_content and help_content != 'help_content':  # Ensure we got a valid translation
+            help_content = self.language_manager.translate("help_content")
+            if (
+                help_content and help_content != "help_content"
+            ):  # Ensure we got a valid translation
                 return help_content
-        
+
         # Fallback to English help content with dark mode compatible colors
         help_text = """
         <style>
@@ -162,14 +168,14 @@ class HelpDialog(QDialog):
         
         <p>For more information, please refer to the documentation.</p>
         """
-    
+
     def translate(self, key, **kwargs):
         """Translate a key using the language manager if available.
-        
+
         Args:
             key: The translation key
             **kwargs: Format arguments for the translation string
-            
+
         Returns:
             The translated string or the key if no translation is found
         """
@@ -177,9 +183,10 @@ class HelpDialog(QDialog):
             return self.language_manager.translate(key, **kwargs)
         return key
 
+
 def show_help(parent=None, language_manager=None):
     """Show the help dialog.
-    
+
     Args:
         parent: The parent widget
         language_manager: An instance of LanguageManager for translations
@@ -187,19 +194,20 @@ def show_help(parent=None, language_manager=None):
     dialog = HelpDialog(parent, language_manager)
     dialog.exec()
 
+
 # For testing
 if __name__ == "__main__":
     import sys
     from PyQt6.QtWidgets import QApplication
     from language_manager import LanguageManager
-    
+
     app = QApplication(sys.argv)
-    
+
     # Test with language manager
     language_manager = LanguageManager()
-    language_manager.set_language('it')  # Test with Italian
-    
+    language_manager.set_language("it")  # Test with Italian
+
     dialog = HelpDialog(language_manager=language_manager)
     dialog.show()
-    
+
     sys.exit(app.exec())

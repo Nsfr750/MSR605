@@ -5,6 +5,56 @@ All notable changes to the MSR605 Card Reader/Writer project will be documented 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.0] - 2025-07-20
+
+### Added
+
+- **Advanced Card Data Visualization**: New visualization features for analyzing card data
+  - Character distribution charts showing frequency of each character in track data
+  - Bit pattern visualization displaying binary representation of track data
+  - Data density metrics including length, unique characters, and character density
+  - Field analysis with automatic detection of field separators and visualization of field lengths
+  - Multiple theme support (dark, light, seaborn, ggplot, etc.)
+  - Interactive visualizations with tooltips and zooming
+  - Integration with the main UI in the Advanced Functions tab
+
+## [2.3.2] - 2025-07-20
+
+### Added
+
+- **Multiple Card Format Support**: Added support for both ISO 7811 and ISO 7813 standards
+  - ISO 7811: General purpose magnetic stripe cards
+  - ISO 7813: Financial transaction cards with enhanced validation
+  - Automatic format detection based on track data
+  - Format-specific validation and parsing
+  - Detailed error reporting for invalid card data
+
+## [2.3.1] - 2025-07-20
+
+### Added
+
+- Comprehensive project documentation including user guide, API reference, and FAQ
+- Enhanced CODEOWNERS file with detailed ownership rules
+- Updated dependency specifications with version bounds for better reproducibility
+- Added PyPI classifiers for better package discovery
+- Included development environment setup instructions in PREREQUISITES.md
+
+### Changed
+
+- Updated all dependencies to their latest stable versions
+- Improved requirements.txt organization with clear section comments
+- Enhanced error messages for better debugging
+- Optimized build process for better cross-platform compatibility
+- Updated development tooling configurations
+
+### Fixed
+
+- Resolved cryptography Rust binary inclusion in PyInstaller builds
+- Fixed path resolution issues in build scripts
+- Corrected menu translations and UI text
+- Addressed various linting and type checking issues
+- Fixed documentation build process
+
 ## [2.3.0] - 2025-07-19
 
 ### Added

@@ -2,12 +2,33 @@
 *       @Nsfr750
 
 # Documentation
-/Docs/    @Nsfr750
+/docs/    @Nsfr750
+/docs/CHANGELOG.md @Nsfr750
+/docs/CODE_OF_CONDUCT.md @Nsfr750
+/docs/CONTRIBUTING.md @Nsfr750
+/docs/PREREQUISITES.md @Nsfr750
+/README.md @Nsfr750
 
 # Python source files
 /script/    @Nsfr750
 
+# Build and deployment
+/install-scripts/ @Nsfr750
+/requirements.txt @Nsfr750
+
 # Configuration files
+/config/ @Nsfr750
+*.ini @Nsfr750
+*.json @Nfsr750
+
+# Tests
+/tests/ @Nsfr750
+
+# GitHub workflows
+.github/ @Nsfr750
+
+# Assets
+/assets/ @Nsfr750
 *.md         @Nsfr750
 *.yaml       @Nsfr750
 *.yml        @Nsfr750

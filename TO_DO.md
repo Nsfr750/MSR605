@@ -13,41 +13,72 @@
 - [x] Implement daily log rotation
 - [x] Add application icon support
 - [x] Improve menu organization and translations
+- [x] Update project documentation
+- [x] Fix cryptography Rust binary inclusion in builds
+- [x] Implement advanced card data visualization (v2.4.0)
 
 ## Medium Priority
-- [x] Implement data export features (CSV, JSON)
-- [ ] Add support for additional card formats (ISO 7811, ISO 7813)
-- [x] Create detailed logging system with daily rotation
-- [x] Implement data import features
-- [x] Update documentation for PyQt6 migration
-- [x] Add dark mode support
-- [x] Implement update checking system
-- [x] Reorganize menu structure
+- [x] Add support for additional card formats (ISO 7811, ISO 7813)
 
 ## Low Priority
-- [ ] Create installation package (.exe, .dmg, .deb)
-- [ ] Implement batch processing for multiple cards
+- [x] Implement advanced card data visualization (v2.4.0, 2025-07-20)
 
 ## In Progress
-- [ ] Add support for Python 3.13
+- [ ] Complete test coverage for all modules
+  - [ ] Increase test coverage for visualization module
+  - [ ] Add integration tests for UI components
 - [ ] Optimize database performance
+  - [ ] Profile database queries
+  - [ ] Optimize schema and indexes
+- [ ] Finalize API documentation
+  - [ ] Document all public methods
+  - [ ] Add usage examples
+
+## Backlog
+- [ ] Add export functionality for visualizations (PNG, PDF, CSV)
 
 ## Documentation
 - [x] Create comprehensive CONTRIBUTING.md
 - [x] Add PREREQUISITES.md with setup instructions
 - [x] Update README.md with latest features
-- [ ] Create API documentation using Sphinx
+- [x] Create API documentation (API.md)
+- [x] Add user guide (user_guide.md)
+- [x] Create FAQ section (FAQ.md)
+- [x] Update CHANGELOG.md
+- [x] Add visualization documentation (visualization.md)
 - [ ] Add architecture decision records (ADRs)
+  - [ ] Document visualization architecture
+  - [ ] Document UI component decisions
 - [ ] Create troubleshooting guide
-- [ ] Add code examples and tutorials
+  - [ ] Add visualization troubleshooting section
+- [ ] Create developer documentation
+  - [ ] Document visualization extension points
 
 ## Completed ✓
+### v2.4.0 (2025-07-20)
+- [x] **Advanced Card Data Visualization**
+  - Added character distribution charts
+  - Implemented bit pattern visualization
+  - Included data density metrics
+  - Added field analysis with separator detection
+  - Integrated with PyQt6 UI with theme support
+  - Added comprehensive unit tests
+  - Created detailed documentation
+
+### Previous Versions
 - [x] Migrated from Tkinter to PyQt6
 - [x] Updated all imports for new package structure
 - [x] Fixed compatibility issues with PyQt6
 - [x] Created project structure and documentation
-- [x] Implemented basic card reading functionality
+- [x] Implemented card reading/writing functionality
 - [x] Added SQLite database integration
+- [x] Implemented encryption/decryption
+- [x] Added comprehensive error handling
+- [x] Created user documentation
+- [x] Set up build system
+- [x] Added logging system
+- [x] Implemented update checking
+- [x] Added dark mode support
 - [x] Created responsive PyQt6 GUI interface
 - [x] Added robust connection management
 - [x] Implemented detailed track decoding

@@ -1,141 +1,75 @@
 #!/usr/bin/env python3
 
-""" isoStandardDictionary.py
-    
-    Description: This file contains 2 dictionaries and 1 function, this is used to check if
-                    track data conforms to ISO Standard for magstripe cards 
-    
-                The characters were obtained from this website:
-                    http://www.abacus21.com/magnetic-strip-encoding-1586.html
-                
+"""isoStandardDictionary.py
+
+Description: This module provides backward compatibility for the original ISO standard
+            character set validation and integrates with the new card format system.
+
+            The new implementation uses the CardFormatManager from card_formats.py
+            which provides support for ISO 7811 and ISO 7813 formats.
 """
 
+from .card_formats import CardFormat, CardFormatManager
 
-#1st track ISO standard character set dictionary
-#i take advantage of the values and use them as return values for the
-#function that checks if the track data meets the ISO standard
-isoDictionaryTrackOne ={
-                            ' ': True,
-                            '!': True,
-                            '\"': True,
-                            '#': True,
-                            '$': True,
-                            '%': True,
-                            '&': True,
-                            '\'': True,
-                            '(': True,
-                            ')': True,
-                            '*': True,
-                            '+': True,
-                            ',': True,
-                            '-': True,
-                            '.': True,
-                            '/': True,
-                            '0': True,
-                            '1': True,
-                            '2': True,
-                            '3': True,
-                            '4': True,
-                            '5': True,
-                            '6': True,
-                            '7': True,
-                            '8': True,
-                            '9': True,
-                            ':': True,
-                            ';': True,
-                            '<': True,
-                            '=': True,
-                            '>': True,
-                            '?': True,
-                            '@': True,
-                            'A': True,
-                            'B': True,
-                            'C': True,
-                            'D': True,
-                            'E': True,
-                            'F': True,
-                            'G': True,
-                            'H': True,
-                            'I': True,
-                            'J': True,
-                            'K': True,
-                            'L': True,
-                            'M': True,
-                            'N': True,
-                            'O': True,
-                            'P': True,
-                            'Q': True,
-                            'R': True,
-                            'S': True,
-                            'T': True,
-                            'U': True,
-                            'V': True,
-                            'W': True,
-                            'X': True,
-                            'Y': True,
-                            'Z': True,
-                            '[': True,
-                            '\\': True,
-                            ']': True,
-                            '^': True,
-                            '_': True
-                        };
+# Backward compatibility dictionaries
+# These are maintained for compatibility with existing code
+isoDictionaryTrackOne = {}
+isoDictionaryTrackTwoThree = {}
 
-#2nd and 3rd track ISO standard character set dictionary
-#i take advantage of the values and use them as return values for the
-#function that checks if the track data meets the ISO standard
-isoDictionaryTrackTwoThree = {
-                            '0': True,
-                            '1': True,
-                            '2': True,
-                            '3': True,
-                            '4': True,
-                            '5': True,
-                            '6': True,
-                            '7': True,
-                            '8': True,
-                            '9': True,
-                            ':': True,
-                            ';': True,
-                            '<': True,
-                            '=': True,
-                            '>': True,
-                            '?': True,
-                        };
+# Initialize the compatibility dictionaries with ISO 7811 characters
+# This ensures backward compatibility with code that directly uses these dictionaries
+for char in (
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ "  # Uppercase letters and space
+    "0123456789:;<=>?@"  # Numbers and special chars
+    "!\"#&'()*+,-./"  # Additional special chars
+    "[\\]^_"  # More special chars
+):
+    isoDictionaryTrackOne[char] = True
+
+for char in "0123456789:;<=>?":
+    isoDictionaryTrackTwoThree[char] = True
 
 
+def iso_standard_track_check(char, track_num, format_type=CardFormat.ISO_7811):
+    """Check if a character meets the ISO standard for a specific track.
 
-    
-def iso_standard_track_check(char, trackNum):
-    """This checks if the character provided meets the ISO Standards for Magnetic Stripe Cards
-    
-        Args:
-            char: this is a single character, it is from the track data and it will be
-                    checked to see if if fits the ISO standard
-            
-        Returns:
-            False: if the character provided is not in the ISO standard character set
-            
-            True: if the character provided is in the ISO standard character set, and also
-                    it returns true if the trackNum is invalid, i do this because i don't want
-                    to lose information
-    
-        Raises:
-            Nothing
+    This is a backward-compatible wrapper around the new CardFormatManager.
+
+    Args:
+        char: A single character to check.
+        track_num: Track number (1, 2, or 3).
+        format_type: The card format (ISO_7811 or ISO_7813). Defaults to ISO_7811
+                    for backward compatibility.
+
+    Returns:
+        bool: True if the character is valid for the specified track and format,
+              False otherwise.
     """
-    
-    char = str(char)
-    
-    #checks the track # to find out which dictionary to use to check if the character is in the
-    #ISO standard character set
-    if trackNum == 1:
-        return isoDictionaryTrackOne.get(char, False)
-    
-    elif trackNum == 2 or trackNum == 3:
-        return isoDictionaryTrackTwoThree.get(char, False)
-    
-    #if a valid track # is not provided, just return true, no data is lost this way
-    else:
-        print ("ISO STANDARD CHECK, TRACK # IS INVALID, IT IS:" , trackNum)
-        return true;
-       
+    try:
+        char = str(char)
+        track_num = int(track_num)
+
+        # Use the new CardFormatManager for validation
+        spec = CardFormatManager.get_track_spec(format_type, track_num)
+        return char in spec.allowed_chars
+
+    except (ValueError, KeyError):
+        # If there's an error, fall back to the old behavior for backward compatibility
+        if track_num == 1:
+            return char in isoDictionaryTrackOne
+        elif track_num in (2, 3):
+            return char in isoDictionaryTrackTwoThree
+        else:
+            print(f"ISO STANDARD CHECK, INVALID TRACK #: {track_num}")
+            return True
+
+
+# Backward compatibility function that matches the original signature
+def iso_standard_track_check_legacy(char, track_num):
+    """Legacy function that matches the original signature for backward compatibility."""
+    return iso_standard_track_check(char, track_num, CardFormat.ISO_7811)
+
+
+# For backward compatibility, assign the legacy function to the original name
+# This ensures existing imports continue to work
+iso_standard_track_check = iso_standard_track_check_legacy

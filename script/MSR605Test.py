@@ -2,166 +2,163 @@
 
 import sys, time, cardReaderExceptions, cardReader
 
-#INITIALIZE MSR605
+# INITIALIZE MSR605
 try:
     msr = cardReader.CardReader()
 except cardReaderExceptions.MSR605ConnectError as e:
-    print (e)
+    print(e)
     sys.exit()
 except cardReaderExceptions.CommunicationTestError as e:
-    print (e)
+    print(e)
     sys.exit()
-    
-#RESET MSR605
+
+# RESET MSR605
 msr.reset()
 
 time.sleep(1)
 
 try:
     msr.communication_test()
-except cardReaderExceptions.CommunicationTestError as e :
-    print (e)
+except cardReaderExceptions.CommunicationTestError as e:
+    print(e)
     sys.exit()
 
 time.sleep(1)
 
-#SENSOR TEST, REQUIRES A CARD SWIPE
+# SENSOR TEST, REQUIRES A CARD SWIPE
 try:
     msr.sensor_test()
-except cardReaderExceptions.SensorTestError as e :
-    print (e)
+except cardReaderExceptions.SensorTestError as e:
+    print(e)
     sys.exit()
 
 time.sleep(1)
 
-#RAM TEST
+# RAM TEST
 try:
     msr.ram_test()
-except cardReaderExceptions.RamTestError as e :
-    print (e)
+except cardReaderExceptions.RamTestError as e:
+    print(e)
     sys.exit()
 
 time.sleep(1)
 
-#GETTING DEVICE MODEL
+# GETTING DEVICE MODEL
 try:
     msr.get_device_model()
-except cardReaderExceptions.GetDeviceModelError as e :
-    print (e)
+except cardReaderExceptions.GetDeviceModelError as e:
+    print(e)
     sys.exit()
-    
+
 time.sleep(1)
-    
-#GET FIRMWARE VERSION
+
+# GET FIRMWARE VERSION
 try:
     msr.get_firmware_version()
-except cardReaderExceptions.GetFirmwareVersionError as e :
-    print (e)
+except cardReaderExceptions.GetFirmwareVersionError as e:
+    print(e)
     sys.exit()
 
 time.sleep(1)
 
-#SETTING MSR605 TO LOW-CO, I DID LOW FIRST BECAUSE I'M PRETTY SURE HI IS THE DEFAULT
+# SETTING MSR605 TO LOW-CO, I DID LOW FIRST BECAUSE I'M PRETTY SURE HI IS THE DEFAULT
 try:
     msr.set_low_co()
-except cardReaderExceptions.SetCoercivityError as e :
-    print (e)
-    sys.exit()    
-
-time.sleep(1)
-
-#CHECKING IF THE MSR605 IS IN LOW-CO (WAS SET BEFORE)
-try:
-    msr.get_hi_or_low_co()
-except cardReaderExceptions.GetCoercivityError as e :
-    print (e)
+except cardReaderExceptions.SetCoercivityError as e:
+    print(e)
     sys.exit()
 
 time.sleep(1)
 
-#SETTING MSR605 TO HI-CO
+# CHECKING IF THE MSR605 IS IN LOW-CO (WAS SET BEFORE)
+try:
+    msr.get_hi_or_low_co()
+except cardReaderExceptions.GetCoercivityError as e:
+    print(e)
+    sys.exit()
+
+time.sleep(1)
+
+# SETTING MSR605 TO HI-CO
 try:
     msr.set_hi_co()
-except cardReaderExceptions.SetCoercivityError as e :
-    print (e)
-    sys.exit()    
+except cardReaderExceptions.SetCoercivityError as e:
+    print(e)
+    sys.exit()
 
 time.sleep(1)
 
-#CHECKING IF THE MSR605 IS IN HI-CO
+# CHECKING IF THE MSR605 IS IN HI-CO
 try:
     msr.get_hi_or_low_co()
-except cardReaderExceptions.GetCoercivityError as e :
-    print (e)
+except cardReaderExceptions.GetCoercivityError as e:
+    print(e)
     sys.exit()
 
 time.sleep(2)
 
-tracks = ['','','']
+tracks = ["", "", ""]
 
-#READING THE MAGNETIC STRIPE CARD
+# READING THE MAGNETIC STRIPE CARD
 try:
     tracks = msr.read_card()
-except cardReaderExceptions.CardReadError as e :
-    print (e)
+except cardReaderExceptions.CardReadError as e:
+    print(e)
     sys.exit()
-except cardReaderExceptions.StatusError as e :
-    print (e)
+except cardReaderExceptions.StatusError as e:
+    print(e)
     sys.exit()
-    
-print ("\nTHE DATA THAT WAS READ FROM THE LAST READ (ABOVE) WILL BE USED TO WRITE")
+
+print("\nTHE DATA THAT WAS READ FROM THE LAST READ (ABOVE) WILL BE USED TO WRITE")
 
 time.sleep(2)
 
-#WRITE THE DATA THAT WAS READ IN BACK TO THE CARD
+# WRITE THE DATA THAT WAS READ IN BACK TO THE CARD
 try:
     msr.write_card(tracks, True)
-except cardReaderExceptions.CardWriteError as  e :
-    print (e)
+except cardReaderExceptions.CardWriteError as e:
+    print(e)
     sys.exit()
-except cardReaderExceptions.StatusError as e :
-    print (e)
+except cardReaderExceptions.StatusError as e:
+    print(e)
     sys.exit()
 
 time.sleep(2)
 
-#CHECK IF THE DATA WAS WRITTEN PROPERLY
+# CHECK IF THE DATA WAS WRITTEN PROPERLY
 try:
     tracks = msr.read_card()
-except cardReaderExceptions.CardReadError as e :
-    print (e)
+except cardReaderExceptions.CardReadError as e:
+    print(e)
     sys.exit()
-except cardReaderExceptions.StatusError as e :
-    print (e)
+except cardReaderExceptions.StatusError as e:
+    print(e)
     sys.exit()
-    
+
 time.sleep(2)
 
-#ERASED THE CARD
+# ERASED THE CARD
 try:
     msr.erase_card(7)
-except cardReaderExceptions.EraseCardError as e :
-    print (e)
+except cardReaderExceptions.EraseCardError as e:
+    print(e)
     sys.exit()
 
 time.sleep(2)
 
-#CHECK IF THE CARD IS ERASED
-#NOTE THAT THE MSR605 WILL NO RESPOND TO EMPTY CARDS, SO YOU WILL NEED TO SWIPE A CARD WITH DATA
+# CHECK IF THE CARD IS ERASED
+# NOTE THAT THE MSR605 WILL NO RESPOND TO EMPTY CARDS, SO YOU WILL NEED TO SWIPE A CARD WITH DATA
 try:
     msr.read_card()
-except cardReaderExceptions.CardReadError as e :
-    print (e)
+except cardReaderExceptions.CardReadError as e:
+    print(e)
     sys.exit()
-except cardReaderExceptions.StatusError as e :
-    print (e)
+except cardReaderExceptions.StatusError as e:
+    print(e)
     sys.exit()
-    
-print ("TRACKS: ", tracks)
+
+print("TRACKS: ", tracks)
 
 
-
-#CLOSE THE SERIAL CONNECTION
+# CLOSE THE SERIAL CONNECTION
 msr.close_serial_connection()
-    
-

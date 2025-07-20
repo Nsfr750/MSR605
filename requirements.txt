@@ -1,39 +1,50 @@
 # MSR605 Card Reader/Writer Dependencies
-# Last Updated: 2025-07-19
+# Last Updated: 2025-07-20
 
 # Core Dependencies
 pyserial>=3.5,<4.0  # For MSR605 communication
-cryptography>=42.0.0  # For encryption/decryption (AES, DES, 3DES)
-wand>=0.7.0  # For image processing (Pillow alternative)
-pyinstaller>=6.0.0  # For creating standalone executables
-pywin32>=306; sys_platform == 'win32'  # For Windows-specific functionality
-qrcode>=7.4.0  # For QR code generation
-requests>=2.32.4  # For HTTP requests
-psutil>=5.9.0  # For system monitoring
+cryptography>=45.0.0,<46.0.0  # For encryption/decryption (AES, DES, 3DES)
+wand>=0.6.13,<0.7.0  # For image processing (Pillow alternative)
+pyinstaller>=6.14.2,<7.0.0  # For creating standalone executables
+pywin32>=306,<308; sys_platform == 'win32'  # For Windows-specific functionality
+qrcode>=7.4.0,<8.0.0  # For QR code generation
+requests>=2.32.4,<3.0.0  # For HTTP requests
+psutil>=5.9.0,<6.0.0  # For system monitoring
+python-dotenv>=1.0.0,<2.0.0  # Environment variable management
 
 # PyQt6 Dependencies
-PyQt6>=6.6.0  # Core GUI framework (includes PyQt6-sip)
-PyQt6-Qt6>=6.6.0  # Qt6 runtime
-PyQt6-WebEngine>=6.6.0  # Web engine for PyQt6
-PyQt6-Qt6-WebEngineWidgets>=6.6.0  # WebEngine widgets for PyQt6
+PyQt6>=6.7.0,<6.8.0  # Core GUI framework (includes PyQt6-sip)
+PyQt6-Qt6>=6.7.0,<6.8.0  # Qt6 runtime
+PyQt6-WebEngine>=6.7.0,<6.8.0  # Web engine for PyQt6 (includes WebEngineWidgets)
 
-# Voice Control Dependencies
-SpeechRecognition>=3.10.0  # For voice command functionality
-PyAudio>=0.2.13; sys_platform != 'linux'  # Required for microphone access
+# Voice Control Dependencies (Optional)
+SpeechRecognition>=3.10.0,<4.0.0  # For voice command functionality
+PyAudio>=0.2.13,<0.3.0; sys_platform != 'linux'  # Required for microphone access
 
-# Development Dependencies (optional)
-pytest>=8.0.0  # For running tests
-pytest-qt>=4.2.0  # Qt testing support
-pytest-cov>=4.1.0  # Test coverage reporting
-black>=24.0.0  # Code formatting
-flake8>=7.0.0  # Linting
-mypy>=1.8.0  # Static type checking
-python-dotenv>=1.0.0  # Environment variable management
-pre-commit>=3.5.0  # Git hooks for code quality
+# Development Dependencies (Optional)
+pytest>=8.2.0,<9.0.0  # For running tests
+pytest-qt>=4.4.0,<5.0.0  # Qt testing support
+pytest-cov>=5.0.0,<6.0.0  # Test coverage reporting
+pytest-xdist>=3.6.0,<4.0.0  # Parallel test execution
+black>=24.4.0,<25.0.0  # Code formatting
+flake8>=7.1.0,<8.0.0  # Linting
+mypy>=1.10.0,<2.0.0  # Static type checking
+pre-commit>=3.7.0,<4.0.0  # Git hooks for code quality
+
+# Visualization Dependencies
+matplotlib>=3.8.0,<4.0.0  # For creating static, animated, and interactive visualizations
+seaborn>=0.13.0,<0.14.0  # Statistical data visualization
+plotly>=5.18.0,<6.0.0  # Interactive visualizations for the web
 
 # Documentation
-docutils>=0.20.0  # For documentation generation
-Sphinx>=7.2.0  # Documentation generator
-sphinx-rtd-theme>=1.3.0  # ReadTheDocs theme
+Sphinx>=7.3.0,<8.0.0  # Documentation generator
+sphinx-rtd-theme>=2.0.0,<3.0.0  # ReadTheDocs theme
+sphinx-autodoc-typehints>=2.0.0,<3.0.0  # Type hints support
+sphinx-copybutton>=0.5.2,<1.0.0  # Copy button for code blocks
 
-# types-PyQt6 is not available on PyPI, using type comments for now
+# Build Dependencies
+setuptools>=70.0.0,<71.0.0  # Package building
+twine>=5.0.0,<6.0.0  # Package publishing
+wheel>=0.43.0,<0.44.0  # Built-package format
+
+# Note: types-PyQt6 is not available on PyPI, using type comments for now

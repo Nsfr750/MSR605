@@ -13,19 +13,20 @@ from PyQt6.QtGui import QPalette, QColor
 # Import the GUI module
 from script.UI import GUI
 
+
 def main():
     """
     Main function that initializes and starts the application.
     """
     # Create the application
     app = QApplication(sys.argv)
-    
+
     # Set Fusion style for consistent look across platforms
-    app.setStyle('Fusion')
-    
+    app.setStyle("Fusion")
+
     # Create and set dark palette
     dark_palette = QPalette()
-    
+
     # Base colors
     dark_palette.setColor(QPalette.ColorRole.Window, QColor(53, 53, 53))
     dark_palette.setColor(QPalette.ColorRole.WindowText, QColor(255, 255, 255))
@@ -40,12 +41,13 @@ def main():
     dark_palette.setColor(QPalette.ColorRole.Link, QColor(42, 130, 218))
     dark_palette.setColor(QPalette.ColorRole.Highlight, QColor(42, 130, 218))
     dark_palette.setColor(QPalette.ColorRole.HighlightedText, QColor(255, 255, 255))
-    
+
     # Set the palette
     app.setPalette(dark_palette)
-    
+
     # Additional styling for dark mode
-    app.setStyleSheet("""
+    app.setStyleSheet(
+        """
         QToolTip { 
             color: #ffffff; 
             background-color: #2a82da; 
@@ -82,18 +84,20 @@ def main():
             left: 10px;
             padding: 0 3px;
         }
-    """)
-    
+    """
+    )
+
     # Set application information
     app.setApplicationName("MSR605 Reader/Writer")
     app.setApplicationDisplayName("MSR605 Card Reader/Writer")
-    
+
     # Create and show the main window
     window = GUI()
     window.show()
-    
+
     # Start the event loop
     sys.exit(app.exec())
+
 
 if __name__ == "__main__":
     main()

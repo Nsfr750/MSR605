@@ -5,9 +5,6 @@
   <img src="https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-blue" alt="Python 3.10+">
   <img src="https://img.shields.io/badge/GUI-PyQt6.6-blue" alt="PyQt6.6">
   <img src="https://img.shields.io/badge/License-GPLv3-blue" alt="GPLv3">
-  <a href="https://github.com/Nsfr750/MSR605/actions">
-    <img src="https://github.com/Nsfr750/MSR605/actions/workflows/tests.yml/badge.svg" alt="Build Status">
-  </a>
   <a href="https://github.com/Nsfr750/MSR605/issues">
     <img src="https://img.shields.io/github/issues/Nsfr750/MSR605" alt="Issues">
   </a>
@@ -51,14 +48,20 @@
 - Tabbed interface with detachable panels
 - Detailed track data parsing and display with syntax highlighting
 - Support for multiple encryption standards (AES-256, DES, 3DES)
+- **Multiple Card Format Support**: Full support for both ISO 7811 and ISO 7813 standards
 - Hardware Security Module (HSM) integration
 - Real-time data validation and sanitization
 - Comprehensive audit logging
 - Plugin system for extending functionality
 
-### 🛠️ Card Operations
-- 🔍 Read magnetic stripe cards with detailed analysis and validation
-- ✍️ Write data to cards with verification and checksum validation
+### ✨ Core Features
+- Read and write magnetic stripe cards (tracks 1, 2, and 3)
+  - **ISO 7811**: Support for alphanumeric track 1 and numeric tracks 2/3
+  - **ISO 7813**: Support for financial transaction cards with enhanced validation
+- Real-time card data visualization
+- Multi-language support
+- Cross-platform compatibility (Windows, Linux, macOS)
+- Logging system with daily rotation
 - 🧹 Erase card data (all tracks or selective) with confirmation
 - 🔬 Advanced card data decoding with field extraction and formatting
 - 🎯 Granular track-level controls with real-time preview
@@ -109,33 +112,28 @@
 - **Storage**: 100MB available space
 - **Display**: 1366x768 resolution minimum
 
-## 🛠️ Installation
+## 📦 Installation
 
-### 1. Clone the Repository
+### Prerequisites
+- Python 3.10, 3.11, or 3.12
+- Rust toolchain (required for cryptography package)
+- Build tools for your platform
+  - Windows: Visual Studio Build Tools with C++ workload
+  - Linux: `build-essential`, `python3-dev`, `libssl-dev`
+  - macOS: Xcode Command Line Tools
+
+### From PyPI (Recommended)
 ```bash
+pip install msr605-tool
+```
+
+### From Source
+```bash
+# Clone the repository
 git clone https://github.com/Nsfr750/MSR605.git
 cd MSR605
-```
 
-### 2. Set Up Python Environment
-#### Using venv (Recommended)
-```bash
-# Create and activate virtual environment
-python -m venv venv
-
-# Windows
-.\venv\Scripts\activate
-
-# Linux/macOS
-source venv/bin/activate
-```
-
-#### Using conda (Alternative)
-```bash
-conda create -n msr605 python=3.10
-conda activate msr605
-```
-
+# Install the package in development mode
 ### 3. Install Dependencies
 ```bash
 # Install core requirements
