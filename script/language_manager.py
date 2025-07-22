@@ -1,5 +1,5 @@
 """
-Language management for Image Deduplicator.
+Language management
 """
 
 from typing import Dict, List, Optional, Any
