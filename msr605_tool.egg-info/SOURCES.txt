@@ -9,6 +9,7 @@ setup.py
 ./script/advanced_functions.py
 ./script/cardReader.py
 ./script/cardReaderExceptions.py
+./script/card_formats.py
 ./script/decrypt.py
 ./script/help.py
 ./script/isoStandardDictionary.py
@@ -17,10 +18,12 @@ setup.py
 ./script/logger.py
 ./script/menu.py
 ./script/parser.py
+./script/settings_manager.py
 ./script/sponsor.py
 ./script/translations.py
 ./script/updates.py
 ./script/version.py
+./script/visualization.py
 ./script/voice_control.py
 msr605_tool.egg-info/PKG-INFO
 msr605_tool.egg-info/SOURCES.txt
@@ -35,6 +38,7 @@ script/about.py
 script/advanced_functions.py
 script/cardReader.py
 script/cardReaderExceptions.py
+script/card_formats.py
 script/decrypt.py
 script/help.py
 script/isoStandardDictionary.py
@@ -43,8 +47,13 @@ script/log_viewer.py
 script/logger.py
 script/menu.py
 script/parser.py
+script/settings_manager.py
 script/sponsor.py
 script/translations.py
 script/updates.py
 script/version.py
+script/visualization.py
 script/voice_control.py
+tests/test_card_formats.py
+tests/test_card_reader.py
+tests/test_visualization.py

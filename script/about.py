@@ -171,7 +171,7 @@ class AboutDialog(QDialog):
         )
         self.github_btn.clicked.connect(
             lambda: QDesktopServices.openUrl(
-                QUrl("https://github.com/Nsfr750/Images-Deduplicator")
+                QUrl("https://github.com/Nsfr750/MSR605")
             )
         )
 

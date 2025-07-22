@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "msr605-tool"
-version = "0.1.0"
+version = "2.4.0"
 description = "Cross-platform tool for reading, writing, and analyzing magnetic stripe cards using the MSR605 reader/writer"
 readme = "README.md"
 authors = [
@@ -68,9 +68,9 @@ packages = ["script"]
 include-package-data = true
 package-data = { "script" = ["assets/*", "config/*", "docs/*", "translations/*", "ui/*.ui"] }
 
-[tool.setuptools.dynamic]
-version = {attr = "script.version.__version__"}
-
+# Removed dynamic version import since we're using static version in project.version
+# [tool.setuptools.dynamic]
+# version = {attr = "script.version.__version__"}
 
 [project.entry-points.console_scripts]
 msr605-tool = "script.main:main"
