@@ -246,7 +246,7 @@ class SponsorDialog(QDialog):
         other_help.setHtml(
             f"<h3>{self.translate('other_ways_to_help')}</h3>"
             f"<ul>"
-            f"<li>{self.translate('star_on_github')} <a href=\"https://github.com/Nsfr750/Images-Deduplicator\">GitHub</a></li>"
+            f"<li>{self.translate('star_on_github')} <a href=\"https://github.com/Nsfr750/MSR605\">GitHub</a></li>"
             f"<li>{self.translate('report_bugs')}</li>"
             f"<li>{self.translate('share_with_others')}</li>"
             f"</ul>"
