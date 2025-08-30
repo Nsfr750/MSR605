@@ -292,7 +292,7 @@ MSR605 Card Reader/Writer is licensed under the GNU General Public License v3.0.
 
 ### Getting Help
 
-- 📖 [Documentation](https://nsfr750.github.io/MSR605/wiki)
+- 📖 [Documentation](https://github.com/Nsfr750/MSR605/wiki)
 - 🐛 [Report a Bug](https://github.com/Nsfr750/MSR605/issues/new?template=bug_report.md)
 - 💡 [Request a Feature](https://github.com/Nsfr750/MSR605/issues/new?template=feature_request.md)
 - ❓ [Ask a Question](https://github.com/Nsfr750/MSR605/discussions)
