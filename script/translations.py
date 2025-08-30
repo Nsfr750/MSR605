@@ -170,7 +170,8 @@ TRANSLATIONS = {
             <li><b>Auto-connect</b>: The application will automatically connect to the MSR605 reader on startup.</li>
         </ul>
         
-        <p>For more information, please refer to the documentation.</p>
+        <p>For more information, please refer to the <a href="https://github.com/Nsfr750/MSR605/wiki">Wiki</a></p>
+
         """,
         # About text
         "about_title": "About",
@@ -388,7 +389,7 @@ TRANSLATIONS = {
             <li><b>Connessione automatica</b>: L'applicazione si connetterà automaticamente al lettore MSR605 all'avvio.</li>
         </ul>
         
-        <p>Per ulteriori informazioni, consultare la documentazione.</p>
+        <p>Per ulteriori informazioni, consultare la <a href="https://github.com/Nsfr750/MSR605/wiki">Wiki</a></p>
         """,
         # About text
         "about_title": "Informazioni",
