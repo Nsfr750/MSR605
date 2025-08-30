@@ -146,4 +146,3 @@ ISO 7813 is a subset of ISO 7811 specifically for financial transaction cards. K
 For additional help, please:
 - Check the [FAQ](FAQ.md)
 - Search or open an issue on [GitHub](https://github.com/yourusername/MSR605/issues)
-- Contact support@example.com
