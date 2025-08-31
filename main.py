@@ -6,6 +6,9 @@ This is the main entry point for the MSR605 Card Reader/Writer application.
 It initializes and starts the PyQt6 application with the main window.
 """
 
+"""
+Main Imports
+"""
 import sys
 from PyQt6.QtWidgets import QApplication, QStyleFactory
 from PyQt6.QtGui import QPalette, QColor
