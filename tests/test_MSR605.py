@@ -1,14 +1,26 @@
 #!/usr/bin/env python3
 
-import sys, time, cardReaderExceptions, cardReader
+import sys
+import time
+from script.cardReader import CardReader
+from script.cardReaderExceptions import (
+    MSR605ConnectError,
+    CommunicationTestError,
+    SensorTestError,
+    RamTestError,
+    GetDeviceModelError,
+    GetFirmwareVersionError,
+    SetCoercivityError,
+    GetCoercivityError
+)
 
 # INITIALIZE MSR605
 try:
-    msr = cardReader.CardReader()
-except cardReaderExceptions.MSR605ConnectError as e:
+    msr = CardReader()
+except MSR605ConnectError as e:
     print(e)
     sys.exit()
-except cardReaderExceptions.CommunicationTestError as e:
+except CommunicationTestError as e:
     print(e)
     sys.exit()
 
@@ -19,7 +31,7 @@ time.sleep(1)
 
 try:
     msr.communication_test()
-except cardReaderExceptions.CommunicationTestError as e:
+except CommunicationTestError as e:
     print(e)
     sys.exit()
 
@@ -28,7 +40,7 @@ time.sleep(1)
 # SENSOR TEST, REQUIRES A CARD SWIPE
 try:
     msr.sensor_test()
-except cardReaderExceptions.SensorTestError as e:
+except SensorTestError as e:
     print(e)
     sys.exit()
 
@@ -37,7 +49,7 @@ time.sleep(1)
 # RAM TEST
 try:
     msr.ram_test()
-except cardReaderExceptions.RamTestError as e:
+except RamTestError as e:
     print(e)
     sys.exit()
 
@@ -46,7 +58,7 @@ time.sleep(1)
 # GETTING DEVICE MODEL
 try:
     msr.get_device_model()
-except cardReaderExceptions.GetDeviceModelError as e:
+except GetDeviceModelError as e:
     print(e)
     sys.exit()
 
@@ -55,7 +67,7 @@ time.sleep(1)
 # GET FIRMWARE VERSION
 try:
     msr.get_firmware_version()
-except cardReaderExceptions.GetFirmwareVersionError as e:
+except GetFirmwareVersionError as e:
     print(e)
     sys.exit()
 
@@ -64,7 +76,7 @@ time.sleep(1)
 # SETTING MSR605 TO LOW-CO, I DID LOW FIRST BECAUSE I'M PRETTY SURE HI IS THE DEFAULT
 try:
     msr.set_low_co()
-except cardReaderExceptions.SetCoercivityError as e:
+except SetCoercivityError as e:
     print(e)
     sys.exit()
 
@@ -73,7 +85,7 @@ time.sleep(1)
 # CHECKING IF THE MSR605 IS IN LOW-CO (WAS SET BEFORE)
 try:
     msr.get_hi_or_low_co()
-except cardReaderExceptions.GetCoercivityError as e:
+except GetCoercivityError as e:
     print(e)
     sys.exit()
 
@@ -82,7 +94,7 @@ time.sleep(1)
 # SETTING MSR605 TO HI-CO
 try:
     msr.set_hi_co()
-except cardReaderExceptions.SetCoercivityError as e:
+except SetCoercivityError as e:
     print(e)
     sys.exit()
 
@@ -91,7 +103,7 @@ time.sleep(1)
 # CHECKING IF THE MSR605 IS IN HI-CO
 try:
     msr.get_hi_or_low_co()
-except cardReaderExceptions.GetCoercivityError as e:
+except GetCoercivityError as e:
     print(e)
     sys.exit()
 

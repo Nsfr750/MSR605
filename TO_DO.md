@@ -27,6 +27,10 @@
 - [ ] Complete test coverage for all modules
   - [ ] Increase test coverage for visualization module
   - [ ] Add integration tests for UI components
+- [ ] Menu system improvements
+  - [x] Add flag emojis to language selection
+  - [ ] Add tooltips for menu items
+  - [x] Add keyboard shortcuts for common actions
 - [ ] Optimize database performance
   - [ ] Profile database queries
   - [ ] Optimize schema and indexes
@@ -99,14 +103,12 @@
 - [x] Implement configuration management
 
 ## Future Enhancements
-- Cloud sync for card databases
-- Mobile app companion
 - Advanced reporting and analytics
 - Plugin system for custom formats
 - Web interface for remote access
 
 ## Notes
-- **Current Version**: 2.3.0
+- **Current Version**: 2.4.0
 - **Last Updated**: 2025-07-19
 - **Python Version**: 3.10+
 - **License**: GPL-3.0

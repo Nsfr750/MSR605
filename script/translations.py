@@ -67,24 +67,29 @@ TRANSLATIONS = {
         "menu_enable_voice": "Enable &Voice Control",
         "menu_voice_help": "Voice Commands &Help",
         "menu_view_logs": "View &Logs",
+        
         # File menu
         "menu_exit": "E&xit",
         "menu_exit_shortcut": "Ctrl+Q",
+       
         # Database menu
         "menu_view_database": "&View Database",
         "menu_export_csv": "&Export to CSV",
         "menu_auto_save": "Autosave Read Cards",
         "menu_allow_duplicates": "Save Duplicate Cards",
+        
         # Help menu
         "menu_help_contents": "&Help Contents",
         "menu_check_updates": "Check for &Updates",
         "menu_about": "&About",
         "menu_support": "&Support Project",
+        
         # Tabs
         "tab_read": "Read Card",
         "tab_write": "Write Card",
         "tab_database": "Database",
         "tab_settings": "Settings",
+        
         # Read tab
         "btn_read_card": "Read Card",
         "lbl_track_data": "Track Data",
@@ -92,6 +97,7 @@ TRANSLATIONS = {
         "lbl_reading": "Reading card...",
         "lbl_read_success": "Card read successfully!",
         "lbl_read_error": "Error reading card",
+        
         # Write tab
         "btn_write_card": "Write Card",
         "btn_clear_tracks": "Clear Tracks",
@@ -100,6 +106,7 @@ TRANSLATIONS = {
         "lbl_write_success": "Card written successfully!",
         "lbl_write_error": "Error writing to card",
         "lbl_no_data": "No data to write",
+        
         # Database tab
         "btn_refresh": "Refresh",
         "btn_export": "Export to CSV",
@@ -112,6 +119,7 @@ TRANSLATIONS = {
         "col_notes": "Notes",
         "export_success": "Successfully exported {count} records to:\n{path}",
         "export_failed": "Failed to export database: {error}",
+        
         # Settings tab
         "grp_connection": "Connection Settings",
         "grp_coercivity": "Coercivity",
@@ -123,6 +131,7 @@ TRANSLATIONS = {
         "lbl_lo_coercivity": "Low Coercivity (300 Oe)",
         "lbl_auto_save": "Auto-save read cards to database",
         "lbl_allow_duplicates": "Allow duplicate cards in database",
+        
         # Messages
         "msg_not_connected": "Please connect to the MSR605 first",
         "msg_connection_success": "Connected to {port}",
@@ -135,6 +144,7 @@ TRANSLATIONS = {
         "msg_import_error": "Failed to import module: {module}",
         "msg_database_error": "Database error: {error}",
         "msg_confirm_exit": "Are you sure you want to exit?",
+        
         # Dialogs
         "dlg_about_title": "About MSR605 Card Reader",
         "dlg_help_title": "Help",
@@ -145,6 +155,7 @@ TRANSLATIONS = {
         "btn_ok": "OK",
         "btn_cancel": "Cancel",
         "btn_close": "Close",
+        
         # Help text
         "help_content": """
         <h2>MSR605 Card Reader - Help</h2>
@@ -184,33 +195,73 @@ TRANSLATIONS = {
         "about_description": "This application is developed and maintained by a single developer.\nYour support helps keep the project alive and allows for new features and improvements.",
         "copyright": "© 2025 Nsfr750",
         "license": "Licensed under the GPLv3 License",
+
+        # Sponsor dialog
+        "support_title": "Support MSR605",
+        "support_project": "Support the Project",
+        "support_project_header": " Support MSR605",
+        "support_project_description": "This application is developed and maintained by a single developer.\nYour support helps keep the project alive and allows for new features and improvements.",
+        "support_on_patreon": "Support on Patreon",
+        "donate_via_paypal": "Donate via PayPal",
+        "copy_address": "Copy Address",
+        "address_copied": "Address Copied",
+        "address_copied_to_clipboard": "Address Copied to Clipboard",
+        "support_development": "Support Development",
+        "support_app_name": "Support MSR605",
+        "support_message": "If you find this application useful, we invite you to support its development.\n\nYour support helps cover hosting costs and encourages further development.",
+        "github_sponsors": "GitHub Sponsors",
+        "paypal_donation": "PayPal Donatiopn",
+        "monero": "Monero",
+        "scan_to_donate_xmr": "Scan to donate XMR",
+        "qr_generation_failed": "QR generation failed",
+        "ways_to_support": "Ways to Support",
+        "other_ways_to_help": "Other Ways to Help",
+        "star_on_github": "Star on GitHub",
+        "report_bugs": "Report Bugs",
+        "share_with_others": "Share with Others",
+        "copied": "Copied!",
+        "close": "Close",
+        "donate_with_paypal": "Donate with PayPal",
+        "copy_monero_address": "Copy Monero Address",
+                
         # Log viewer
-        "save_log_file": "Salva File di Log",
-        "log_files": "File di Log (*.log);;Tutti i File (*)",
-        "logs_saved": "Log salvati con successo in: {path}",
-        "failed_save_logs": "Impossibile salvare il file di log: {error}",
-        "log_level": "Livello di Log",
-        "all_levels": "Tutti i Livelli",
-        "refresh": "Aggiorna",
-        "select_log_file": "Seleziona File di Log",
-        "no_logs_found": "Nessun Log Trovato",
-        "log_level_filters": "Filtri Livello Log",
-        "clear_log": "Pulisci Log",
-        "save_as": "Salva come",
-        "no_logs_available": "Nessun Log Disponibile",
-        "log_viewer": "Visualizzatore Log",
-        "filter_logs": "Filtra Log",
-        "no_log_file": "Nessun file di log disponibile.",
-        "error_reading_log": "Errore durante la lettura del file di log: {error}",
-        "confirm_clear_logs": "Sei sicuro di voler cancellare tutti i log? Questa azione non può essere annullata.",
-        "save_logs": "Salva Log",
+        "save_log_file": "Save Log File",
+        "log_files": "Log File (*.log);;All Files (*)",
+        "logs_saved": "Logs saved successfully in: {path}",
+        "failed_save_logs": "Failed to save log file: {error}",
+        "log_level": "Log Level",
+        "all_levels": "All Level",
+        "refresh": "Refresh",
+        "select_log_file": "Select Log file",
+        "no_logs_found": "No Logs Found",
+        "log_level_filters": "Log Level Filters",
+        "clear_log": "Clear Log",
+        "save_as": "Save As",
+        "no_logs_available": "No Logs Available",
+        "log_viewer": "Log Viewer",
+        "filter_logs": "Filter Logs",
+        "no_log_file": "No Log File",
+        "error_reading_log": "Error reading log: {error}",
+        "confirm_clear_logs": "Are you sure you want to clear all logs? Thos action cannot be undone.",
+        "save_logs": "Save Logs",
+        
         # Update checker
-        "update_available": "Aggiornamento Disponibile",
-        "new_version_available": "È disponibile una nuova versione!",
-        "download_update": "Scarica Aggiornamento",
-        "remind_me_later": "Ricordamelo più tardi",
-        "skip_this_version": "Salta questa versione",
-        "checking_for_updates": "Controllo aggiornamenti in corso...",
+        "update_available": "Update Available",
+        "new_version_available": "New version available!",
+        "download_update": "Download Update",
+        "remind_me_later": "Remind me later",
+        "skip_this_version": "Skip this version",
+        "checking_for_updates": "Checking for updates...",
+        "up_to_date": "You are up to date.",
+        "update_error": "Error checking for updates",
+        "update_check_failed": "Failed to check for updates: {error}",
+        "release_notes": "Release Notes",
+        "download": "Download",
+        "view_changes": "View Changes",
+        "update_available_title": "Update Available",
+        "current_version": "Current Version: {version}",
+        "latest_version": "Latest Version: {version}",
+
         # Missing
         'msg_no_track_data': "No Track Data available",
         'lbl_cardholder': "Cardholder",
@@ -286,24 +337,29 @@ TRANSLATIONS = {
         "menu_enable_voice": "Abilita Controllo &Vocale",
         "menu_voice_help": "Aiuto Comandi &Vocali",
         "menu_view_logs": "Visualizza &Log",
+        
         # File menu
         "menu_exit": "&Esci",
         "menu_exit_shortcut": "Ctrl+Q",
+        
         # Database menu
         "menu_view_database": "&Visualizza Database",
         "menu_export_csv": "&Esporta in CSV",
         "menu_auto_save": "Salva automaticamente le carte lette",
         "menu_allow_duplicates": "Salva carte duplicate",
+        
         # Help menu
         "menu_help_contents": "&Guida",
         "menu_check_updates": "Controlla &aggiornamenti",
         "menu_about": "&Informazioni",
         "menu_support": "&Supporta il Progetto",
+        
         # Tabs
         "tab_read": "Leggi Carta",
         "tab_write": "Scrivi Carta",
         "tab_database": "Database",
         "tab_settings": "Impostazioni",
+        
         # Read tab
         "btn_read_card": "Leggi Carta",
         "lbl_track_data": "Dati Traccia",
@@ -311,6 +367,7 @@ TRANSLATIONS = {
         "lbl_reading": "Lettura carta in corso...",
         "lbl_read_success": "Carta letta con successo!",
         "lbl_read_error": "Errore durante la lettura della carta",
+        
         # Write tab
         "btn_write_card": "Scrivi Carta",
         "btn_clear_tracks": "Pulisci Tracce",
@@ -319,6 +376,7 @@ TRANSLATIONS = {
         "lbl_write_success": "Carta scritta con successo!",
         "lbl_write_error": "Errore durante la scrittura sulla carta",
         "lbl_no_data": "Nessun dato da scrivere",
+        
         # Database tab
         "btn_refresh": "Aggiorna",
         "btn_export": "Esporta in CSV",
@@ -331,6 +389,7 @@ TRANSLATIONS = {
         "col_notes": "Note",
         "export_success": "Esportati con successo {count} record in:\n{path}",
         "export_failed": "Errore durante l'esportazione del database: {error}",
+        
         # Settings tab
         "grp_connection": "Impostazioni Connessione",
         "grp_coercivity": "Coercitività",
@@ -342,6 +401,7 @@ TRANSLATIONS = {
         "lbl_lo_coercivity": "Bassa Coercitività (300 Oe)",
         "lbl_auto_save": "Salva automaticamente le carte lette nel database",
         "lbl_allow_duplicates": "Consenti carte duplicate nel database",
+        
         # Messages
         "msg_not_connected": "Si prega di connettersi prima al lettore MSR605",
         "msg_connection_success": "Connesso a {port}",
@@ -354,6 +414,7 @@ TRANSLATIONS = {
         "msg_import_error": "Errore durante l'importazione del modulo: {module}",
         "msg_database_error": "Errore del database: {error}",
         "msg_confirm_exit": "Sei sicuro di voler uscire?",
+        
         # Dialogs
         "dlg_about_title": "Informazioni su MSR605",
         "dlg_help_title": "Guida",
@@ -364,6 +425,7 @@ TRANSLATIONS = {
         "btn_ok": "OK",
         "btn_cancel": "Annulla",
         "btn_close": "Chiudi",
+        
         # Help text
         "help_content": """
         <h2>MSR605 - Guida all'uso</h2>
@@ -391,6 +453,7 @@ TRANSLATIONS = {
         
         <p>Per ulteriori informazioni, consultare la <a href="https://github.com/Nsfr750/MSR605/wiki">Wiki</a></p>
         """,
+        
         # About text
         "about_title": "Informazioni",
         "app_name": "MSR605 Card Reader",
@@ -402,6 +465,7 @@ TRANSLATIONS = {
         "about_description": "Questa applicazione è sviluppata e mantenuta da un singolo sviluppatore.\nIl tuo supporto aiuta a mantenere in vita il progetto e permette di aggiungere nuove funzionalità e miglioramenti.",
         "copyright": "© 2025 Nsfr750",
         "license": "Licenza GPLv3",
+                
         # Sponsor dialog
         "support_title": "Supporta MSR605",
         "support_project": "Supporta il Progetto",
@@ -429,6 +493,7 @@ TRANSLATIONS = {
         "close": "Chiudi",
         "donate_with_paypal": "Dona con PayPal",
         "copy_monero_address": "Copia Indirizzo Monero",
+        
         # Log viewer
         "log_viewer": "Visualizzatore Log",
         "filter_logs": "Filtra Log",
@@ -450,6 +515,7 @@ TRANSLATIONS = {
         "clear_log": "Pulisci Log",
         "save_as": "Salva come",
         "no_logs_available": "Nessun Log Disponibile",
+        
         # Update checker
         "update_available": "Aggiornamento Disponibile",
         "new_version_available": "È disponibile una nuova versione di MSR605!",
@@ -466,6 +532,7 @@ TRANSLATIONS = {
         "download": "Scarica",
         "view_changes": "Visualizza Modifiche",
         "update_available_title": "Aggiornamento Disponibile",
+        
         # Missing
         'msg_no_track_data': "Nessun dato traccia disponibile",
         'lbl_cardholder': "Titolare Carta",

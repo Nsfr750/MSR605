@@ -5,6 +5,16 @@ All notable changes to the MSR605 Card Reader/Writer project will be documented 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.1] - 2025-08-31
+
+### Added
+- Added flag emojis (🇬🇧, 🇮🇹) to language selection menu for better visual feedback
+
+### Fixed
+- Fixed menu text visibility issues in the application menu bar
+- Resolved menu item duplication when changing languages
+- Improved menu styling and layout consistency
+
 ## [2.4.0] - 2025-07-20
 
 ### Added

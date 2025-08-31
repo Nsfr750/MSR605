@@ -8,7 +8,7 @@ for the MSR605 project.
 # Version information follows Semantic Versioning 2.0.0 (https://semver.org/)
 VERSION_MAJOR = 2
 VERSION_MINOR = 4
-VERSION_PATCH = 0
+VERSION_PATCH = 1
 
 # Additional version qualifiers
 VERSION_QUALIFIER = "stable"  # Could be 'alpha', 'beta', 'rc', or ''

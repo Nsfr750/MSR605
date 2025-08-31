@@ -57,7 +57,7 @@ HI_OR_LOW_CO = b"\x64"
 class CardReader:
     """Allows interfacing with the MSR605 using the serial module"""
 
-    def __init__(self, port=None, default_format=CardFormat.ISO_7811):
+    def __init__(self, port=None, default_format=CardFormat.ISO_7811, auto_connect=True):
         """Initializes the CardReader instance.
 
         Args:
@@ -65,6 +65,8 @@ class CardReader:
                                 the class will try to auto-detect the port.
             default_format (CardFormat, optional): Default card format to use for operations.
                                                 Defaults to ISO_7811.
+            auto_connect (bool, optional): Whether to automatically connect to the device.
+                                        Defaults to True.
 
         Returns:
             Nothing
@@ -76,6 +78,9 @@ class CardReader:
         self.__port = port
         self.__default_format = default_format
         self.__current_format = default_format
+        
+        if auto_connect:
+            self.connect()
 
     def connect(self):
         """Connects to the MSR605 using the specified port or auto-detects it.
