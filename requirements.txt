@@ -5,12 +5,12 @@
 pyserial>=3.5,<4.0  # For MSR605 communication
 cryptography>=45.0.0,<46.0.0  # For encryption/decryption (AES, DES, 3DES)
 wand>=0.6.13,<0.7.0  # For image processing (Pillow alternative)
-pyinstaller>=6.14.2,<7.0.0  # For creating standalone executables
 pywin32>=306,<308; sys_platform == 'win32'  # For Windows-specific functionality
 qrcode>=7.4.0,<8.0.0  # For QR code generation
 requests>=2.32.4,<3.0.0  # For HTTP requests
 psutil>=5.9.0,<6.0.0  # For system monitoring
 python-dotenv>=1.0.0,<2.0.0  # Environment variable management
+send2trash>=1.8.0,<2.0.0  # For safe file deletion
 
 # PyQt6 Dependencies
 PyQt6>=6.7.0,<6.8.0  # Core GUI framework (includes PyQt6-sip)
@@ -35,12 +35,6 @@ pre-commit>=3.7.0,<4.0.0  # Git hooks for code quality
 matplotlib>=3.8.0,<4.0.0  # For creating static, animated, and interactive visualizations
 seaborn>=0.13.0,<0.14.0  # Statistical data visualization
 plotly>=5.18.0,<6.0.0  # Interactive visualizations for the web
-
-# Documentation
-Sphinx>=7.3.0,<8.0.0  # Documentation generator
-sphinx-rtd-theme>=2.0.0,<3.0.0  # ReadTheDocs theme
-sphinx-autodoc-typehints>=2.0.0,<3.0.0  # Type hints support
-sphinx-copybutton>=0.5.2,<1.0.0  # Copy button for code blocks
 
 # Build Dependencies
 setuptools>=70.0.0,<71.0.0  # Package building
