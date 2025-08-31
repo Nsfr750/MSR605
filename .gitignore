@@ -113,3 +113,4 @@ config/*.json
 install-scripts/build_config.py
 build_config.py
 Dati MSR605.txt
+build_nuitka.py

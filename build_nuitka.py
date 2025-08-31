@@ -46,7 +46,7 @@ try:
     VERSION = '.'.join(version_parts[:4])  # Take first 4 parts
 except Exception as e:
     print(f"Error reading version from {VERSION_FILE}: {e}")
-    VERSION = "2.4.0.0"
+    VERSION = "2.4.1.0"
 
 def parse_arguments():
     """Parse command line arguments."""
@@ -79,19 +79,19 @@ def get_nuitka_command(args):
         "--standalone",
         "--assume-yes-for-downloads",
         "--output-dir=dist",
-        "---output-filename=MSR605-2.4.0.exe",
+        "--output-filename=MSR605-2.4.1.exe",
         "--windows-icon-from-ico=assets/icon.ico",
         "--follow-imports",
         "--remove-output",
         "--company-name=Tuxxle",
         "--product-name=MSR605",
-        "--product-version=2.4.0.stable",
-        "--file-version=2.4.0.stable",
+        "--product-version=2.4.1.blue",
+        "--file-version=2.4.1.blue",
         "--file-description=MSR605 - Card Reader/Writer",
         "--windows-disable-console",
         "--windows-company-name=Tuxxle",
-        "--windows-file-version=2.4.0.0",
-        "--windows-product-version=2.4.0.0",
+        "--windows-file-version=2.4.1.0",
+        "--windows-product-version=2.4.1.0",
         "--windows-product-name=MSR605",
         "--windows-file-description=MSR605 - Card Reader/Writer",
         "--copyright=© 2025 Nsfr750",
