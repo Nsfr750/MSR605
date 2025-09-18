@@ -1,5 +1,5 @@
 """
-Sponsor dialog for the Image Deduplicator application.
+Sponsor dialog for the MSR605 application.
 """
 
 from PyQt6.QtWidgets import (

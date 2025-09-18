@@ -1,3 +1,7 @@
+"""
+About dialog for MSR605 application.
+"""
+
 from PyQt6.QtWidgets import (
     QDialog,
     QVBoxLayout,

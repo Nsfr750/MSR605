@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+"""
+UI for the MSR605 application.
+"""
+
 import sys
 import os
 import time

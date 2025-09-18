@@ -1,5 +1,5 @@
 """
-Log viewer dialog for MSR605 Card Reader.
+Log viewer for MSR605 Card Reader.
 """
 
 import os

@@ -1,5 +1,5 @@
 """
-Advanced logging configuration and utilities for Project Browser application.
+Advanced logging configuration and utilities for MSR605 application.
 Features colored console output, structured logging, and enhanced error handling.
 """
 

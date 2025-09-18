@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-MSR605 Card Reader/Writer - Main Entry Point
+MSR605 - Main Entry Point
 
 This is the main entry point for the MSR605 Card Reader/Writer application.
 It initializes and starts the PyQt6 application with the main window.
