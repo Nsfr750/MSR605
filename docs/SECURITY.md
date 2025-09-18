@@ -7,6 +7,7 @@ This document outlines the security practices, policies, and guidelines for the 
 ## 🔒 Security Overview
 
 The MSR605 application handles magnetic stripe card data, which may contain sensitive information such as:
+
 - Financial card data (credit/debit cards)
 - Personal identification information
 - Access control credentials
@@ -27,13 +28,14 @@ We encourage responsible disclosure of security vulnerabilities. If you discover
 
 #### How to Report
 
-1. **Email**: nsfr750@yandex.com
+1. **Email**: [Nsfr750](mailto:nsfr750@yandex.com)
 2. **GitHub**: Create a private issue in the [MSR605 repository](https://github.com/Nsfr750/MSR605)
 3. **Discord**: Contact us on our [Discord server](https://discord.gg/ryqNeuRYjD)
 
 #### What to Include
 
 Please provide as much information as possible about the vulnerability:
+
 - Detailed description of the vulnerability
 - Steps to reproduce the issue
 - Potential impact of the vulnerability
@@ -164,7 +166,8 @@ We will acknowledge receipt of your report within **48 hours** and provide a det
 ### Contact Information
 
 For security incidents or emergencies:
-- **Email**: nsfr750@yandex.com
+
+- **Email**: [Nsfr750](mailto:nsfr750@yandex.com)
 - **Discord**: [https://discord.gg/ryqNeuRYjD](https://discord.gg/ryqNeuRYjD)
 - **GitHub**: [https://github.com/Nsfr750/MSR605](https://github.com/Nsfr750/MSR605)
 
@@ -246,6 +249,6 @@ For security incidents or emergencies:
 **Last Updated**: September 18, 2025  
 **Version**: 2.4.2  
 **Maintainer**: Nsfr750  
-**Contact**: nsfr750@yandex.com
+**Contact**: [Nsfr750](mailto:nsfr750@yandex.com)
 
 For questions or concerns about this security policy, please contact us using the information provided above.

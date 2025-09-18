@@ -1,5 +1,5 @@
 # MSR605 Card Reader/Writer Dependencies
-# Last Updated: 2025-07-20
+# Last Updated: 2025-09-18
 
 # Core Dependencies
 pyserial>=3.5,<4.0  # For MSR605 communication

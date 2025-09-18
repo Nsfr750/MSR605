@@ -22,7 +22,7 @@ TRANSLATIONS = {
         "menu_enable_voice": "Enable &Voice Control",
         "menu_voice_help": "Voice Commands &Help",
         "menu_view_logs": "View &Logs",
-        "menu_check_updates": "Check Updates",
+        "menu.check_updates": "Check Updates",
         # File menu
         "menu_exit": "E&xit",
         "menu_exit_shortcut": "Ctrl+Q",
@@ -33,7 +33,6 @@ TRANSLATIONS = {
         "menu_allow_duplicates": "Save Duplicate Cards",
         # Help menu
         "menu_help_contents": "&Help Contents",
-        "menu_check_updates": "Check for &Updates",
         "menu_about": "&About",
         "menu_support": "&Support Project",
         # Tabs
@@ -178,7 +177,6 @@ TRANSLATIONS = {
         "confirm_clear_logs": "Sei sicuro di voler cancellare tutti i log? Questa azione non può essere annullata.",
         "save_logs": "Salva Log",
         # Update checker
-        "menu_check_updates": "Controlla Aggiornamenti",
         "update_available": "Aggiornamento Disponibile",
         "new_version_available": "È disponibile una nuova versione!",
         "download_update": "Scarica Aggiornamento",
@@ -220,7 +218,7 @@ TRANSLATIONS = {
         "menu_allow_duplicates": "Salva carte duplicate",
         # Help menu
         "menu_help_contents": "&Guida",
-        "menu_check_updates": "Controlla &aggiornamenti",
+        "menu.check_updates": "Controlla &aggiornamenti",
         "menu_about": "&Informazioni",
         "menu_support": "&Supporta il Progetto",
         # Tabs
