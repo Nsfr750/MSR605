@@ -127,6 +127,9 @@ class CardReader:
             # Reset again after communication test
             self.reset()
 
+            # Initialize the device with fallback coercivity mode
+            self.initialize_device()
+
             print("\nCONNECTED TO MSR605")
 
         except Exception as e:
@@ -247,6 +250,12 @@ class CardReader:
 
         print("\nATTEMPTING TO RESET THE MSR605")
 
+        # Check if serial connection is established
+        if self.__serialConn is None:
+            print("WARNING: No serial connection established. Cannot reset MSR605.")
+            print("Please connect to the MSR605 first using the connect() method.")
+            return None
+
         # flusing the input and output solves the issue where the MSR605 app/gui would need
         # to be restarted if there was an issue like say swiping the card backwards, I
         # found out about the flushing input & output before the reset from this MSR605
@@ -254,15 +263,23 @@ class CardReader:
         # I assume before there would be data left on the buffer which would mess up
         # the reading and writing of commands since there would be extra data which
         # wasn't expected
-        self.__serialConn.flushInput()
-        self.__serialConn.flushOutput()
+        try:
+            self.__serialConn.flushInput()
+            self.__serialConn.flushOutput()
+        except Exception as e:
+            print(f"WARNING: Error flushing serial buffers: {e}")
+            # Continue with reset attempt anyway
 
         # writes the command code for resetting the MSR605
-        self.__serialConn.write(ESCAPE + RESET)
-
-        # so i might be a noob here but from what i read, flush waits for the command above
-        # to fully write and complete, I thought this was better than adding time delays
-        self.__serialConn.flush()
+        try:
+            self.__serialConn.write(ESCAPE + RESET)
+            
+            # so i might be a noob here but from what i read, flush waits for the command above
+            # to fully write and complete, I thought this was better than adding time delays
+            self.__serialConn.flush()
+        except Exception as e:
+            print(f"WARNING: Error writing reset command: {e}")
+            # Continue anyway - reset might still work
 
         print("MSR605 SHOULD'VE BEEN RESET")
         # there is no response from the MSR605
@@ -383,32 +400,68 @@ class CardReader:
             CardReadError: If an error occurs while reading the card
             StatusError: If the device reports an error status
         """
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                print(f"\nATTEMPTING TO READ FROM CARD (SWIPE NOW) - Attempt {attempt + 1}")
+                # read in track data will be stored in this array
+                tracks = ["", "", ""]
 
-        print("\nATTEMPTING TO READ FROM CARD (SWIPE NOW)")
-        # read in track data will be stored in this array
-        tracks = ["", "", ""]
+                # command code for reading written to the MSR605
+                self.__serialConn.write(ESCAPE + READ)
+                self.__serialConn.flush()
 
-        # command code for reading written to the MSR605
-        self.__serialConn.write(ESCAPE + READ)
-        self.__serialConn.flush()
+                # Give the device a moment to process
+                time.sleep(0.1)
 
-        # response/output from the MSR605
-        if self.__serialConn.read() != ESCAPE:
-            raise cardReaderExceptions.CardReadError(
-                "[Datablock] READ ERROR, R/W Data " "Field, looking for ESCAPE(\x1b)",
-                None,
-            )
+                # response/output from the MSR605 - with retry logic
+                response = self.__serialConn.read()
+                if response != ESCAPE:
+                    print(f"Attempt {attempt + 1}: Expected ESCAPE, got {response}")
+                    if attempt < max_retries - 1:
+                        print("Retrying...")
+                        time.sleep(0.5)
+                        continue
+                    else:
+                        raise cardReaderExceptions.CardReadError(
+                            "[Datablock] READ ERROR, R/W Data Field, looking for ESCAPE(\\x1b)", None
+                        )
 
-        if self.__serialConn.read() != b"s":
-            raise cardReaderExceptions.CardReadError(
-                "[Datablock] READ ERROR, R/W Data " "Field, looking for s (\x73)", None
-            )
+                response = self.__serialConn.read()
+                if response != b"s":
+                    print(f"Attempt {attempt + 1}: Expected 's', got {response}")
+                    if attempt < max_retries - 1:
+                        print("Retrying...")
+                        time.sleep(0.5)
+                        continue
+                    else:
+                        raise cardReaderExceptions.CardReadError(
+                            "[Datablock] READ ERROR, R/W Data Field, looking for s (\\x73)", None
+                        )
 
-        if self.__serialConn.read() != ESCAPE:
-            raise cardReaderExceptions.CardReadError(
-                "[Carddata] READ ERROR, R/W Data " "Field, looking for ESCAPE(\x1b)",
-                None,
-            )
+                response = self.__serialConn.read()
+                if response != ESCAPE:
+                    print(f"Attempt {attempt + 1}: Expected ESCAPE, got {response}")
+                    if attempt < max_retries - 1:
+                        print("Retrying...")
+                        time.sleep(0.5)
+                        continue
+                    else:
+                        raise cardReaderExceptions.CardReadError(
+                            "[Carddata] READ ERROR, R/W Data Field, looking for ESCAPE(\\x1b)", None
+                        )
+
+                # If we got here, the initial response was correct, continue with normal reading
+                break
+
+            except Exception as e:
+                print(f"Attempt {attempt + 1}: Error during read: {e}")
+                if attempt < max_retries - 1:
+                    print("Retrying...")
+                    time.sleep(0.5)
+                    continue
+                else:
+                    raise e
 
         # track one data will be read in, this isn't raising an exception because the card
         # might not have track 1 data
@@ -463,35 +516,76 @@ class CardReader:
                 tracks[1] = ""
 
         # track 3
-        if self.__serialConn.read() != END_OF_TEXT:
-            print("This card might not have a TRACK 3")
-            print(
-                "[Carddata] READ ERROR, R/W Data Field, looking for END OF TEXT - ETX(\x03)"
-            )
-        else:
+        try:
+            response = self.__serialConn.read()
+            print(f"Track 3 response: {response} (hex: {response.hex() if response else 'None'})")
+            
+            if response != END_OF_TEXT:
+                print("This card might not have a TRACK 3")
+                print(f"[Carddata] Expected END_OF_TEXT (ETX/\\x03), got: {response} (hex: {response.hex() if response else 'None'})")
+                
+                # Check if we got the FILE_SEPERATOR instead, which might indicate end of data
+                if response == FILE_SEPERATOR:
+                    print("Track 3 data appears to be empty (got FILE_SEPERATOR)")
+                    tracks[2] = ""
+                else:
+                    # Try to read any remaining data that might be Track 3
+                    print("Attempting to read Track 3 data anyway...")
+                    try:
+                        # Small timeout to see if there's more data
+                        time.sleep(0.1)
+                        if self.__serialConn.in_waiting > 0:
+                            tracks[2] = self.read_until(FILE_SEPERATOR, 3, False)  # Don't validate ISO for potentially partial data
+                            print(f"TRACK 3 (recovered): {tracks[2]}")
+                        else:
+                            tracks[2] = ""
+                    except Exception as e:
+                        print(f"Failed to recover Track 3 data: {e}")
+                        tracks[2] = ""
+            else:
+                # Successfully got END_OF_TEXT, now read Track 3 data
+                tracks[2] = self.read_until(FILE_SEPERATOR, 3, True)
+                print("TRACK 3: ", tracks[2])
 
-            tracks[2] = self.read_until(FILE_SEPERATOR, 3, True)
-            print("TRACK 3: ", tracks[2])
+                if len(tracks[2]) > 0:
+                    if tracks[2][-1] != "?":
+                        tracks[2] += "?"
 
-            if len(tracks[2]) > 0:
-                if tracks[2][-1] != "?":
-                    tracks[2] += "?"
+                    if tracks[2][0] == ";":
+                        tracks[2] = tracks[2][1:]
 
-                if tracks[2][0] == ";":
-                    tracks[2] = tracks[2][1:]
+                else:  # since track 3 requires a ? when writing
+                    tracks[2] = "?"
+                    
+        except Exception as e:
+            print(f"Error reading Track 3: {e}")
+            tracks[2] = ""
 
-            else:  # since track 3 requres a ? when writing
-                tracks[2] = "?"
-
-        last_byte = self.__serialConn.read()
-        if last_byte not in (ESCAPE, FILE_SEPERATOR):
-            raise cardReaderExceptions.CardReadError(
-                "[Datablock] READ ERROR, Ending Field, looking for ESCAPE(\\x1B) or FILE_SEPERATOR(\\x1C)",
-                tracks,
-            )
+        # Check for ending field - be more flexible with what we accept
+        try:
+            last_byte = self.__serialConn.read()
+            print(f"Ending field byte: {last_byte} (hex: {last_byte.hex() if last_byte else 'None'})")
+            
+            if last_byte not in (ESCAPE, FILE_SEPERATOR):
+                # This might not be a critical error - let's see if we can still read the status
+                print(f"Warning: Unexpected ending field byte: {last_byte}")
+                print("Attempting to continue with status reading...")
+                
+                # Put the byte back if it might be the status
+                # Note: This is a workaround since serial doesn't support unread
+                # We'll try to read status directly
+                
+        except Exception as e:
+            print(f"Warning: Error reading ending field: {e}")
+            print("Attempting to continue with status reading...")
 
         # this reads the status byte and raises exceptions
-        self.status_read()
+        try:
+            self.status_read()
+        except Exception as e:
+            print(f"Status read error: {e}")
+            # Don't raise the exception - we still have track data
+            print("Continuing with available track data...")
 
         result = {"tracks": tracks, "format": self.__current_format.name}
 
@@ -721,8 +815,8 @@ class CardReader:
 
             if eraseCardResponse != b"A":
                 raise cardReaderExceptions.EraseCardError(
-                    "ERASE CARD ERROR, looking for A(\x41), "
-                    "the card was not erased but the erasing "
+                    "ERASE CARD ERROR, looking for A(\x41), the "
+                    "card was not erased but the erasing "
                     "didn't fail, so this is a weird case"
                 )
 
@@ -748,22 +842,19 @@ class CardReader:
            None
 
         Returns:
-            Nothing
+           Nothing
 
         Raises:
-            Nothing
+           Nothing
         """
-
-        print("\nLED'S OFF")
-
-        # command code to turn off all the LED's, note that LED's turn on automatically based
-        # on certain commands like read and write
-        self.__serialConn.write(ESCAPE + ALL_LED_OFF)
-        self.__serialConn.flush()
-
-        # no response from the MSR605, just the LED change
-
-        return None
+        try:
+            self._check_connection()
+            self.__serialConn.write(ESCAPE + ALL_LED_OFF)
+            self.__serialConn.flush()
+        except cardReaderExceptions.MSR605ConnectError:
+            print("WARNING: Cannot turn off LEDs - no serial connection established")
+        except Exception as e:
+            print(f"WARNING: Error turning off LEDs: {e}")
 
     def led_on(self):
         """This command is used to turn on all the LEDs.
@@ -773,22 +864,19 @@ class CardReader:
            None
 
         Returns:
-            Nothing
+           Nothing
 
         Raises:
-            Nothing
+           Nothing
         """
-
-        print("\nLED'S ON")
-
-        # command code to turn on all the LED's, note that LED's turn on automatically based
-        # on certain commands like read and write
-        self.__serialConn.write(ESCAPE + ALL_LED_ON)
-        self.__serialConn.flush()
-
-        # no response from the MSR605, just the LED change
-
-        return None
+        try:
+            self._check_connection()
+            self.__serialConn.write(ESCAPE + ALL_LED_ON)
+            self.__serialConn.flush()
+        except cardReaderExceptions.MSR605ConnectError:
+            print("WARNING: Cannot turn on LEDs - no serial connection established")
+        except Exception as e:
+            print(f"WARNING: Error turning on LEDs: {e}")
 
     def green_led_on(self):
         """This command is used to turn on the green LEDs.
@@ -797,22 +885,19 @@ class CardReader:
            None
 
         Returns:
-            Nothing
+           Nothing
 
         Raises:
-            Nothing
+           Nothing
         """
-
-        print("\nGREEN LED ON")
-
-        # command code to turn on the green LED, note that LED's turn on automatically based
-        # on certain commands like read and write
-        self.__serialConn.write(ESCAPE + GREEN_LED_ON)
-        self.__serialConn.flush()
-
-        # no response from the MSR605, just the LED change
-
-        return None
+        try:
+            self._check_connection()
+            self.__serialConn.write(ESCAPE + GREEN_LED_ON)
+            self.__serialConn.flush()
+        except cardReaderExceptions.MSR605ConnectError:
+            print("WARNING: Cannot turn on green LED - no serial connection established")
+        except Exception as e:
+            print(f"WARNING: Error turning on green LED: {e}")
 
     def yellow_led_on(self):
         """This command is used to turn on the yellow LED.
@@ -821,22 +906,19 @@ class CardReader:
            None
 
         Returns:
-            Nothing
+           Nothing
 
         Raises:
-            Nothing
+           Nothing
         """
-
-        print("\nYELLOW LED ON")
-
-        # command code to turn on the yellow LED, note that LED's turn on automatically based
-        # on certain commands like read and write
-        self.__serialConn.write(ESCAPE + YELLOW_LED_ON)
-        self.__serialConn.flush()
-
-        # no response from the MSR605, just the LED change
-
-        return None
+        try:
+            self._check_connection()
+            self.__serialConn.write(ESCAPE + YELLOW_LED_ON)
+            self.__serialConn.flush()
+        except cardReaderExceptions.MSR605ConnectError:
+            print("WARNING: Cannot turn on yellow LED - no serial connection established")
+        except Exception as e:
+            print(f"WARNING: Error turning on yellow LED: {e}")
 
     def red_led_on(self):
         """This command is used to turn on the red LED.
@@ -845,22 +927,19 @@ class CardReader:
            None
 
         Returns:
-            Nothing
+           Nothing
 
         Raises:
-            Nothing
+           Nothing
         """
-
-        print("\nRED LED ON")
-
-        # command code to turn on the red LED, note that LED's turn on automatically based
-        # on certain commands like read and write
-        self.__serialConn.write(ESCAPE + RED_LED_ON)
-        self.__serialConn.flush()
-
-        # no response from the MSR605, just the LED change
-
-        return None
+        try:
+            self._check_connection()
+            self.__serialConn.write(ESCAPE + RED_LED_ON)
+            self.__serialConn.flush()
+        except cardReaderExceptions.MSR605ConnectError:
+            print("WARNING: Cannot turn on red LED - no serial connection established")
+        except Exception as e:
+            print(f"WARNING: Error turning on red LED: {e}")
 
     # ****************************************
     #
@@ -881,29 +960,38 @@ class CardReader:
         Raises:
             CommunicationTestError: An error occurred while testing the MSR605's communication
         """
+        try:
+            self._check_connection()
+            
+            print("\nCHECK COMMUNICATION LINK BETWEEN THE COMPUTER AND THE MSR605")
 
-        print("\nCHECK COMMUNICATION LINK BETWEEN THE COMPUTER AND THE MSR605")
+            # command code for testing the MSR605 Communication with the Computer
+            self.__serialConn.write(ESCAPE + COMMUNICATIONS_TEST)
+            self.__serialConn.flush()
 
-        # command code for testing the MSR605 Communication with the Computer
-        self.__serialConn.write(ESCAPE + COMMUNICATIONS_TEST)
-        self.__serialConn.flush()
+            # response/output from the MSR605
+            if self.__serialConn.read() != ESCAPE:
+                raise cardReaderExceptions.CommunicationTestError(
+                    "COMMUNICATION ERROR, looking for " "ESCAPE(\x1b)",
+                    None,
+                )
 
-        # response/output from the MSR605
-        if self.__serialConn.read() != ESCAPE:
+            if self.__serialConn.read() != b"y":
+                raise cardReaderExceptions.CommunicationTestError(
+                    "COMMUNICATION ERROR, looking for " "y(\x79)",
+                    None,
+                )
+
+            print("COMMUNICATION IS GOOD")
+
+        except cardReaderExceptions.MSR605ConnectError as e:
             raise cardReaderExceptions.CommunicationTestError(
-                "COMMUNICATION ERROR, looking for " "ESCAPE(\x1b)",
-                None,
+                f"Cannot test communication - {e}"
             )
-
-        if self.__serialConn.read() != b"y":
+        except Exception as e:
             raise cardReaderExceptions.CommunicationTestError(
-                "COMMUNICATION ERROR, looking for " "y(\x79)",
-                None,
+                f"Communication test failed: {e}"
             )
-
-        print("COMMUNICATION IS GOOD")
-
-        return None
 
     def sensor_test(self):
         """This command is used to verify that the card sensing circuit of MSR605 is
@@ -916,34 +1004,44 @@ class CardReader:
            None
 
         Returns:
-            Nothing
+           Nothing
 
         Raises:
-            SensorTestError: An error occurred while testing the MSR605's communication
+           SensorTestError: An error occurred while testing the MSR605's communication
         """
+        try:
+            self._check_connection()
+            
+            print("\nCHECK IF THE CARD SENSING CIRCUIT OF MSR605 IS WORKING")
+            print("NOTE: A CARD NEEDS TO BE SWIPED FOR THIS TEST")
 
-        print("\nTESTING SENSOR'S")
+            # command code for sensor test written to the MSR605
+            self.__serialConn.write(ESCAPE + SENSOR_TEST)
+            self.__serialConn.flush()
 
-        # command code for testing the card sensing circuit
-        self.__serialConn.write(ESCAPE + SENSOR_TEST)
-        self.__serialConn.flush()
+            # response/output from the MSR605
+            if self.__serialConn.read() != ESCAPE:
+                raise cardReaderExceptions.SensorTestError(
+                    "SENSOR TEST ERROR, looking for ESCAPE(\x1b)",
+                    None,
+                )
 
-        # response/output from the MSR605
-        if self.__serialConn.read() != ESCAPE:
+            if self.__serialConn.read() != b"0":
+                raise cardReaderExceptions.SensorTestError(
+                    "SENSOR TEST ERROR, looking for 0(\x30)",
+                    None,
+                )
+
+            print("TESTS WERE SUCCESSFUL")
+
+        except cardReaderExceptions.MSR605ConnectError as e:
             raise cardReaderExceptions.SensorTestError(
-                "SENSOR TEST ERROR, looking for ESCAPE(\x1b)",
-                None,
+                f"Cannot test sensor - {e}"
             )
-
-        if self.__serialConn.read() != b"0":
+        except Exception as e:
             raise cardReaderExceptions.SensorTestError(
-                "SENSOR TEST ERROR, looking for 0(\x30)",
-                None,
+                f"Sensor test failed: {e}"
             )
-
-        print("TESTS WERE SUCCESSFUL")
-
-        return None
 
     def ram_test(self):
         """This command is used to request MSR605 to perform a test on its on board RAM.
@@ -957,41 +1055,49 @@ class CardReader:
         Raises:
             RamTestError: An error occurred accessing the bigtable.Table object.
         """
+        try:
+            self._check_connection()
+            
+            print("\nCHECK IF THE ON BOARD RAM OF MSR605 IS WORKING")
 
-        print("\nTESTING THE RAM")
+            # command code for RAM test written to the MSR605
+            self.__serialConn.write(ESCAPE + RAM_TEST)
+            self.__serialConn.flush()
 
-        # command code for testing the ram
-        self.__serialConn.write(ESCAPE + RAM_TEST)
-        self.__serialConn.flush()
+            # response/output from the MSR605
+            if self.__serialConn.read() != ESCAPE:
+                raise cardReaderExceptions.RamTestError(
+                    "RAM TEST ERROR, looking for ESCAPE(\x1b)",
+                    None,
+                )
 
-        # response/output from the MSR605
-        if self.__serialConn.read() != ESCAPE:
+            ramTestResponse = self.__serialConn.read()
+
+            if ramTestResponse != b"0":
+
+                if ramTestResponse != b"A":
+                    raise cardReaderExceptions.RamTestError(
+                        "RAM TEST ERROR, looking for A(\x41), the "
+                        "RAM is not ok but the RAM hasn't failed a "
+                        "test either, so this is a weird case"
+                    )
+
+                else:
+                    raise cardReaderExceptions.RamTestError(
+                        "RAM TEST ERROR, the RAM test has failed",
+                        None,
+                    )
+
+            print("RAM TESTS SUCCESSFUL")
+
+        except cardReaderExceptions.MSR605ConnectError as e:
             raise cardReaderExceptions.RamTestError(
-                "RAM TEST ERROR, looking for ESCAPE(\x1b)",
-                None,
+                f"Cannot test RAM - {e}"
             )
-
-        ramTestResponse = self.__serialConn.read()
-
-        if ramTestResponse != b"0":
-
-            if ramTestResponse != b"A":
-                raise cardReaderExceptions.RamTestError(
-                    "RAM TEST ERROR, looking for A(\x41), the "
-                    "RAM is not ok but the RAM hasn't failed a "
-                    "test either, so this is a weird case",
-                    None,
-                )
-
-            else:
-                raise cardReaderExceptions.RamTestError(
-                    "RAM TEST ERROR, the RAM test has failed",
-                    None,
-                )
-
-        print("RAM TESTS SUCCESSFUL")
-
-        return None
+        except Exception as e:
+            raise cardReaderExceptions.RamTestError(
+                f"RAM test failed: {e}"
+            )
 
     # **********************************
     #
@@ -1000,55 +1106,35 @@ class CardReader:
     # **********************************
 
     def set_hi_co(self):
-        """This command is used to set MSR605 status to write Hi-Co card.
+        """Set the MSR605 to high coercivity mode with retry logic."""
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                self.__serialConn.write(ESCAPE + HI_CO)
+                self.__serialConn.flush()
 
-        Hi-Coercivity (Hi-Co) is just one kind of magstripe card, the other
-        being Low-Coercivity (Low-Co), google for more info
+                response = self.__serialConn.read()
 
-        Args:
-            None
-
-        Returns:
-            Nothing
-
-        Raises:
-            SetCoercivityError: An error occurred when setting the coercivity
-        """
-
-        print("\nSETTING THE MSR605 TO HI-COERCIVITY")
-
-        # command code for setting the MSR605 to Hi-Coercivity
-
-        self.__serialConn.write(ESCAPE + HI_CO)
-        self.__serialConn.flush()
-
-        # response/output from the MSR605
-        # for some reason i get this response before getting to the escape character EVU3.10
-
-        # if this is false than move on to the next part of the response
-        if self.__serialConn.read() != ESCAPE:
-
-            # just read until the 0 of the EVU3.10 response
-            self.read_until("0", 4, False)
-
-            # after reading that weird response,i check if there is an ESCAPE character
-            if self.__serialConn.read() != ESCAPE:
-                raise cardReaderExceptions.SetCoercivityError(
-                    "SETTING THE DEVICE TO HI-CO ERROR" ", looking for ESCAPE(\x1b)",
-                    "high",
-                )
-
-        if self.__serialConn.read() != b"0":
-            raise cardReaderExceptions.SetCoercivityError(
-                "SETTING THE DEVICE TO HI-CO ERROR, looking "
-                "for 0(\x30), Device might have not been set "
-                "to Hi-Co",
-                "high",
-            )
-
-        print("SUCCESSFULLY SET THE MSR605 TO HI-COERCIVITY")
-
-        return None
+                if response and response.strip() == b"0":
+                    print("SUCCESSFULLY SET THE MSR605 TO HI-COERCIVITY")
+                    return True
+                else:
+                    print(f"Attempt {attempt + 1}: Unexpected response: {response}")
+                    if attempt < max_retries - 1:
+                        print("Retrying...")
+                        time.sleep(1)  # Wait before retry
+                        continue
+                    
+            except Exception as e:
+                print(f"Attempt {attempt + 1}: Error setting Hi-Co: {e}")
+                if attempt < max_retries - 1:
+                    print("Retrying...")
+                    time.sleep(1)
+                    continue
+        
+        print(f"Failed to set Hi-Co after {max_retries} attempts")
+        print("Device might not support Hi-Co mode or there's a communication issue")
+        return False
 
     def set_low_co(self):
         """This command is used to set MSR605 status to write Low-Co card.
@@ -1110,7 +1196,7 @@ class CardReader:
             None
 
         Returns:
-            A String that contains what mode the MSR605 card reader/writer is in
+            A string that contains what mode the MSR605 card reader/writer is in
 
             ex:
                 HI-CO
@@ -1306,6 +1392,28 @@ class CardReader:
     #
     # ***********************
 
+    def getSerialConn(self):
+        return self.__serialConn
+
+    def setSerialConn(self, serialConn):
+        self.__serialConn = serialConn
+
+    def _check_connection(self):
+        """Check if serial connection is established.
+        
+        Returns:
+            bool: True if connection is established, False otherwise
+            
+        Raises:
+            MSR605ConnectError: If no connection is established
+        """
+        if self.__serialConn is None:
+            raise cardReaderExceptions.MSR605ConnectError(
+                "No serial connection established. "
+                "Please connect to the MSR605 first using the connect() method."
+            )
+        return True
+
     def get_device_model(self):
         """This command is used to get the model of MSR605.
 
@@ -1382,12 +1490,6 @@ class CardReader:
 
         print("SUCCESSFULLY RETRIEVED THE FIRMWARE VERSION")
         return firmware
-
-    def getSerialConn(self):
-        return self.__serialConn
-
-    def setSerialConn(self, serialConn):
-        self.__serialConn = serialConn
 
     def decode_tracks(self):
         """This command reads and decodes the data from all tracks on the card.
@@ -1472,3 +1574,20 @@ class CardReader:
             raise cardReaderExceptions.DecodeError(
                 f"Failed to decode card data: {str(e)}"
             )
+
+    def initialize_device(self):
+        """Initialize the MSR605 device with fallback coercivity mode."""
+        print("\nINITIALIZING THE MSR605")
+        
+        # Try Hi-Co first
+        if self.set_hi_co():
+            print("Device initialized in Hi-Co mode")
+            return True
+        else:
+            print("Hi-Co mode failed, trying Low-Co mode...")
+            if self.set_low_co():
+                print("Device initialized in Low-Co mode")
+                return True
+            else:
+                print("Failed to initialize device in any coercivity mode")
+                return False

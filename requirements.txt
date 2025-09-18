@@ -14,7 +14,6 @@ send2trash>=1.8.0,<2.0.0  # For safe file deletion
 
 # PyQt6 Dependencies
 PyQt6>=6.7.0,<6.8.0  # Core GUI framework (includes PyQt6-sip)
-PyQt6-Qt6>=6.7.0,<6.8.0  # Qt6 runtime
 PyQt6-WebEngine>=6.7.0,<6.8.0  # Web engine for PyQt6 (includes WebEngineWidgets)
 
 # Development Dependencies (Optional)
@@ -31,6 +30,7 @@ pre-commit>=3.7.0,<4.0.0  # Git hooks for code quality
 matplotlib>=3.8.0,<4.0.0  # For creating static, animated, and interactive visualizations
 seaborn>=0.13.0,<0.14.0  # Statistical data visualization
 plotly>=5.18.0,<6.0.0  # Interactive visualizations for the web
+PyQt6-Qt6>=6.7.0,<6.8.0  # Qt6 runtime (ensure compatibility with matplotlib)
 
 # Build Dependencies
 setuptools>=70.0.0,<71.0.0  # Package building

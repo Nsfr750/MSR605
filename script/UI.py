@@ -4,7 +4,6 @@ import sys
 import os
 import time
 import sqlite3
-import logging
 import json
 from pathlib import Path
 from datetime import datetime
@@ -65,7 +64,7 @@ from script.version import get_version, get_version_info
 from script.language_manager import LanguageManager
 from script.translations import LANGUAGES
 from script.help import show_help
-from script.logger import logger, setup_logging
+from script.logger import setup_logger, get_logger
 from script.about import AboutDialog
 from script.help import HelpDialog
 from script.sponsor import SponsorDialog
@@ -78,7 +77,7 @@ class GUI(QMainWindow):
         super().__init__()
 
         # Initialize logger
-        self.logger = setup_logging()
+        self.logger = setup_logger()
         self.logger.info("MSR605 Application starting...")
 
         # Initialize connection state
@@ -619,36 +618,78 @@ class GUI(QMainWindow):
 
     def setup_connection_tab(self):
         """Set up the Connection tab."""
-        tab = ConnectionSettingsWidget(self)
+        self.connection_settings_widget = ConnectionSettingsWidget(self)
+        
+        # Pass the language manager to the connection settings widget
+        self.connection_settings_widget.set_language_manager(self.language_manager)
         
         # Connect signals from connection settings widget
-        tab.connect_requested.connect(self.connect_to_msr605)
-        tab.disconnect_requested.connect(self.close_connection)
-        tab.settings_changed.connect(self.on_connection_settings_changed)
+        self.connection_settings_widget.connect_requested.connect(self.connect_to_msr605)
+        self.connection_settings_widget.disconnect_requested.connect(self.close_connection)
+        self.connection_settings_widget.settings_changed.connect(self.on_connection_settings_changed)
+        self.connection_settings_widget.save_requested.connect(self.on_connection_settings_saved)
         
-        self.tabs.addTab(tab, "Connection Settings")
+        self.tabs.addTab(self.connection_settings_widget, self.language_manager.translate("tab_connection_settings"))
 
     def setup_general_settings_tab(self):
         """Set up the General Settings tab."""
-        tab = GeneralSettingsWidget(self)
+        from script.general_setting import GeneralSettingsWidget
+
+        self.general_settings_widget = GeneralSettingsWidget(self)
         
-        # Connect signals from general settings widget
-        tab.coercivity_changed.connect(self.on_coercivity_changed)
-        tab.auto_save_changed.connect(self.on_auto_save_changed)
-        tab.allow_duplicates_changed.connect(self.on_allow_duplicates_changed)
+        # Pass the language manager to the general settings widget
+        self.general_settings_widget.set_language_manager(self.language_manager)
         
-        # Set initial values
-        tab.set_coercivity(self.__coercivity)
-        tab.set_auto_save(self.__auto_save_database)
-        tab.set_allow_duplicates(self.__enable_duplicates)
+        # Connect signals
+        self.general_settings_widget.coercivity_changed.connect(self.on_coercivity_changed)
+        self.general_settings_widget.auto_save_changed.connect(self.on_auto_save_changed)
+        self.general_settings_widget.allow_duplicates_changed.connect(self.on_allow_duplicates_changed)
         
-        self.tabs.addTab(tab, "General Settings")
+        # Set current values
+        self.general_settings_widget.set_coercivity(self.__coercivity)
+        self.general_settings_widget.set_auto_save(self.__auto_save_database)
+        self.general_settings_widget.set_allow_duplicates(self.__enable_duplicates)
+        self.general_settings_widget.set_language(self.language_manager.current_language)
+        
+        self.tabs.addTab(self.general_settings_widget, self.language_manager.translate("tab_general_settings"))
 
     def on_connection_settings_changed(self, settings):
         """Handle connection settings changes."""
         # Update connection settings when they change
         self.logger.info(f"Connection settings changed: {settings}")
         # Additional handling can be added here as needed
+
+    def on_connection_settings_saved(self, settings):
+        """Handle connection settings save."""
+        # Save connection settings to persistent storage
+        self.logger.info(f"Connection settings saved: {settings}")
+        
+        # Save to QSettings for persistence
+        qsettings = QSettings("Tuxxle", "MSR605")
+        qsettings.setValue("connection/port", settings.get('port', ''))
+        qsettings.setValue("connection/baudrate", settings.get('baudrate', 9600))
+        qsettings.setValue("connection/bytesize", settings.get('bytesize', 8))
+        qsettings.setValue("connection/parity", settings.get('parity', 'None'))
+        qsettings.setValue("connection/stopbits", settings.get('stopbits', 1))
+        qsettings.setValue("connection/flowcontrol", settings.get('flowcontrol', 'None'))
+        qsettings.setValue("connection/timeout", settings.get('timeout', 1.0))
+        
+        # Show success message to user
+        self.statusBar().showMessage("Connection settings saved successfully", 3000)
+        
+        # If currently connected, ask user if they want to reconnect with new settings
+        if self.__connected:
+            reply = QMessageBox.question(
+                self, 
+                "Settings Saved", 
+                "Connection settings have been saved. Do you want to reconnect with the new settings?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.No
+            )
+            if reply == QMessageBox.StandardButton.Yes:
+                self.close_connection()
+                # Small delay before reconnecting
+                QTimer.singleShot(500, lambda: self.connect_to_msr605())
 
     def on_coercivity_changed(self, coercivity):
         """Handle coercivity changes."""

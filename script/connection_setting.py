@@ -23,6 +23,7 @@ class ConnectionSettingsWidget(QWidget):
     connect_requested = pyqtSignal()
     disconnect_requested = pyqtSignal()
     settings_changed = pyqtSignal(dict)
+    save_requested = pyqtSignal(dict)  # New signal for save button
     
     def __init__(self, parent=None):
         """
@@ -34,14 +35,28 @@ class ConnectionSettingsWidget(QWidget):
         super().__init__(parent)
         self.parent = parent
         self.is_connected = False
+        self.language_manager = None
         self.init_ui()
+        
+    def set_language_manager(self, language_manager):
+        """
+        Set the language manager for translations.
+        
+        Args:
+            language_manager: The language manager instance
+        """
+        self.language_manager = language_manager
+        if self.language_manager:
+            # Connect to language changes
+            self.language_manager.language_changed.connect(self.retranslate_ui)
+            self.retranslate_ui()
         
     def init_ui(self):
         """Initialize the UI components."""
         layout = QVBoxLayout(self)
         
         # Connection settings group
-        conn_group = QGroupBox("Connection Settings")
+        self.conn_group = QGroupBox("Connection Settings")
         conn_layout = QFormLayout()
         
         # Port selection
@@ -102,23 +117,67 @@ class ConnectionSettingsWidget(QWidget):
         self.timeout_combo.currentTextChanged.connect(self.on_settings_changed)
         conn_layout.addRow("Timeout (s):", self.timeout_combo)
         
-        conn_group.setLayout(conn_layout)
+        self.conn_group.setLayout(conn_layout)
+        
+        # Create horizontal layout for buttons
+        buttons_layout = QHBoxLayout()
         
         # Connect/Disconnect button
         self.connect_button = QPushButton("Connect")
         self.connect_button.clicked.connect(self.on_connect_button_clicked)
         
+        # Save button (green background, white text)
+        self.save_button = QPushButton("Save")
+        self.save_button.setStyleSheet("""
+            QPushButton {
+                background-color: #28a745;
+                color: white;
+                border: none;
+                padding: 8px 16px;
+                border-radius: 4px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #218838;
+            }
+            QPushButton:pressed {
+                background-color: #1e7e34;
+            }
+            QPushButton:disabled {
+                background-color: #6c757d;
+            }
+        """)
+        self.save_button.clicked.connect(self.on_save_button_clicked)
+        
+        # Add buttons to layout with stretch
+        buttons_layout.addWidget(self.connect_button)
+        buttons_layout.addStretch()  # This pushes the save button to the right
+        buttons_layout.addWidget(self.save_button)
+        
         # Status label
         self.status_label = QLabel("Not connected")
         
         # Add widgets to layout
-        layout.addWidget(conn_group)
-        layout.addWidget(self.connect_button)
+        layout.addWidget(self.conn_group)
+        layout.addLayout(buttons_layout)  # Add the buttons layout
         layout.addWidget(self.status_label)
         layout.addStretch()
         
         # Initial port refresh
         self.refresh_ports()
+        
+    def retranslate_ui(self):
+        """Retranslate UI elements based on current language."""
+        if not self.language_manager:
+            return
+            
+        t = self.language_manager.translate
+        
+        self.conn_group.setTitle(t("grp_connection"))
+        self.refresh_ports_button.setText(t("btn_refresh"))
+        self.connect_button.setText(t("btn_connect") if not self.is_connected else t("btn_disconnect"))
+        self.save_button.setText(t("btn_save"))
+        self.status_label.setText(t("msg_not_connected") if not self.is_connected else t("msg_connection_success").format(port=self.port_combo.currentText()))
         
     def refresh_ports(self):
         """Refresh the list of available COM ports."""
@@ -133,9 +192,15 @@ class ConnectionSettingsWidget(QWidget):
                 if current_port and current_port in ports:
                     self.port_combo.setCurrentText(current_port)
             else:
-                self.port_combo.addItem("No ports found")
+                if self.language_manager:
+                    self.port_combo.addItem(self.language_manager.translate("msg_no_ports"))
+                else:
+                    self.port_combo.addItem("No ports found")
         except Exception as e:
-            self.port_combo.addItem("Error detecting ports")
+            if self.language_manager:
+                self.port_combo.addItem(self.language_manager.translate("msg_port_error"))
+            else:
+                self.port_combo.addItem("Error detecting ports")
             print(f"Error refreshing ports: {e}")
             
     def get_available_ports(self):
@@ -158,6 +223,11 @@ class ConnectionSettingsWidget(QWidget):
         else:
             self.connect_requested.emit()
             
+    def on_save_button_clicked(self):
+        """Handle save button click."""
+        settings = self.get_serial_settings()
+        self.save_requested.emit(settings)
+        
     def on_settings_changed(self):
         """Handle settings changes."""
         settings = self.get_serial_settings()
@@ -187,9 +257,9 @@ class ConnectionSettingsWidget(QWidget):
         
         flowcontrol_map = {
             'None': 0,  # No flow control
-            'XON/XOFF': serial.XONXOFF,
-            'RTS/CTS': serial.RTSCTS,
-            'DTR/DSR': serial.DTRDSR
+            'XON/XOFF': 1,  # Software flow control (XON/XOFF)
+            'RTS/CTS': 2,  # Hardware flow control (RTS/CTS)
+            'DTR/DSR': 3   # Hardware flow control (DTR/DSR)
         }
         
         return {
@@ -198,10 +268,8 @@ class ConnectionSettingsWidget(QWidget):
             'bytesize': int(self.databits_combo.currentText()),
             'parity': parity_map.get(self.parity_combo.currentText(), serial.PARITY_NONE),
             'stopbits': stopbits_map.get(self.stopbits_combo.currentText(), serial.STOPBITS_ONE),
-            'timeout': float(self.timeout_combo.currentText()),
-            'xonxoff': flowcontrol_map.get(self.flowcontrol_combo.currentText(), 0) == serial.XONXOFF,
-            'rtscts': flowcontrol_map.get(self.flowcontrol_combo.currentText(), 0) == serial.RTSCTS,
-            'dsrdtr': flowcontrol_map.get(self.flowcontrol_combo.currentText(), 0) == serial.DTRDSR
+            'flowcontrol': flowcontrol_map.get(self.flowcontrol_combo.currentText(), 0),
+            'timeout': float(self.timeout_combo.currentText())
         }
         
     def set_connected_state(self, connected):
@@ -216,28 +284,14 @@ class ConnectionSettingsWidget(QWidget):
         if connected:
             self.connect_button.setText("Disconnect")
             self.status_label.setText(f"Connected to {self.port_combo.currentText()}")
-            # Disable settings when connected
-            self.port_combo.setEnabled(False)
-            self.refresh_ports_button.setEnabled(False)
-            self.baudrate_combo.setEnabled(False)
-            self.databits_combo.setEnabled(False)
-            self.stopbits_combo.setEnabled(False)
-            self.parity_combo.setEnabled(False)
-            self.flowcontrol_combo.setEnabled(False)
-            self.timeout_combo.setEnabled(False)
         else:
             self.connect_button.setText("Connect")
             self.status_label.setText("Not connected")
-            # Enable settings when disconnected
-            self.port_combo.setEnabled(True)
-            self.refresh_ports_button.setEnabled(True)
-            self.baudrate_combo.setEnabled(True)
-            self.databits_combo.setEnabled(True)
-            self.stopbits_combo.setEnabled(True)
-            self.parity_combo.setEnabled(True)
-            self.flowcontrol_combo.setEnabled(True)
-            self.timeout_combo.setEnabled(True)
             
+        # Update translations if language manager is available
+        if self.language_manager:
+            self.retranslate_ui()
+        
     def set_connection_state(self, connected):
         """
         Set the connection state (alias for set_connected_state).
@@ -292,29 +346,11 @@ class ConnectionSettingsWidget(QWidget):
         Args:
             settings (dict): Dictionary containing serial settings
         """
+        if 'port' in settings:
+            self.set_port(settings['port'])
         if 'baudrate' in settings:
             self.baudrate_combo.setCurrentText(str(settings['baudrate']))
         if 'bytesize' in settings:
             self.databits_combo.setCurrentText(str(settings['bytesize']))
-        if 'stopbits' in settings:
-            # Map back from serial constants to strings
-            stopbits_map = {
-                serial.STOPBITS_ONE: '1',
-                serial.STOPBITS_ONE_POINT_FIVE: '1.5',
-                serial.STOPBITS_TWO: '2'
-            }
-            stopbits_str = stopbits_map.get(settings['stopbits'], '1')
-            self.stopbits_combo.setCurrentText(stopbits_str)
-        if 'parity' in settings:
-            # Map back from serial constants to strings
-            parity_map = {
-                serial.PARITY_NONE: 'None',
-                serial.PARITY_EVEN: 'Even',
-                serial.PARITY_ODD: 'Odd',
-                serial.PARITY_MARK: 'Mark',
-                serial.PARITY_SPACE: 'Space'
-            }
-            parity_str = parity_map.get(settings['parity'], 'None')
-            self.parity_combo.setCurrentText(parity_str)
         if 'timeout' in settings:
             self.timeout_combo.setCurrentText(str(settings['timeout']))

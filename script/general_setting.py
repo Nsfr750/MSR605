@@ -6,9 +6,11 @@ This module contains the general settings UI components including coercivity and
 """
 
 from PyQt6.QtWidgets import (
-    QWidget, QVBoxLayout, QGroupBox, QRadioButton, QCheckBox, QLabel
+    QWidget, QVBoxLayout, QGroupBox, QRadioButton, QCheckBox, QLabel, QComboBox, QPushButton, QMessageBox
 )
 from PyQt6.QtCore import pyqtSignal
+import sys
+import os
 
 
 class GeneralSettingsWidget(QWidget):
@@ -20,6 +22,7 @@ class GeneralSettingsWidget(QWidget):
     coercivity_changed = pyqtSignal(str)
     auto_save_changed = pyqtSignal(bool)
     allow_duplicates_changed = pyqtSignal(bool)
+    language_changed = pyqtSignal(str)
     
     def __init__(self, parent=None):
         """
@@ -30,14 +33,28 @@ class GeneralSettingsWidget(QWidget):
         """
         super().__init__(parent)
         self.parent = parent
+        self.language_manager = None
         self.init_ui()
+        
+    def set_language_manager(self, language_manager):
+        """
+        Set the language manager for translations.
+        
+        Args:
+            language_manager: The language manager instance
+        """
+        self.language_manager = language_manager
+        if self.language_manager:
+            # Connect to language changes
+            self.language_manager.language_changed.connect(self.retranslate_ui)
+            self.retranslate_ui()
         
     def init_ui(self):
         """Initialize the UI components."""
         layout = QVBoxLayout(self)
         
         # Coercivity settings
-        coercivity_group = QGroupBox("Coercivity")
+        self.coercivity_group = QGroupBox("Coercivity")
         coercivity_layout = QVBoxLayout()
         
         self.hi_coercivity = QRadioButton("High Coercivity (300 Oe)")
@@ -51,10 +68,27 @@ class GeneralSettingsWidget(QWidget):
         
         coercivity_layout.addWidget(self.hi_coercivity)
         coercivity_layout.addWidget(self.lo_coercivity)
-        coercivity_group.setLayout(coercivity_layout)
+        self.coercivity_group.setLayout(coercivity_layout)
+        
+        # Language settings
+        self.language_group = QGroupBox("Language")
+        language_layout = QVBoxLayout()
+        
+        self.language_combo = QComboBox()
+        self.language_combo.addItem("English", "en")
+        self.language_combo.addItem("Italiano", "it")
+        
+        # Add restart button
+        self.restart_button = QPushButton("Apply Language Changes")
+        self.restart_button.clicked.connect(self.on_language_changed)
+        
+        language_layout.addWidget(QLabel("Select Language:"))
+        language_layout.addWidget(self.language_combo)
+        language_layout.addWidget(self.restart_button)
+        self.language_group.setLayout(language_layout)
         
         # Database settings
-        db_group = QGroupBox("Database Settings")
+        self.db_group = QGroupBox("Database Settings")
         db_layout = QVBoxLayout()
         
         self.auto_save = QCheckBox("Auto-save read cards to database")
@@ -66,12 +100,31 @@ class GeneralSettingsWidget(QWidget):
         
         db_layout.addWidget(self.auto_save)
         db_layout.addWidget(self.allow_duplicates)
-        db_group.setLayout(db_layout)
+        self.db_group.setLayout(db_layout)
         
         # Add groups to layout
-        layout.addWidget(coercivity_group)
-        layout.addWidget(db_group)
+        layout.addWidget(self.coercivity_group)
+        layout.addWidget(self.language_group)
+        layout.addWidget(self.db_group)
         layout.addStretch()
+        
+    def retranslate_ui(self):
+        """Retranslate UI elements based on current language."""
+        if not self.language_manager:
+            return
+            
+        t = self.language_manager.translate
+        
+        self.coercivity_group.setTitle(t("settings_coercivity"))
+        self.hi_coercivity.setText(t("settings_hi_coercivity"))
+        self.lo_coercivity.setText(t("settings_lo_coercivity"))
+        
+        self.language_group.setTitle(t("settings_language"))
+        self.restart_button.setText(t("settings_apply_language"))
+        
+        self.db_group.setTitle(t("settings_database"))
+        self.auto_save.setText(t("settings_auto_save"))
+        self.allow_duplicates.setText(t("settings_allow_duplicates"))
         
     def on_coercivity_changed(self):
         """Handle coercivity radio button changes."""
@@ -85,6 +138,58 @@ class GeneralSettingsWidget(QWidget):
     def on_allow_duplicates_changed(self, checked):
         """Handle allow duplicates checkbox changes."""
         self.allow_duplicates_changed.emit(checked)
+        
+    def on_language_changed(self):
+        """Handle language change and restart application."""
+        if not self.language_manager:
+            return
+            
+        current_lang = self.language_manager.current_language
+        selected_lang = self.language_combo.currentData()
+        
+        if selected_lang != current_lang:
+            # Show confirmation dialog
+            reply = QMessageBox.question(
+                self,
+                self.language_manager.translate("msg_language_change_title"),
+                self.language_manager.translate("msg_language_change_confirm"),
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.No
+            )
+            
+            if reply == QMessageBox.StandardButton.Yes:
+                # Set the new language
+                self.language_manager.set_language(selected_lang)
+                
+                # Restart the application
+                self.restart_application()
+        
+    def restart_application(self):
+        """Restart the application with the new language."""
+        import subprocess
+        import sys
+        
+        # Get the current script path
+        script_path = os.path.abspath(sys.argv[0])
+        
+        # Restart the application
+        try:
+            # Close the current application
+            if self.parent:
+                self.parent.close()
+            
+            # Start new instance
+            subprocess.Popen([sys.executable, script_path])
+            
+            # Exit the current process
+            sys.exit(0)
+            
+        except Exception as e:
+            QMessageBox.critical(
+                self,
+                "Restart Error",
+                f"Failed to restart application: {str(e)}"
+            )
         
     def set_coercivity(self, coercivity):
         """
@@ -103,7 +208,7 @@ class GeneralSettingsWidget(QWidget):
         Set the auto-save checkbox state.
         
         Args:
-            enabled (bool): Whether auto-save is enabled
+            enabled (bool): True to enable auto-save
         """
         self.auto_save.setChecked(enabled)
         
@@ -112,33 +217,17 @@ class GeneralSettingsWidget(QWidget):
         Set the allow duplicates checkbox state.
         
         Args:
-            enabled (bool): Whether duplicates are allowed
+            enabled (bool): True to allow duplicates
         """
         self.allow_duplicates.setChecked(enabled)
         
-    def get_coercivity(self):
+    def set_language(self, lang_code):
         """
-        Get the current coercivity setting.
+        Set the selected language.
         
-        Returns:
-            str: 'hi' or 'lo'
+        Args:
+            lang_code (str): Language code ('en', 'it', etc.)
         """
-        return "hi" if self.hi_coercivity.isChecked() else "lo"
-        
-    def get_auto_save(self):
-        """
-        Get the current auto-save setting.
-        
-        Returns:
-            bool: Whether auto-save is enabled
-        """
-        return self.auto_save.isChecked()
-        
-    def get_allow_duplicates(self):
-        """
-        Get the current allow duplicates setting.
-        
-        Returns:
-            bool: Whether duplicates are allowed
-        """
-        return self.allow_duplicates.isChecked()
+        index = self.language_combo.findData(lang_code)
+        if index >= 0:
+            self.language_combo.setCurrentIndex(index)

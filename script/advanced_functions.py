@@ -28,6 +28,12 @@ from PyQt6.QtCore import Qt, QSize, pyqtSignal, QObject
 from PyQt6.QtGui import QFont, QTextCursor, QIcon
 
 # Import visualization module
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 try:
     from .visualization import VisualizationWidget
 
@@ -35,10 +41,6 @@ try:
 except ImportError as e:
     logger.warning(f"Visualization features disabled: {e}")
     VISUALIZATION_AVAILABLE = False
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 
 class AdvancedFunctionsWidget(QWidget):
@@ -261,8 +263,8 @@ class AdvancedFunctionsWidget(QWidget):
         visualization_tab = QWidget()
         visualization_layout = QVBoxLayout(visualization_tab)
 
-        # Create visualization widget
-        self.visualization_widget = VisualizationWidget()
+        # Create visualization widget with current track data
+        self.visualization_widget = VisualizationWidget(tracks=self.tracks)
         visualization_layout.addWidget(self.visualization_widget)
 
         # Add tab

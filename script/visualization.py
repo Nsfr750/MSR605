@@ -14,8 +14,11 @@ import math
 from collections import Counter
 
 # Import visualization libraries
+import matplotlib
+# Configure matplotlib to use Qt backend
+matplotlib.use('QtAgg')
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTabWidget, QSizePolicy
 from PyQt6.QtCore import Qt
@@ -68,33 +71,53 @@ class CardDataVisualizer:
         Returns:
             List of TrackVisualization objects
         """
+        print(f"DEBUG: create_visualizations called with {len(tracks)} tracks")
         visualizations = []
 
         for i, track in enumerate(tracks, 1):
+            print(f"DEBUG: Processing track {i}: '{track[:50]}...' (length: {len(track)})")
             if not track:
+                print(f"DEBUG: Track {i} is empty, skipping")
                 continue
 
             # Create character distribution visualization
+            print(f"DEBUG: Creating character distribution for track {i}")
             char_dist = self._create_character_distribution(track, i)
             if char_dist:
                 visualizations.append(char_dist)
+                print(f"DEBUG: Added character distribution for track {i}")
+            else:
+                print(f"DEBUG: Failed to create character distribution for track {i}")
 
             # Create bit pattern visualization
+            print(f"DEBUG: Creating bit pattern for track {i}")
             bit_pattern = self._create_bit_pattern(track, i)
             if bit_pattern:
                 visualizations.append(bit_pattern)
+                print(f"DEBUG: Added bit pattern for track {i}")
+            else:
+                print(f"DEBUG: Failed to create bit pattern for track {i}")
 
             # Create data density visualization
+            print(f"DEBUG: Creating data density for track {i}")
             density = self._create_data_density(track, i)
             if density:
                 visualizations.append(density)
+                print(f"DEBUG: Added data density for track {i}")
+            else:
+                print(f"DEBUG: Failed to create data density for track {i}")
 
             # Create field analysis visualization if track has fields
             if any(sep in track for sep in ["^", "="]):
+                print(f"DEBUG: Creating field analysis for track {i}")
                 field_analysis = self._create_field_analysis(track, i)
                 if field_analysis:
                     visualizations.append(field_analysis)
+                    print(f"DEBUG: Added field analysis for track {i}")
+                else:
+                    print(f"DEBUG: Failed to create field analysis for track {i}")
 
+        print(f"DEBUG: Total visualizations created: {len(visualizations)}")
         return visualizations
 
     def _create_character_distribution(
@@ -361,14 +384,24 @@ class CardDataVisualizer:
 class VisualizationWidget(QWidget):
     """Qt widget for displaying card data visualizations."""
 
-    def __init__(self, parent=None):
-        """Initialize the visualization widget."""
+    def __init__(self, parent=None, tracks=None):
+        """Initialize the visualization widget.
+        
+        Args:
+            parent: Parent widget
+            tracks: List of track data strings [track1, track2, track3]
+        """
         super().__init__(parent)
         self.visualizer = CardDataVisualizer()
         self.current_visualizations = []
+        self.tracks = tracks or ["", "", ""]
 
         # Set up the UI
         self._setup_ui()
+        
+        # Update visualizations if tracks are provided
+        if any(self.tracks):
+            self.update_visualizations(self.tracks)
 
     def _setup_ui(self):
         """Set up the user interface."""
@@ -450,8 +483,7 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
 
     # Create and show visualization widget
-    widget = VisualizationWidget()
-    widget.update_visualizations(sample_tracks)
+    widget = VisualizationWidget(tracks=sample_tracks)
     widget.resize(800, 600)
     widget.show()
 
