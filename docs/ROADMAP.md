@@ -4,20 +4,17 @@ This document outlines the development roadmap for the MSR605 Card Reader/Writer
 
 ## 🚀 Upcoming Features (Planned)
 
-### v2.4.0 - Enhanced UI/UX
-- [ ] Dark/Light theme support
-- [ ] Customizable keyboard shortcuts
+### v2.4.5 - Advanced Card Operations
 - [ ] Improved card reading/writing interface
-- [ ] Enhanced error handling and user feedback
+- [ ] Support for additional card formats
 
 ### v2.5.0 - Advanced Card Operations
-- [ ] Support for additional card formats
+- [ ] Enhanced error handling and user feedback
 - [ ] Batch processing of multiple cards
 - [ ] Template system for common card operations
 - [ ] Advanced data validation
 
 ### v3.0.0 - Cloud Integration
-- [ ] Secure cloud backup for card data
 - [ ] Multi-device synchronization
 - [ ] Web-based management portal
 - [ ] API for third-party integrations
@@ -41,7 +38,8 @@ This document outlines the development roadmap for the MSR605 Card Reader/Writer
 | Version | Target Date       | Status      |
 |---------|-------------------|-------------|
 | v2.3.0  | July 2025         | ✅ Released |
-| v2.4.0  | Q4 2025           | 🔄 In Progress |
+| v2.4.0  | Q4 2025           | ✅ Released |
+| v2.4.5  | Q4 2025           | 🔄 In Progress |
 | v2.5.0  | Q1 2026          | ⏳ Planned  |
 | v3.0.0  | Q3 2026           | ⏳ Planned  |
 
