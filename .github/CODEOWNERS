@@ -19,7 +19,7 @@
 # Configuration files
 /config/ @Nsfr750
 *.ini @Nsfr750
-*.json @Nfsr750
+*.json @Nsfr750
 
 # Tests
 /tests/ @Nsfr750
