@@ -11,6 +11,7 @@ from PyQt6.QtCore import Qt, pyqtSignal, QTimer
 from script.logger import logger
 from script.help import show_help
 from script.log_viewer import LogViewer
+from script.updates import check_for_updates
 
 
 def tr(key, language_manager=None, **kwargs):
@@ -94,6 +95,10 @@ class AppMenuBar(QMenuBar):
         self.about_action = QAction(tr("menu_about", self.language_manager), self.parent)
         self.sponsor_action = QAction(tr("menu_support", self.language_manager), self.parent)
 
+        # Check for Updates Action
+        self.updates_action = QAction(tr("menu.check_updates", self.language_manager), self.parent)
+        self.updates_action.triggered.connect(self.check_for_updates)
+        
     def _build_menu_structure(self):
         """Build the menu structure by adding actions to menus."""
         # File menu
@@ -115,6 +120,9 @@ class AppMenuBar(QMenuBar):
         self.help_menu.addAction(self.help_action)
         self.help_menu.addAction(self.about_action)
         self.help_menu.addAction(self.sponsor_action)
+        self.help_menu.addSeparator()
+        self.help_menu.addAction(self.updates_action)
+        
 
     def _setup_connections(self):
         """Setup signal connections for all actions."""
@@ -202,6 +210,7 @@ class AppMenuBar(QMenuBar):
                 self.log_viewer_action.setText(tr("menu_view_logs", self.language_manager))
                 self.about_action.setText(tr("menu_about", self.language_manager))
                 self.sponsor_action.setText(tr("menu_support", self.language_manager))
+                self.updates_action.setText(tr("menu.check_updates", self.language_manager))
             else:
                 self.exit_action.setText("Exit")
                 self.auto_save_action.setText("Auto Save")
@@ -212,6 +221,7 @@ class AppMenuBar(QMenuBar):
                 self.log_viewer_action.setText("Log Viewer")
                 self.about_action.setText("About")
                 self.sponsor_action.setText("Sponsor")
+                self.updates_action.setText("Check for Updates")
                 
         except Exception as e:
             logger.error(f"Error retranslating menus: {e}")
@@ -273,6 +283,19 @@ class AppMenuBar(QMenuBar):
             logger.error(f"Failed to open log viewer: {str(e)}")
             QMessageBox.critical(
                 self.parent, "Error", f"Failed to open log viewer: {str(e)}"
+            )
+
+    def check_for_updates(self):
+        """Check for application updates."""
+        try:
+            # Import here to avoid circular imports
+            from script.updates import check_for_updates as show_update_dialog
+            show_update_dialog(self.parent)
+        except Exception as e:
+            QMessageBox.critical(
+                self.parent,
+                "Update Check Error",
+                f"Failed to check for updates: {str(e)}"
             )
 
     def update_menu_states(self):

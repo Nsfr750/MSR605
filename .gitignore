@@ -116,3 +116,4 @@ Dati MSR605.txt
 build_nuitka.py
 publish_to_pypi.py
 pyproject.toml
+/venv312
