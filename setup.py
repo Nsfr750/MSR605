@@ -17,7 +17,7 @@ long_description = (this_directory / "README.md").read_text(encoding="utf-8")
 
 # Project metadata
 NAME = "msr605-tool"
-VERSION = "2.4.1"
+VERSION = "2.4.2"
 DESCRIPTION = "Cross-platform tool for reading, writing, and analyzing magnetic stripe cards using the MSR605 reader/writer"
 LONG_DESCRIPTION = long_description
 AUTHOR = "Nsfr750"
