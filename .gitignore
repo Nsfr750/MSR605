@@ -119,3 +119,4 @@ pyproject.toml
 /venv312
 build_debug.py
 test_imports.py
+pypi.py
