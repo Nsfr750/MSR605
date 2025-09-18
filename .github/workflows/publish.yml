@@ -1,99 +1,40 @@
-name: Publish Python Package
+name: Publish Python Package to PYPI
 
 on:
   release:
-    types: [created]
+    types: [published]
+  push:
+    tags:
+      - 'v*'
   workflow_dispatch:
 
 jobs:
   deploy:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
-        exclude:
-          # Skip Python 3.8 on Windows as it's not supported
-          - os: windows-latest
-            python-version: "3.8"
-
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
-        cache: 'pip'
-
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements-dev.txt
-        pip install -e .
-
-    - name: Run tests
-      run: |
-        python -m pytest tests/ -v
-
-    - name: Build package
-      if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11'
-      run: |
-        pip install build
-        python -m build
-      
-    - name: Publish to PyPI
-      if: github.event_name == 'release' && matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11'
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        user: __token__
-        password: ${{ secrets.PYPI_API_TOKEN }}
-        verbose: true
-        skip-existing: true
-
-  build-windows-installer:
-    needs: deploy
-    if: github.event_name == 'release' && github.ref_type == 'tag'
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     
     steps:
     - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-        
-    - name: Set up Python 3.11
+    
+    - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.11'
-        
+        python-version: '3.12'
+    
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements-dev.txt
-        pip install -e .
-        
-    - name: Install NSIS
+        pip install build twine wheel setuptools
+    
+    - name: Build package
       run: |
-        $nsisVersion = '3.09'
-        $url = "https://downloads.sourceforge.net/project/nsis/NSIS%203/$nsisVersion/nsis-$nsisVersion-setup.exe"
-        $output = "$env:TEMP\nsis-setup.exe"
-        Invoke-WebRequest -Uri $url -OutFile $output
-        Start-Process -FilePath $output -ArgumentList "/S" -Wait
-        $env:Path += ";C:\\Program Files (x86)\\NSIS"
-        echo "C:\\Program Files (x86)\\NSIS" | Out-File -FilePath $env:GITHUB_PATH -Append
-        
-    - name: Build Windows installer
+        python -m build
+    
+    - name: Check package
       run: |
-        python build_nuitka.py --clean --onefile
-        makensis installer.nsi
-        
-    - name: Upload Artifacts
-      uses: actions/upload-artifact@v4
+        python -m twine check dist/*
+    
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
       with:
-        name: MSR605-Installer
-        path: |
-          dist/MSR605-*.exe
-          installer.nsi
-          build/
+        password: ${{ secrets.PYPI_API_TOKEN }}
+        verbose: true
