@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 """
 Setup script for MSR605 Card Reader/Writer application.
-
-This script handles the packaging and distribution of the MSR605 application.
 """
 
 import os
