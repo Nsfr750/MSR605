@@ -6,7 +6,7 @@ This package provides the core functionality for interacting with the MSR605 mag
 
 # Import key components to make them available at the package level
 from .UI import GUI
-from .menu import MenuBar
+from .app_menu import AppMenuBar
 from .language_manager import LanguageManager
 from . import translations
 from .version import get_version, get_version_info

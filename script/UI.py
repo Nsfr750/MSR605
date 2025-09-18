@@ -52,7 +52,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt, QTimer, QByteArray, QSettings, QThread, pyqtSignal, QObject
 
 # Import custom components
-from .menu import MenuBar
+from .app_menu import AppMenuBar
 from PyQt6.QtGui import QIcon, QAction, QFont, QTextCursor, QPixmap, QColor, QPalette
 
 # Import local modules
@@ -716,9 +716,9 @@ class GUI(QMainWindow):
         self.logger.info(f"Allow duplicates changed to: {enabled}")
 
     def create_menu_bar(self):
-        """Create the application menu bar using the custom MenuBar class."""
+        """Create the application menu bar using the custom AppMenuBar class."""
         # Create and set the custom menu bar
-        menubar = MenuBar(self)
+        menubar = AppMenuBar(self)
         self.setMenuBar(menubar)
         return menubar
 
