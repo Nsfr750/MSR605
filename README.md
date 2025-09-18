@@ -1,6 +1,6 @@
 # MSR605 Card Reader/Writer
 
-![Version](https://img.shields.io/badge/Version-2.4.1-blue)
+![Version](https://img.shields.io/badge/Version-2.4.2-blue)
 ![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-blue)
 ![GUI](https://img.shields.io/badge/GUI-PyQt6.6-blue)
 ![License](https://img.shields.io/badge/License-GPLv3-blue)
@@ -10,6 +10,15 @@
 ## 🌟 Overview
 
 **MSR605 Card Reader/Writer** is a sophisticated, open-source GUI application designed for reading, writing, and managing magnetic stripe cards using the MSR605 hardware. This powerful tool provides comprehensive card data management with advanced decoding and analysis capabilities.
+
+### What's New in v2.4.2
+
+#### Build System Improvements
+
+- Fixed Nuitka compilation issues by excluding PIL modules and explicitly including Wand
+- Resolved Scons C backend compilation errors in build process
+- Updated build script to properly handle Wand instead of Pillow dependencies
+- Improved build process for better cross-platform compatibility
 
 ### What's New in v2.4.1
 
@@ -317,8 +326,8 @@ MSR605 Card Reader/Writer is licensed under the GNU General Public License v3.0.
 
 ## 🏷️ Version Information
 
-Current Version: 2.4.0 (Stable)
-Release Date: July 20, 2025
+Current Version: 2.4.2 (Stable)
+Release Date: September 18, 2025
 
 ### What's New in v2.3.0
 

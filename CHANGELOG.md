@@ -5,6 +5,15 @@ All notable changes to the MSR605 Card Reader/Writer project will be documented 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.2] - 2025-09-18
+
+### Fixed
+
+- Fixed Nuitka compilation issues by excluding PIL modules and explicitly including Wand
+- Resolved Scons C backend compilation errors in build process
+- Updated build script to properly handle Wand instead of Pillow dependencies
+- Improved build process for better cross-platform compatibility
+
 ## [2.4.1] - 2025-08-31
 
 ### Fixed

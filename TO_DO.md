@@ -28,9 +28,6 @@
 
 ## In Progress
 
-- [ ] Complete test coverage for all modules
-  - [ ] Increase test coverage for visualization module
-  - [ ] Add integration tests for UI components
 - [ ] Optimize database performance
   - [ ] Profile database queries
   - [ ] Optimize schema and indexes
@@ -54,6 +51,14 @@
 - [x] Add visualization documentation (visualization.md)
 
 ## Completed ✓
+
+### v2.4.2 (2025-09-18)
+
+- [x] **Build System Improvements**
+  - Fixed Nuitka compilation issues by excluding PIL modules
+  - Resolved Scons C backend compilation errors
+  - Updated build script to properly handle Wand instead of Pillow dependencies
+  - Improved build process for better cross-platform compatibility
 
 ### v2.4.0 (2025-07-20)
 
@@ -108,7 +113,7 @@
 
 ## Notes
 
-- **Current Version**: 2.4.1
-- **Last Updated**: 2025-07-19
-- **Python Version**: 3.10+
+- **Current Version**: 2.4.3
+- **Last Updated**: 2025-09-18
+- **Python Version**: 3.12
 - **License**: GPL-3.0
