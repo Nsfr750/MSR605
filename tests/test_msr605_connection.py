@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Test script that mimics the exact MSR605 connection process
-with Tkinter GUI for results display
+with a GUI for results display
 """
 
 import sys
