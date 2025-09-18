@@ -3,6 +3,7 @@
 Welcome to the MSR605 Card Reader/Writer user guide! This document will help you get started with using the application to read from and write to magnetic stripe cards.
 
 ## Table of Contents
+
 1. [Installation](#installation)
 2. [Getting Started](#getting-started)
 3. [Reading Cards](#reading-cards)
@@ -13,18 +14,23 @@ Welcome to the MSR605 Card Reader/Writer user guide! This document will help you
 ## Installation
 
 ### Windows
+
 1. Download the latest installer from the [Releases](https://github.com/yourusername/MSR605/releases) page
 2. Run the installer and follow the on-screen instructions
 3. Connect your MSR605 device to an available USB port
 4. Launch the application from the Start Menu or desktop shortcut
 
 ### Linux/macOS
+
 1. Ensure you have Python 3.8+ installed
 2. Install the required dependencies:
+
    ```bash
    pip install -r requirements.txt
    ```
+
 3. Run the application:
+
    ```bash
    python main.py
    ```
@@ -32,11 +38,13 @@ Welcome to the MSR605 Card Reader/Writer user guide! This document will help you
 ## Getting Started
 
 ### Connecting the Device
+
 1. Connect your MSR605 device to your computer using the USB cable
 2. The application should automatically detect the device
 3. The status bar will show "Device Connected" when successful
 
 ### Main Interface
+
 - **Card Data Display**: Shows the data read from the card
 - **Track Selection**: Choose which tracks to read/write (1, 2, and/or 3)
 - **Action Buttons**: Read, Write, and Clear functions
@@ -92,10 +100,13 @@ ISO 7813 is a subset of ISO 7811 specifically for financial transaction cards. K
 ### Selecting the Correct Format
 
 1. Go to **Settings** > **Card Format**
+
 2. Choose between:
+
    - **Auto-detect** (default): Automatically detects the card format
    - **ISO 7811**: For general purpose cards
    - **ISO 7813**: For financial transaction cards
+
 3. Click **Apply** to save the settings
 
 ## Writing Cards
@@ -110,12 +121,14 @@ ISO 7813 is a subset of ISO 7811 specifically for financial transaction cards. K
 ## Configuration
 
 ### Device Settings
+
 - **Baud Rate**: Adjust the communication speed (default: 9600)
 - **Parity**: Set the parity (None, Even, Odd, Mark, Space)
 - **Data Bits**: Set the number of data bits (default: 8)
 - **Stop Bits**: Set the number of stop bits (default: 1)
 
 ### Application Settings
+
 - **Auto-detect Device**: Enable/disable automatic device detection
 - **Start Minimized**: Launch the application minimized to system tray
 - **Save Logs**: Enable logging of operations to a file
@@ -125,18 +138,21 @@ ISO 7813 is a subset of ISO 7811 specifically for financial transaction cards. K
 ### Common Issues
 
 #### Device Not Detected
+
 - Ensure the device is properly connected to the USB port
 - Try a different USB port
 - Check if the device is recognized in your system's Device Manager
 - Restart the application
 
 #### Reading/Writing Fails
+
 - Ensure the card is properly inserted
 - Clean the card's magnetic stripe
 - Verify the card is not write-protected
 - Check the track configuration matches the card format
 
 #### Application Crashes
+
 - Ensure you have the latest version installed
 - Check the log file for error details
 - Try reinstalling the application
@@ -144,5 +160,7 @@ ISO 7813 is a subset of ISO 7811 specifically for financial transaction cards. K
 ## Support
 
 For additional help, please:
+
 - Check the [FAQ](FAQ.md)
+
 - Search or open an issue on [GitHub](https://github.com/yourusername/MSR605/issues)

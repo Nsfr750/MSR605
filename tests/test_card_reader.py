@@ -14,8 +14,8 @@ from pathlib import Path
 # Add the script directory to the Python path
 sys.path.insert(0, str(Path(__file__).parent.parent / "script"))
 
-from cardReader import CardReader
-from card_formats import CardFormat
+from script.cardReader import CardReader
+from script.card_formats import CardFormat
 
 
 class TestCardReader(unittest.TestCase):

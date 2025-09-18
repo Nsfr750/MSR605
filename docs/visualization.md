@@ -11,6 +11,7 @@ The visualization module provides interactive and static visualizations of magne
 ### 1. Character Distribution
 
 Visualizes the frequency of each character in a track's data using a bar chart. This helps identify:
+
 - Most common characters
 - Data patterns
 - Potential anomalies or corruption
@@ -18,6 +19,7 @@ Visualizes the frequency of each character in a track's data using a bar chart. 
 ### 2. Bit Pattern
 
 Displays the binary representation of the track data as a waveform, showing:
+
 - Individual bit values (0/1)
 - Bit transitions
 - Data density
@@ -25,6 +27,7 @@ Displays the binary representation of the track data as a waveform, showing:
 ### 3. Data Density Metrics
 
 Presents key metrics about the track data:
+
 - Total length (in characters)
 - Number of unique characters
 - Character density (unique characters / total length)
@@ -32,6 +35,7 @@ Presents key metrics about the track data:
 ### 4. Field Analysis
 
 Analyzes and visualizes the structure of track data by:
+
 - Detecting field separators (^, =)
 - Displaying field lengths
 - Highlighting field boundaries

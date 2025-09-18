@@ -9,7 +9,9 @@ from .UI import GUI
 from .menu import MenuBar
 from .language_manager import LanguageManager
 from . import translations
+from .version import get_version, get_version_info
 
-__version__ = "2.4.1"
+__version__ = get_version()
+__version_info__ = get_version_info()
 __author__ = "Nsfr750"
 __license__ = "GPLv3"

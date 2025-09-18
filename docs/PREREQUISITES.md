@@ -24,12 +24,14 @@ pip install -r requirements.txt
 ## Environment Setup
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/Nsfr750/MSR605.git
    cd MSR605
    ```
 
 2. (Optional) Create and activate a virtual environment:
+
    ```bash
    # On Windows
    python -m venv venv
@@ -41,6 +43,7 @@ pip install -r requirements.txt
    ```
 
 3. Install development dependencies:
+
    ```bash
    pip install -r requirements-dev.txt
    ```
@@ -48,6 +51,7 @@ pip install -r requirements.txt
 ## Configuration
 
 1. Copy the example configuration file and update it with your settings:
+
    ```bash
    cp config.example.ini config.ini
    ```

@@ -17,10 +17,6 @@ PyQt6>=6.7.0,<6.8.0  # Core GUI framework (includes PyQt6-sip)
 PyQt6-Qt6>=6.7.0,<6.8.0  # Qt6 runtime
 PyQt6-WebEngine>=6.7.0,<6.8.0  # Web engine for PyQt6 (includes WebEngineWidgets)
 
-# Voice Control Dependencies (Optional)
-SpeechRecognition>=3.10.0,<4.0.0  # For voice command functionality
-PyAudio>=0.2.13,<0.3.0; sys_platform != 'linux'  # Required for microphone access
-
 # Development Dependencies (Optional)
 pytest>=8.2.0,<9.0.0  # For running tests
 pytest-qt>=4.4.0,<5.0.0  # Qt testing support

@@ -14,8 +14,7 @@
 ### What's New in v2.4.1
 
 #### UI/UX Improvements
-- Added flag emojis (🇬🇧/🇮🇹) to language selection menu
-- Fixed menu text visibility and styling
+
 - Resolved menu item duplication on language change
 
 #### What's New in v2.4.0
@@ -311,6 +310,7 @@ MSR605 Card Reader/Writer is licensed under the GNU General Public License v3.0.
 - 📰 [Project Blog](https://nsfr750.github.io/)
 
 ### Support the Project
+
 - 💖 [GitHub Sponsors](https://github.com/sponsors/Nsfr750)
 - 💰 [Patreon](https://www.patreon.com/Nsfr750)
 - 💳 [PayPal](https://paypal.me/3dmega)
@@ -321,6 +321,7 @@ Current Version: 2.4.0 (Stable)
 Release Date: July 20, 2025
 
 ### What's New in v2.3.0
+
 - Added voice command support
 - New plugin system
 - Dark/light theme support
@@ -328,6 +329,7 @@ Release Date: July 20, 2025
 - Enhanced security features
 
 ### System Requirements
+
 - Python 3.10, 3.11, or 3.12
 - Windows 10/11 or Linux
 - MSR605 Hardware Reader

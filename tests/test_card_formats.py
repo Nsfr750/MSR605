@@ -14,7 +14,7 @@ from pathlib import Path
 # Add the script directory to the Python path
 sys.path.insert(0, str(Path(__file__).parent.parent / "script"))
 
-from card_formats import CardFormat, CardFormatManager, TrackSpecification
+from script.card_formats import CardFormat, CardFormatManager, TrackSpecification
 
 
 class TestCardFormats(unittest.TestCase):

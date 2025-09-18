@@ -3,6 +3,7 @@
 This document provides detailed information about the MSR605 Card Reader/Writer API for developers who want to extend or integrate with the application.
 
 ## Table of Contents
+
 1. [Overview](#overview)
 2. [Core Modules](#core-modules)
 3. [Device Communication](#device-communication)
@@ -18,9 +19,11 @@ The MSR605 API provides a Python interface for interacting with magnetic stripe 
 ## Core Modules
 
 ### `msr605`
+
 The main module containing the core functionality.
 
 #### `MSR605` Class
+
 ```python
 class MSR605:
     def __init__(self, port=None, baudrate=9600, timeout=1):
@@ -78,6 +81,7 @@ class MSR605:
 ### Serial Protocol
 
 #### Commands
+
 | Command | Description | Format |
 |---------|-------------|--------|
 | `ESC e` | Reset device | `\x1be` |
@@ -86,6 +90,7 @@ class MSR605:
 | `ESC x` | Set security level | `\x1bx` |
 
 #### Responses
+
 | Response | Description |
 |----------|-------------|
 | `\x1b1` | Command successful |
@@ -96,6 +101,7 @@ class MSR605:
 ## Card Operations
 
 ### Reading Data
+
 ```python
 from msr605 import MSR605
 
@@ -117,6 +123,7 @@ device.disconnect()
 ```
 
 ### Writing Data
+
 ```python
 from msr605 import MSR605
 
@@ -142,11 +149,13 @@ device.disconnect()
 ## Data Formats
 
 ### Track Formats
+
 - **Track 1 (IATA)**: Up to 79 alphanumeric characters
 - **Track 2 (ABA)**: Up to 40 numeric characters
 - **Track 3 (THRIFT)**: Up to 107 numeric characters
 
 ### Special Characters
+
 | Character | Description |
 |-----------|-------------|
 | `%` | Start sentinel (Track 1) |
@@ -159,6 +168,7 @@ device.disconnect()
 ## Error Handling
 
 ### Exceptions
+
 | Exception | Description |
 |-----------|-------------|
 | `MSR605Error` | Base exception for all MSR605 errors |
@@ -167,6 +177,7 @@ device.disconnect()
 | `MSR605CardError` | Card operation errors |
 
 ### Example
+
 ```python
 from msr605 import MSR605, MSR605Error
 
@@ -185,6 +196,7 @@ finally:
 ## Examples
 
 ### Basic Usage
+
 ```python
 from msr605 import MSR605
 
@@ -219,6 +231,7 @@ if __name__ == "__main__":
 ```
 
 ### Advanced Usage
+
 ```python
 from msr605 import MSR605
 import json

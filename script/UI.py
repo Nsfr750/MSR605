@@ -69,7 +69,9 @@ from script.logger import logger, setup_logging
 from script.about import AboutDialog
 from script.help import HelpDialog
 from script.sponsor import SponsorDialog
-
+from script.advanced_functions import AdvancedFunctionsWidget
+from script.general_setting import GeneralSettingsWidget
+from script.connection_setting import ConnectionSettingsWidget
 
 class GUI(QMainWindow):
     def __init__(self):
@@ -203,7 +205,8 @@ class GUI(QMainWindow):
                 geometry_hex = settings.get("geometry")
                 if geometry_hex:
                     try:
-                        self.restoreGeometry(QByteArray.fromHex(bytes(geometry_hex, 'utf-8')))
+                        geometry = QByteArray.fromHex(geometry_hex.encode())
+                        self.restoreGeometry(geometry)
                         self.logger.info("Restored window geometry")
                     except Exception as e:
                         self.logger.error(f"Error restoring window geometry: {e}")
@@ -212,7 +215,8 @@ class GUI(QMainWindow):
                 state_hex = settings.get("windowState")
                 if state_hex:
                     try:
-                        self.restoreState(QByteArray.fromHex(bytes(state_hex, 'utf-8')))
+                        state = QByteArray.fromHex(state_hex.encode())
+                        self.restoreState(state)
                         self.logger.info("Restored window state")
                     except Exception as e:
                         self.logger.error(f"Error restoring window state: {e}")
@@ -226,65 +230,6 @@ class GUI(QMainWindow):
             self.__enable_duplicates = False
             self.__coercivity = "hi"
             self.logger.info("Using default settings due to error")
-
-        print(
-            f"  Loaded settings - auto_save: {self.__auto_save_database}, "
-            f"allow_duplicates: {self.__enable_duplicates}, "
-            f"coercivity: {self.__coercivity}"
-        )
-
-        # Window geometry and state are already handled in the try block above
-        # This is just for backward compatibility with old settings format
-        if hasattr(self, "restoreGeometry") and settings.get("geometry"):
-            try:
-                geometry = QByteArray.fromHex(settings.get("geometry").encode())
-                self.restoreGeometry(geometry)
-                print(f"  Restored window geometry from old format")
-            except Exception as e:
-                self.logger.error(f"Error restoring window geometry from old format: {e}")
-                
-        if hasattr(self, "restoreState") and settings.get("windowState"):
-            try:
-                state = QByteArray.fromHex(settings.get("windowState").encode())
-                self.restoreState(state)
-                print(f"  Restored window state from old format")
-            except Exception as e:
-                self.logger.error(f"Error restoring window state from old format: {e}")
-
-    def retranslate_ui(self):
-        """Retranslate the UI elements based on the current language."""
-        self.logger.info("Retranslating UI elements...")
-        
-        # Update window title with version
-        version = get_version()
-        self.setWindowTitle(self.language_manager.translate("app_title").format(version=version))
-        
-        # Update tab names
-        if hasattr(self, 'tabs'):
-            self.tabs.setTabText(0, self.language_manager.translate("tab_read"))
-            self.tabs.setTabText(1, self.language_manager.translate("tab_write"))
-            self.tabs.setTabText(2, self.language_manager.translate("tab_database"))
-            self.tabs.setTabText(3, self.language_manager.translate("tab_settings"))
-        
-        # Update Read tab elements
-        if hasattr(self, 'read_button'):
-            self.read_button.setText(self.language_manager.translate("btn_read_card"))
-        
-        if hasattr(self, 'advanced_button'):
-            self.advanced_button.setText(self.language_manager.translate("btn_advanced_functions"))
-        
-        if hasattr(self, 'status_label'):
-            self.status_label.setText(self.language_manager.translate("lbl_status_ready"))
-        
-        # Update status bar message if connected
-        if hasattr(self, 'statusBar') and hasattr(self, '_GUI__connected') and self._GUI__connected:
-            port = getattr(self, 'port_combo', None)
-            if port and hasattr(port, 'currentText'):
-                self.statusBar().showMessage(
-                    self.language_manager.translate("status_connected").format(port=port.currentText())
-                )
-        
-        self.logger.info("UI retranslation complete")
 
         print(
             f"  Loaded settings - auto_save: {self.__auto_save_database}, "
@@ -331,8 +276,10 @@ class GUI(QMainWindow):
                     self.tabs.setTabText(i, t("tab_write"))
                 elif tab_text in ["Database", t("tab_database")]:
                     self.tabs.setTabText(i, t("tab_database"))
-                elif tab_text in ["Settings", t("tab_settings")]:
-                    self.tabs.setTabText(i, t("tab_settings"))
+                elif tab_text in ["Connection Settings", t("tab_connection_settings")]:
+                    self.tabs.setTabText(i, t("tab_connection_settings"))
+                elif tab_text in ["General Settings", t("tab_general_settings")]:
+                    self.tabs.setTabText(i, t("tab_general_settings"))
 
         # Update status bar
         if hasattr(self, "statusBar") and self.statusBar():
@@ -351,6 +298,8 @@ class GUI(QMainWindow):
             self.export_button.setText(t("menu_export_csv"))
         if hasattr(self, "connect_button"):
             self.connect_button.setText(t("btn_connect"))
+        if hasattr(self, "advanced_button"):
+            self.advanced_button.setText(t("btn_advanced_functions"))
 
         # Update menu bar
         if hasattr(self, "menuBar") and self.menuBar():
@@ -365,9 +314,9 @@ class GUI(QMainWindow):
             self.__msr.reset()
             # Set the coercivity after reset
             if self.__coercivity == "hi":
-                self.__msr.set_hi_coercivity()
+                self.__msr.set_hi_co()
             else:
-                self.__msr.set_lo_coercivity()
+                self.__msr.set_low_co()
 
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to reset MSR605: {str(e)}")
@@ -408,7 +357,6 @@ class GUI(QMainWindow):
     def init_ui(self):
         """Initialize the main UI components."""
         # Set window properties
-        self.setWindowTitle(f"MSR605 Card Reader/Writer {get_version()}")
         self.setMinimumSize(800, 600)
 
         # Create central widget and main layout
@@ -430,7 +378,8 @@ class GUI(QMainWindow):
         self.setup_read_tab()
         self.setup_write_tab()
         self.setup_database_tab()
-        self.setup_settings_tab()
+        self.setup_connection_tab()
+        self.setup_general_settings_tab()
 
     def view_database(self):
         """Display the card database in a new window."""
@@ -668,119 +617,62 @@ class GUI(QMainWindow):
         # Load initial data
         self.refresh_database()
 
-    def setup_settings_tab(self):
-        """Set up the Settings tab."""
-        tab = QWidget()
-        layout = QVBoxLayout(tab)
+    def setup_connection_tab(self):
+        """Set up the Connection tab."""
+        tab = ConnectionSettingsWidget(self)
+        
+        # Connect signals from connection settings widget
+        tab.connect_requested.connect(self.connect_to_msr605)
+        tab.disconnect_requested.connect(self.close_connection)
+        tab.settings_changed.connect(self.on_connection_settings_changed)
+        
+        self.tabs.addTab(tab, "Connection Settings")
 
-        # Connection settings
-        conn_group = QGroupBox("Connection Settings")
-        conn_layout = QFormLayout()
+    def setup_general_settings_tab(self):
+        """Set up the General Settings tab."""
+        tab = GeneralSettingsWidget(self)
+        
+        # Connect signals from general settings widget
+        tab.coercivity_changed.connect(self.on_coercivity_changed)
+        tab.auto_save_changed.connect(self.on_auto_save_changed)
+        tab.allow_duplicates_changed.connect(self.on_allow_duplicates_changed)
+        
+        # Set initial values
+        tab.set_coercivity(self.__coercivity)
+        tab.set_auto_save(self.__auto_save_database)
+        tab.set_allow_duplicates(self.__enable_duplicates)
+        
+        self.tabs.addTab(tab, "General Settings")
 
-        self.port_combo = QComboBox()
-        self.refresh_ports()
+    def on_connection_settings_changed(self, settings):
+        """Handle connection settings changes."""
+        # Update connection settings when they change
+        self.logger.info(f"Connection settings changed: {settings}")
+        # Additional handling can be added here as needed
 
-        self.connect_button = QPushButton("Connect")
-        self.connect_button.clicked.connect(self.toggle_connection)
+    def on_coercivity_changed(self, coercivity):
+        """Handle coercivity changes."""
+        self.__coercivity = coercivity
+        if self.__connected and self.__msr:
+            try:
+                if coercivity == "hi":
+                    self.__msr.set_hi_co()
+                else:
+                    self.__msr.set_low_co()
+                self.statusBar().showMessage(f"Set to {coercivity} coercivity")
+            except Exception as e:
+                self.logger.error(f"Failed to set coercivity: {e}")
+                QMessageBox.critical(self, "Error", f"Failed to set coercivity: {str(e)}")
 
-        conn_layout.addRow("Port:", self.port_combo)
-        conn_layout.addRow(self.connect_button)
-        conn_group.setLayout(conn_layout)
+    def on_auto_save_changed(self, enabled):
+        """Handle auto-save changes."""
+        self.__auto_save_database = enabled
+        self.logger.info(f"Auto-save changed to: {enabled}")
 
-        # Coercivity settings
-        coercivity_group = QGroupBox("Coercivity")
-        coercivity_layout = QVBoxLayout()
-
-        self.hi_coercivity = QRadioButton("High Coercivity (300 Oe)")
-        self.lo_coercivity = QRadioButton("Low Coercivity (300 Oe)")
-
-        # Default to high coercivity
-        self.hi_coercivity.setChecked(True)
-
-        self.hi_coercivity.toggled.connect(
-            lambda: self.set_coercivity(
-                "hi" if self.hi_coercivity.isChecked() else "lo"
-            )
-        )
-
-        coercivity_layout.addWidget(self.hi_coercivity)
-        coercivity_layout.addWidget(self.lo_coercivity)
-        coercivity_group.setLayout(coercivity_layout)
-
-        # Database settings
-        db_group = QGroupBox("Database Settings")
-        db_layout = QVBoxLayout()
-
-        self.auto_save = QCheckBox("Auto-save read cards to database")
-        self.auto_save.setChecked(self.__auto_save_database)
-        self.auto_save.toggled.connect(
-            lambda checked: setattr(self, "_GUI__auto_save_database", checked)
-        )
-
-        self.allow_duplicates = QCheckBox("Allow duplicate cards in database")
-        self.allow_duplicates.setChecked(self.__enable_duplicates)
-        self.allow_duplicates.toggled.connect(
-            lambda checked: setattr(self, "_GUI__enable_duplicates", checked)
-        )
-
-        db_layout.addWidget(self.auto_save)
-        db_layout.addWidget(self.allow_duplicates)
-        db_group.setLayout(db_layout)
-
-        # Add all groups to main layout
-        layout.addWidget(conn_group)
-        layout.addWidget(coercivity_group)
-        layout.addWidget(db_group)
-        layout.addStretch()
-
-        self.tabs.addTab(tab, "Settings")
-
-    def setup_read_tab(self):
-        """Set up the Read tab."""
-        tab = QWidget()
-        layout = QVBoxLayout(tab)
-
-        # Add track displays
-        tracks_group = QGroupBox("Track Data")
-        tracks_layout = QVBoxLayout()
-
-        self.track_displays = []
-        for i in range(3):
-            group = QGroupBox(f"Track {i+1}")
-            group_layout = QVBoxLayout()
-
-            text_edit = QPlainTextEdit()
-            text_edit.setReadOnly(True)
-            text_edit.setMaximumHeight(60)
-            self.track_displays.append(text_edit)
-
-            group_layout.addWidget(text_edit)
-            group.setLayout(group_layout)
-            tracks_layout.addWidget(group)
-
-        tracks_group.setLayout(tracks_layout)
-        layout.addWidget(tracks_group)
-
-        # Add buttons layout
-        button_layout = QHBoxLayout()
-
-        # Add read button
-        self.read_button = QPushButton(self.language_manager.translate("btn_read_card"))
-        self.read_button.clicked.connect(self.read_card)
-        button_layout.addWidget(self.read_button)
-
-        # Add Advanced Functions button
-        self.advanced_button = QPushButton(self.language_manager.translate("btn_advanced_functions"))
-        self.advanced_button.clicked.connect(self.show_advanced_functions)
-        button_layout.addWidget(self.advanced_button)
-
-        layout.addLayout(button_layout)
-
-        # Add status label
-        self.status_label = QLabel("Ready to read card...")
-        layout.addWidget(self.status_label)
-
-        self.tabs.addTab(tab, "Read Card")
+    def on_allow_duplicates_changed(self, enabled):
+        """Handle allow duplicates changes."""
+        self.__enable_duplicates = enabled
+        self.logger.info(f"Allow duplicates changed to: {enabled}")
 
     def create_menu_bar(self):
         """Create the application menu bar using the custom MenuBar class."""
@@ -811,12 +703,21 @@ class GUI(QMainWindow):
         else:
             self.connect_to_msr605()
 
-    def connect_to_msr605(self):
+    def connect_to_msr605(self, port=None, baudrate=9600):
         """Connect to the MSR605 device."""
         if self.__connected:
             return
 
-        port = self.port_combo.currentText()
+        # If no port specified, try to get it from the connection settings widget
+        if port is None:
+            # Find the connection settings tab
+            for i in range(self.tabs.count()):
+                tab = self.tabs.widget(i)
+                if isinstance(tab, ConnectionSettingsWidget):
+                    port = tab.get_port()
+                    baudrate = tab.get_baudrate()
+                    break
+
         if not port or port == "No ports found":
             QMessageBox.critical(
                 self, "Error", "No port selected or no ports available"
@@ -824,17 +725,23 @@ class GUI(QMainWindow):
             return
 
         try:
-            self.__msr = CardReader(port)
+            self.__msr = CardReader(port, baudrate=baudrate)
             self.__msr.connect()
             self.__connected = True
-            self.connect_button.setText("Disconnect")
-            self.statusBar().showMessage(f"Connected to {port}")
+            self.statusBar().showMessage(f"Connected to {port} at {baudrate} baud")
 
             # Set the coercivity
             if self.__coercivity == "hi":
                 self.__msr.set_hi_co()
             else:
-                self.__msr.set_lo_co()
+                self.__msr.set_low_co()
+
+            # Update connection status in the connection settings widget
+            for i in range(self.tabs.count()):
+                tab = self.tabs.widget(i)
+                if isinstance(tab, ConnectionSettingsWidget):
+                    tab.set_connection_state(True)
+                    break
 
         except Exception as e:
             QMessageBox.critical(
@@ -847,13 +754,19 @@ class GUI(QMainWindow):
             return
 
         try:
-            self.__msr.disconnect()
+            self.__msr.close_serial_connection()
         except:
             pass
 
         self.__connected = False
-        self.connect_button.setText("Connect")
         self.statusBar().showMessage("Disconnected")
+
+        # Update connection status in the connection settings widget
+        for i in range(self.tabs.count()):
+            tab = self.tabs.widget(i)
+            if isinstance(tab, ConnectionSettingsWidget):
+                tab.set_connection_state(False)
+                break
 
     def set_coercivity(self, coercivity):
         """Set the coercivity of the MSR605 device."""
@@ -862,59 +775,15 @@ class GUI(QMainWindow):
 
         try:
             if coercivity == "hi":
-                self.__msr.set_hi_coercivity()
+                self.__msr.set_hi_co()
             else:
-                self.__msr.set_lo_coercivity()
+                self.__msr.set_low_co()
 
             self.__coercivity = coercivity
             self.statusBar().showMessage(f"Set to {coercivity} coercivity")
 
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to set coercivity: {str(e)}")
-
-    def show_advanced_functions(self):
-        """Show the advanced functions dialog."""
-        try:
-            from .advanced_functions import AdvancedFunctionsWidget
-            
-            # Create and show the advanced functions dialog
-            dialog = QDialog(self)
-            dialog.setWindowTitle("Advanced Functions")
-            dialog.setMinimumSize(800, 600)
-            
-            # Create the advanced functions widget with language manager
-            advanced_widget = AdvancedFunctionsWidget(
-                parent=dialog, 
-                tracks=self.__tracks,
-                language_manager=self.language_manager
-            )
-            
-            # Connect the read_card_requested signal to the read_card method
-            advanced_widget.read_card_requested.connect(self.read_card)
-            
-            # Set up the layout
-            layout = QVBoxLayout(dialog)
-            layout.addWidget(advanced_widget)
-            
-            # Add close button
-            button_box = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
-            button_box.rejected.connect(dialog.reject)
-            layout.addWidget(button_box)
-            
-            dialog.exec()
-            
-        except ImportError as e:
-            QMessageBox.critical(
-                self, 
-                "Error", 
-                f"Failed to load advanced functions: {str(e)}\n\nMake sure all required dependencies are installed."
-            )
-        except Exception as e:
-            QMessageBox.critical(
-                self, 
-                "Error", 
-                f"An error occurred: {str(e)}"
-            )
 
     def read_card(self):
         """Read data from a magnetic stripe card."""
@@ -928,9 +797,9 @@ class GUI(QMainWindow):
         QApplication.processEvents()  # Update the UI
 
         try:
-            # Read the card using the correct method
-            result = self.__msr.read_card()
-            tracks = result.get('tracks', ["", "", ""])
+            # Read the card
+            card_data = self.__msr.read_card()
+            tracks = card_data['tracks']
 
             # Update the track displays
             for i in range(3):
@@ -950,7 +819,34 @@ class GUI(QMainWindow):
         except Exception as e:
             self.status_label.setText("Error reading card")
             QMessageBox.critical(self, "Read Error", f"Failed to read card: {str(e)}")
-            self.logger.error(f"Error reading card: {str(e)}", exc_info=True)
+
+    def open_advanced_functions(self):
+        """Open the advanced functions dialog."""
+        try:
+            # Create a dialog for advanced functions
+            dialog = QDialog(self)
+            dialog.setWindowTitle("Advanced Functions")
+            dialog.setMinimumSize(800, 600)
+            
+            # Create layout
+            layout = QVBoxLayout(dialog)
+            
+            # Create advanced functions widget with current track data
+            advanced_widget = AdvancedFunctionsWidget(dialog, self.__tracks)
+            layout.addWidget(advanced_widget)
+            
+            # Add close button
+            close_button = QPushButton("Close")
+            close_button.clicked.connect(dialog.close)
+            layout.addWidget(close_button)
+            
+            # Show the dialog
+            dialog.exec()
+            
+        except Exception as e:
+            QMessageBox.critical(
+                self, "Error", f"Failed to open advanced functions: {str(e)}"
+            )
 
     def write_card(self):
         """Write data to a magnetic stripe card."""
@@ -974,7 +870,7 @@ class GUI(QMainWindow):
 
         try:
             # Write to the card
-            self.__msr.write_tracks(*tracks)
+            self.__msr.write_card(tracks)
 
             # Update the track displays to show what was written
             for i in range(3):
@@ -1152,17 +1048,66 @@ class GUI(QMainWindow):
             print(error_msg)
             QMessageBox.critical(self, "Error", error_msg)
 
+    def setup_read_tab(self):
+        """Set up the Read tab."""
+        tab = QWidget()
+        layout = QVBoxLayout(tab)
+
+        # Add track displays
+        tracks_group = QGroupBox("Track Data")
+        tracks_layout = QVBoxLayout()
+
+        self.track_displays = []
+        for i in range(3):
+            group = QGroupBox(f"Track {i+1}")
+            group_layout = QVBoxLayout()
+
+            text_edit = QPlainTextEdit()
+            text_edit.setReadOnly(True)
+            text_edit.setMaximumHeight(60)
+            self.track_displays.append(text_edit)
+
+            group_layout.addWidget(text_edit)
+            group.setLayout(group_layout)
+            tracks_layout.addWidget(group)
+
+        tracks_group.setLayout(tracks_layout)
+        layout.addWidget(tracks_group)
+
+        # Create horizontal layout for buttons
+        button_layout = QHBoxLayout()
+        
+        # Add read button
+        self.read_button = QPushButton("Read Card")
+        self.read_button.clicked.connect(self.read_card)
+        button_layout.addWidget(self.read_button)
+        
+        # Add advanced functions button
+        self.advanced_button = QPushButton("Advanced Functions")
+        self.advanced_button.clicked.connect(self.open_advanced_functions)
+        button_layout.addWidget(self.advanced_button)
+        
+        # Add the button layout to the main layout
+        layout.addLayout(button_layout)
+
+        # Add status label
+        self.status_label = QLabel("Ready to read card...")
+        layout.addWidget(self.status_label)
+
+        self.tabs.addTab(tab, "Read Card")
+
     def init_database(self):
         """Initialize the SQLite database."""
         try:
-            # Create or connect to the database
-            db_path = os.path.abspath(
-                os.path.join(os.path.dirname(__file__), "..", "card_database.db")
-            )
+            # Create or connect to the database in the data/ folder
+            project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            data_dir = os.path.join(project_root, "data")
+            db_path = os.path.join(data_dir, "card_database.db")
+            
             print(f"Initializing database at: {db_path}")
 
-            # Ensure the directory exists
-            os.makedirs(os.path.dirname(db_path), exist_ok=True)
+            # Ensure the data directory exists
+            os.makedirs(data_dir, exist_ok=True)
 
             self.__db_conn = sqlite3.connect(db_path)
             self.__db_cursor = self.__db_conn.cursor()

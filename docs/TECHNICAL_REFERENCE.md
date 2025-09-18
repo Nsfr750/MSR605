@@ -3,6 +3,7 @@
 ## Architecture Overview
 
 ### System Components
+
 - **GUI Module**: `GUI.py`
 - **Card Reader Interface**: `cardReader.py`
 - **Database Management**: Integrated SQLite
@@ -13,6 +14,7 @@
 ## Software Design
 
 ### Design Principles
+
 - Modular architecture
 - Separation of concerns
 - High cohesion
@@ -21,17 +23,20 @@
 ### Module Responsibilities
 
 #### GUI Module
+
 - User interaction handling
 - Window management
 - Event processing
 
 #### Card Reader Module
+
 - Hardware communication
 - Low-level card reading/writing
 - Error handling
 - Track data processing
 
 #### Database Module
+
 - Data persistence
 - CRUD operations
 - Query management
@@ -39,6 +44,7 @@
 ## Communication Protocols
 
 ### Serial Communication
+
 - Baud Rate: 9600
 - Data Bits: 8
 - Stop Bits: 1
@@ -107,12 +113,10 @@ classDiagram
   - Format: `%[format code][primary account number]^[name]^[expiration date][service code][discretionary data]?`
   - Character Set: A-Z, 0-9, space, !"%&'()*+,-./:;<=>?_#
   
-
 - **Track 2**: Numeric (up to 40 chars)
   - Format: `;[primary account number]=[expiration date][service code][discretionary data]?`
   - Character Set: 0-9, =, ?
   
-
 - **Track 3**: Read/Write (up to 107 chars)
   - Primarily numeric data
   - Used for financial transactions
@@ -124,7 +128,6 @@ classDiagram
   - Fixed field lengths for certain elements
   - Enhanced validation rules
   
-
 - **Track 2**: Numeric with specific validation
   - Similar to ISO 7811 but with additional constraints
   - Strict field validation
@@ -166,24 +169,28 @@ classDiagram
 ## Performance Metrics
 
 ### Read/Write Speed
+
 - Average Read Time: <500ms
 - Average Write Time: <1000ms
 - Maximum Tracks: 3
 
 ### Resource Utilization
+
 - Memory Footprint: <100MB
 - CPU Usage: Low to Moderate
 - Disk Space: <500MB
 
-## Error Handling
+### Error Handling
 
-### Error Categories
+#### Error Categories
+
 - Hardware Errors
 - Communication Errors
 - Data Parsing Errors
 - Database Errors
 
-### Error Logging
+#### Error Logging
+
 - Timestamp
 - Error Type
 - Detailed Description
@@ -192,11 +199,13 @@ classDiagram
 ## Security Considerations
 
 ### Data Protection
+
 - No card data storage without consent
 - Encrypted database (optional)
 - Configurable data retention policies
 
 ### Compliance
+
 - GDPR considerations
 - PCI DSS guidelines
 - Data minimization principles
@@ -204,6 +213,7 @@ classDiagram
 ## Extensibility
 
 ### Plugin Architecture
+
 - Support for custom track parsers
 - Extensible database backends
 - Configurable hardware interfaces
@@ -211,6 +221,7 @@ classDiagram
 ## Development Environment
 
 ### Recommended Tools
+
 - Python 3.12+
 - Visual Studio Code
 - PyCharm
@@ -218,6 +229,7 @@ classDiagram
 - Virtual Environment
 
 ### Recommended Extensions
+
 - Python
 - Pylance
 - GitLens
@@ -226,11 +238,13 @@ classDiagram
 ## Build and Deployment
 
 ### Build Process
+
 - Use `pyinstaller` for executable
 - Create platform-specific installers
 - Sign executables
 
 ### Continuous Integration
+
 - GitHub Actions
 - Automated testing
 - Version compatibility checks
@@ -238,18 +252,21 @@ classDiagram
 ## API and Extensibility
 
 ### Public Methods
+
 - `read_card()`
 - `write_card()`
 - `decode_track()`
 - `export_database()`
 
 ### Configuration Options
+
 - Hardware settings
 - Database preferences
 - Decoding rules
 - User interface customization
 
 ## Roadmap and Future Development
+
 - Machine learning card analysis
 - Cloud synchronization
 - Multi-language support

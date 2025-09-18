@@ -70,6 +70,6 @@ def iso_standard_track_check_legacy(char, track_num):
     return iso_standard_track_check(char, track_num, CardFormat.ISO_7811)
 
 
-# For backward compatibility, assign the legacy function to the original name
-# This ensures existing imports continue to work
-iso_standard_track_check = iso_standard_track_check_legacy
+# Note: We don't reassign iso_standard_track_check to avoid breaking the 3-parameter signature
+# The original iso_standard_track_check function supports both 2 and 3 parameters
+# through the default format_type parameter

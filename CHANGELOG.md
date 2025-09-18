@@ -7,13 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.4.1] - 2025-08-31
 
-### Added
-- Added flag emojis (🇬🇧, 🇮🇹) to language selection menu for better visual feedback
-
 ### Fixed
-- Fixed menu text visibility issues in the application menu bar
-- Resolved menu item duplication when changing languages
-- Improved menu styling and layout consistency
+
+- Fixed menu item duplication when changing languages
 
 ## [2.4.0] - 2025-07-20
 
@@ -24,7 +20,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Bit pattern visualization displaying binary representation of track data
   - Data density metrics including length, unique characters, and character density
   - Field analysis with automatic detection of field separators and visualization of field lengths
-  - Multiple theme support (dark, light, seaborn, ggplot, etc.)
   - Interactive visualizations with tooltips and zooming
   - Integration with the main UI in the Advanced Functions tab
 
@@ -74,7 +69,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved menu organization and translations
 - New update checking system with GitHub integration
 - Dark mode support throughout the application
-- Voice control menu in Tools
 - Sponsor information in Help menu
 
 ### Changed
@@ -100,7 +94,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Support for Python 3.12 and 3.13
 - Enhanced error handling for hardware communication
-- New configuration options in `config.ini`
 - Additional test cases for better code coverage
 - Comprehensive documentation in CONTRIBUTING.md and PREREQUISITES.md
 - GitHub CODEOWNERS file for better code review workflow

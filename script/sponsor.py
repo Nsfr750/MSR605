@@ -138,8 +138,7 @@ class SponsorDialog(QDialog):
         # Monero
         monero_address = "47Jc6MC47WJVFhiQFYwHyBNQP5BEsjUPG6tc8R37FwcTY8K5Y3LvFzveSXoGiaDQSxDrnCUBJ5WBj6Fgmsfix8VPD4w3gXF"
         self.monero_label = QLabel()
-        monero_xmr= "XMR XMR XMR XMR XMR XMR XMR XMR XMR XMR XMR XMR XMR XMR XMR XMR XMR XMR"
-        monero_address_label = QLabel(monero_xmr)
+        monero_address_label = QLabel(monero_address)
         monero_address_label.setTextInteractionFlags(
             Qt.TextInteractionFlag.TextSelectableByMouse
         )
@@ -247,7 +246,7 @@ class SponsorDialog(QDialog):
         other_help.setHtml(
             f"<h3>{self.translate('other_ways_to_help')}</h3>"
             f"<ul>"
-            f"<li>{self.translate('star_on_github')} <a href=\"https://github.com/Nsfr750/MSR605\">GitHub</a></li>"
+            f"<li>{self.translate('star_on_github')} <a href=\"https://github.com/Nsfr750/Images-Deduplicator\">GitHub</a></li>"
             f"<li>{self.translate('report_bugs')}</li>"
             f"<li>{self.translate('share_with_others')}</li>"
             f"</ul>"

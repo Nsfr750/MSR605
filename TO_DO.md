@@ -1,6 +1,7 @@
 # MSR605 Card Reader/Writer - Project To-Do List
 
 ## High Priority
+
 - [x] Migrate from Tkinter to PyQt6 for the GUI
 - [x] Update all imports to use new package structure
 - [x] Fix compatibility issues with PyQt6
@@ -18,19 +19,18 @@
 - [x] Implement advanced card data visualization (v2.4.0)
 
 ## Medium Priority
+
 - [x] Add support for additional card formats (ISO 7811, ISO 7813)
 
 ## Low Priority
+
 - [x] Implement advanced card data visualization (v2.4.0, 2025-07-20)
 
 ## In Progress
+
 - [ ] Complete test coverage for all modules
   - [ ] Increase test coverage for visualization module
   - [ ] Add integration tests for UI components
-- [ ] Menu system improvements
-  - [x] Add flag emojis to language selection
-  - [ ] Add tooltips for menu items
-  - [x] Add keyboard shortcuts for common actions
 - [ ] Optimize database performance
   - [ ] Profile database queries
   - [ ] Optimize schema and indexes
@@ -39,9 +39,11 @@
   - [ ] Add usage examples
 
 ## Backlog
+
 - [ ] Add export functionality for visualizations (PNG, PDF, CSV)
 
 ## Documentation
+
 - [x] Create comprehensive CONTRIBUTING.md
 - [x] Add PREREQUISITES.md with setup instructions
 - [x] Update README.md with latest features
@@ -50,16 +52,11 @@
 - [x] Create FAQ section (FAQ.md)
 - [x] Update CHANGELOG.md
 - [x] Add visualization documentation (visualization.md)
-- [ ] Add architecture decision records (ADRs)
-  - [ ] Document visualization architecture
-  - [ ] Document UI component decisions
-- [ ] Create troubleshooting guide
-  - [ ] Add visualization troubleshooting section
-- [ ] Create developer documentation
-  - [ ] Document visualization extension points
 
 ## Completed ✓
+
 ### v2.4.0 (2025-07-20)
+
 - [x] **Advanced Card Data Visualization**
   - Added character distribution charts
   - Implemented bit pattern visualization
@@ -70,6 +67,7 @@
   - Created detailed documentation
 
 ### Previous Versions
+
 - [x] Migrated from Tkinter to PyQt6
 - [x] Updated all imports for new package structure
 - [x] Fixed compatibility issues with PyQt6
@@ -103,12 +101,14 @@
 - [x] Implement configuration management
 
 ## Future Enhancements
+
 - Advanced reporting and analytics
 - Plugin system for custom formats
 - Web interface for remote access
 
 ## Notes
-- **Current Version**: 2.4.0
+
+- **Current Version**: 2.4.1
 - **Last Updated**: 2025-07-19
 - **Python Version**: 3.10+
 - **License**: GPL-3.0
