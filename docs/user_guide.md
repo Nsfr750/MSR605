@@ -15,7 +15,7 @@ Welcome to the MSR605 Card Reader/Writer user guide! This document will help you
 
 ### Windows
 
-1. Download the latest installer from the [Releases](https://github.com/yourusername/MSR605/releases) page
+1. Download the latest installer from the [Releases](https://github.com/Nsfr750/MSR605/releases) page
 2. Run the installer and follow the on-screen instructions
 3. Connect your MSR605 device to an available USB port
 4. Launch the application from the Start Menu or desktop shortcut
