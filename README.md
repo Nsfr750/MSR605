@@ -331,16 +331,9 @@ MSR605 Card Reader/Writer is licensed under the GNU General Public License v3.0.
 Current Version: 2.4.2 (Stable)
 Release Date: September 18, 2025
 
-### What's New in v2.3.0
-
-- Added voice command support
-- New plugin system
-- Dark/light theme support
-- Performance improvements
-- Enhanced security features
-
 ### System Requirements
 
 - Python 3.10, 3.11, or 3.12
 - Windows 10/11 or Linux
 - MSR605 Hardware Reader
+- Prolific USB to Serial Driver (can be find on releases page)
