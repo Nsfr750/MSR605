@@ -1113,25 +1113,38 @@ class CardReader:
                 self.__serialConn.write(ESCAPE + HI_CO)
                 self.__serialConn.flush()
 
-                response = self.__serialConn.read()
+                first = self.__serialConn.read()
 
-                if response and response.strip() == b"0":
+                if first != ESCAPE:
+                    self.read_until("0", 4, False)
+                    if self.__serialConn.read() != ESCAPE:
+                        print(f"Attempt {attempt + 1}: Unexpected response: {first}")
+                        if attempt < max_retries - 1:
+                            print("Retrying...")
+                            time.sleep(1)
+                            continue
+                        print(f"Failed to set Hi-Co after {max_retries} attempts")
+                        print("Device might not support Hi-Co mode or there's a communication issue")
+                        return False
+
+                status = self.__serialConn.read()
+                if status == b"0":
                     print("SUCCESSFULLY SET THE MSR605 TO HI-COERCIVITY")
                     return True
-                else:
-                    print(f"Attempt {attempt + 1}: Unexpected response: {response}")
-                    if attempt < max_retries - 1:
-                        print("Retrying...")
-                        time.sleep(1)  # Wait before retry
-                        continue
-                    
+
+                print(f"Attempt {attempt + 1}: Unexpected response: {status}")
+                if attempt < max_retries - 1:
+                    print("Retrying...")
+                    time.sleep(1)
+                    continue
+
             except Exception as e:
                 print(f"Attempt {attempt + 1}: Error setting Hi-Co: {e}")
                 if attempt < max_retries - 1:
                     print("Retrying...")
                     time.sleep(1)
                     continue
-        
+
         print(f"Failed to set Hi-Co after {max_retries} attempts")
         print("Device might not support Hi-Co mode or there's a communication issue")
         return False

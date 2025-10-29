@@ -120,3 +120,5 @@ pyproject.toml
 build_debug.py
 test_imports.py
 pypi.py
+clean_pycache.py
+clear_cache.py
