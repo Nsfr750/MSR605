@@ -11,6 +11,8 @@
 
 **MSR605 Card Reader/Writer** is a sophisticated, open-source GUI application designed for reading, writing, and managing magnetic stripe cards using the MSR605 hardware. This powerful tool provides comprehensive card data management with advanced decoding and analysis capabilities.
 
+Check [Gallery](docs/GALLERY.md) for screenshots and visuals of the MSR605 application.
+
 ### What's New in v2.4.2
 
 #### Build System Improvements
