@@ -126,7 +126,7 @@
 - **OS**: Windows 10/11, Linux (Ubuntu 22.04+, Debian 11+, Fedora 36+)
 - **Python**: 3.10, 3.11, or 3.12
 - **Hardware**: MSR605 Card Reader (USB or Serial)
-- **Dependencies**: See [PREREQUISITES.md](PREREQUISITES.md) for detailed requirements
+- **Dependencies**: See [PREREQUISITES.md](docs/PREREQUISITES.md) for detailed requirements
 
 ### Recommended Hardware
 
@@ -297,7 +297,7 @@ open _build/html/index.html  # macOS
 3. Push to the branch (`git push origin feature/AmazingFeature`)
 4. Open a Pull Request
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed contribution guidelines.
+See [CONTRIBUTING.md](docs/CONTRIBUTING.md) for detailed contribution guidelines.
 
 ## License
 
