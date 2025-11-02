@@ -16,7 +16,7 @@ The application is designed to work on:
 
 ### Where can I download the latest version?
 
-You can download the latest release from our [GitHub Releases](https://github.com/yourusername/MSR605/releases) page.
+You can download the latest release from our [GitHub Releases](https://github.com/Nsfr750/MSR605/releases) page.
 
 ## Installation
 
@@ -123,7 +123,7 @@ Yes, the application provides a Python API for integration with other applicatio
 
 ### How do I report a bug?
 
-Please open an issue on our [GitHub Issues](https://github.com/yourusername/MSR605/issues) page with the following information:
+Please open an issue on our [GitHub Issues](https://github.com/Nsfr750/MSR605/issues) page with the following information:
 
 - Steps to reproduce the issue
 - Expected behavior
@@ -136,11 +136,7 @@ Please open an issue on our [GitHub Issues](https://github.com/yourusername/MSR6
 ### Where can I get help?
 
 - Check the [User Guide](user_guide.md) for detailed instructions
-- Search or post on our [GitHub Discussions](https://github.com/yourusername/MSR605/discussions)
-
-### Is there a community forum?
-
-Yes, you can join our community forum at [forum.example.com](https://forum.example.com) to ask questions and share experiences with other users.
+- Search or post on our [GitHub Discussions](https://github.com/Nsfr750/MSR605/discussions)
 
 ## Legal
 
