@@ -113,7 +113,7 @@
 
 ## Notes
 
-- **Current Version**: 2.4.3
+- **Current Version**: 2.4.2
 - **Last Updated**: 2025-09-18
 - **Python Version**: 3.12
 - **License**: GPL-3.0

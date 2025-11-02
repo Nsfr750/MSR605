@@ -5,7 +5,7 @@
 ![GUI](https://img.shields.io/badge/GUI-PyQt6.6-blue)
 ![License](https://img.shields.io/badge/License-GPLv3-blue)
 [![Issues](https://img.shields.io/github/issues/Nsfr750/MSR605)](https://github.com/Nsfr750/MSR605/issues)
-[![Code Coverage](https://codecov.io/gh/Nsfr750/MSR605/branch/main/graph/badge.svg)](https://codecov.io/gh/Nsfr750/MSR605)
+
 
 ## 🌟 Overview
 
@@ -317,13 +317,11 @@ MSR605 Card Reader/Writer is licensed under the GNU General Public License v3.0.
 ### Stay Connected
 
 - 🌐 [GitHub Repository](https://github.com/Nsfr750/MSR605)
-- 💬 [Discord Community](https://discord.gg/BvvkUEP9)
 - 📰 [Project Blog](https://nsfr750.github.io/)
 
 ### Support the Project
 
 - 💖 [GitHub Sponsors](https://github.com/sponsors/Nsfr750)
-- 💰 [Patreon](https://www.patreon.com/Nsfr750)
 - 💳 [PayPal](https://paypal.me/3dmega)
 
 ## 🏷️ Version Information
