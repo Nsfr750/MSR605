@@ -39,9 +39,9 @@ This document outlines the development roadmap for the MSR605 Card Reader/Writer
 |---------|-------------------|-------------|
 | v2.3.0  | July 2025         | ✅ Released |
 | v2.4.0  | Q4 2025           | ✅ Released |
-| v2.4.5  | Q4 2025           | 🔄 In Progress |
-| v2.5.0  | Q1 2026          | ⏳ Planned  |
-| v3.0.0  | Q3 2026           | ⏳ Planned  |
+| v2.4.5  | Q1 2026           | 🔄 In Progress |
+| v2.5.0  | Q3 2026          | ⏳ Planned  |
+| v3.0.0  | Q1 2027           | ⏳ Planned  |
 
 ## 🤝 How to Contribute
 

@@ -20,6 +20,7 @@ pip install -r requirements.txt
 
 - MSR605 Magnetic Stripe Card Reader/Encoder
 - USB port for device connection
+- Prolific USB to Serial Driver (can be find on releases page)
 
 ## Environment Setup
 
