@@ -9,7 +9,6 @@ Welcome to the MSR605 Card Reader/Writer user guide! This document will help you
 3. [Reading Cards](#reading-cards)
 4. [Writing Cards](#writing-cards)
 5. [Configuration](#configuration)
-6. [Troubleshooting](#troubleshooting)
 
 ## Installation
 
@@ -133,34 +132,12 @@ ISO 7813 is a subset of ISO 7811 specifically for financial transaction cards. K
 - **Start Minimized**: Launch the application minimized to system tray
 - **Save Logs**: Enable logging of operations to a file
 
-## Troubleshooting
-
-### Common Issues
-
-#### Device Not Detected
-
-- Ensure the device is properly connected to the USB port
-- Try a different USB port
-- Check if the device is recognized in your system's Device Manager
-- Restart the application
-
-#### Reading/Writing Fails
-
-- Ensure the card is properly inserted
-- Clean the card's magnetic stripe
-- Verify the card is not write-protected
-- Check the track configuration matches the card format
-
-#### Application Crashes
-
-- Ensure you have the latest version installed
-- Check the log file for error details
-- Try reinstalling the application
-
 ## Support
 
 For additional help, please:
 
 - Check the [FAQ](FAQ.md)
 
-- Search or open an issue on [GitHub](https://github.com/yourusername/MSR605/issues)
+- Check the [Troubleshooting](TROUBLESHOOTING.md)
+
+- Search or open an issue on [GitHub](https://github.com/Nsfr750/MSR605/issues)
