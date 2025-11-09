@@ -114,6 +114,7 @@ install-scripts/build_config.py
 build_config.py
 Dati MSR605.txt
 build_nuitka.py
+build_linux.py
 publish_to_pypi.py
 pyproject.toml
 /venv312
