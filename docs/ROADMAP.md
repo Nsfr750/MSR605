@@ -14,9 +14,8 @@ This document outlines the development roadmap for the MSR605 Card Reader/Writer
 - [ ] Template system for common card operations
 - [ ] Advanced data validation
 
-### v3.0.0 - Cloud Integration
+### v3.0.0 - Multi-Device Integration
 - [ ] Multi-device synchronization
-- [ ] Web-based management portal
 - [ ] API for third-party integrations
 
 ## 🛠️ Technical Improvements
