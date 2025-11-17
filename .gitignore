@@ -124,3 +124,4 @@ pypi.py
 clean_pycache.py
 clear_cache.py
 .windsurf/rules
+INST/
