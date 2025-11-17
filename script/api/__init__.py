@@ -6,7 +6,7 @@ This module provides a RESTful API for third-party integrations with the MSR605 
 from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field as PydanticField
 from typing import List, Optional, Dict, Any
 import uvicorn
 import json
@@ -15,7 +15,7 @@ from pathlib import Path
 import logging
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
-from passlib.context import CryptContext
+import bcrypt
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -26,9 +26,17 @@ SECRET_KEY = "your-secret-key-here"  # In production, use environment variables
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-# Password hashing
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+# Password hashing functions
+def get_password_hash(password: str) -> str:
+    # Encode the password as UTF-8 and hash with bcrypt
+    password_bytes = password.encode('utf-8')
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(password_bytes, salt).decode('utf-8')
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    # Encode the plain password and compare with the hashed password
+    return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token", auto_error=False)
 
 # API Models
 class Token(BaseModel):
@@ -39,26 +47,26 @@ class TokenData(BaseModel):
     username: Optional[str] = None
 
 class CardReadRequest(BaseModel):
-    detect_format: bool = True
-    validate: bool = True
+    detect_format: bool = PydanticField(default=True, description="Whether to automatically detect the card format")
+    do_validation: bool = PydanticField(default=True, alias="validate", description="Whether to validate the card data")
 
 class CardWriteRequest(BaseModel):
-    tracks: List[str] = Field(..., max_items=3, min_items=1)
-    format: Optional[str] = None
+    tracks: List[str] = PydanticField(..., max_items=3, min_items=1, description="List of track data to write")
+    format: Optional[str] = PydanticField(None, description="Card format (e.g., 'ISO_7813')")
 
 class CardTemplateRequest(BaseModel):
-    name: str
-    description: Optional[str] = None
-    tracks: List[str] = Field(..., max_items=3)
-    format: str
-    metadata: Optional[Dict[str, Any]] = None
+    name: str = PydanticField(..., description="Name of the template")
+    description: Optional[str] = PydanticField(None, description="Optional description")
+    tracks: List[str] = PydanticField(..., max_items=3, description="List of track data")
+    format: str = PydanticField(..., description="Card format (e.g., 'ISO_7813')")
+    metadata: Optional[Dict[str, Any]] = PydanticField(None, description="Additional metadata")
 
 class BatchOperation(BaseModel):
-    operation_type: str  # 'read', 'write', 'apply_template'
-    params: Dict[str, Any]
+    operation_type: str = PydanticField(..., description="Type of operation: 'read', 'write', or 'apply_template'")
+    params: Dict[str, Any] = PydanticField(..., description="Parameters for the operation")
 
 class BatchRequest(BaseModel):
-    operations: List[BatchOperation]
+    operations: List[BatchOperation] = PydanticField(..., description="List of batch operations to perform")
 
 # API Application
 app = FastAPI(
@@ -76,11 +84,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mock user database (in production, use a real database)
+# Helper function to get user from database
+def get_user(db, username: str):
+    if username in db:
+        user_dict = db[username]
+        return user_dict
+    return None
+
+# Mock user database with pre-hashed password
 fake_users_db = {
     "admin": {
         "username": "admin",
-        "hashed_password": pwd_context.hash("admin"),
+        # This is a pre-hashed version of "admin123"
+        "hashed_password": "$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW",
         "disabled": False,
     }
 }
@@ -184,8 +200,9 @@ async def process_batch(
     }
 
 # Helper functions
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    # Encode the plain password and compare with the hashed password
+    return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
 
 def get_password_hash(password):
     return pwd_context.hash(password)

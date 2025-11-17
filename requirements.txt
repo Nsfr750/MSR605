@@ -11,6 +11,13 @@ requests>=2.32.4,<3.0.0  # For HTTP requests
 psutil>=5.9.0,<6.0.0  # For system monitoring
 python-dotenv>=1.0.0,<2.0.0  # Environment variable management
 send2trash>=1.8.0,<2.0.0  # For safe file deletion
+fastapi==0.95.2  # For API development
+uvicorn[standard]>=0.21.0,<0.23.0 # ASGI server for FastAPI
+python-jose[cryptography]>=3.3.0,<4.0.0  # For JWT authentication
+passlib>=1.7.4,<2.0.0  # Password hashing
+bcrypt>=3.2.0,<3.3.0  # Password hashing
+pydantic==1.10.7
+python-multipart>=0.0.5,<0.1.0
 
 # PyQt6 Dependencies
 PyQt6>=6.7.0,<6.8.0  # Core GUI framework (includes PyQt6-sip)

@@ -781,7 +781,7 @@ class GUI(QMainWindow):
             return
 
         try:
-            self.__msr = CardReader(port, baudrate=baudrate)
+            self.__msr = CardReader(port, baud_rate=baudrate)
             self.__msr.connect()
             self.__connected = True
             self.statusBar().showMessage(f"Connected to {port} at {baudrate} baud")
