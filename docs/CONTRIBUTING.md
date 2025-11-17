@@ -26,7 +26,48 @@ Thank you for your interest in contributing to the MSR605 Card Reader/Writer pro
 
 By participating in this project, you agree to abide by our [Code of Conduct](CODE_OF_CONDUCT.md). Please read it before making any contributions.
 
-## 🚀 How to Contribute
+## 🚀 How to Contribute (v2.4.5+)
+
+### CI/CD Integration
+
+The project now uses GitHub Actions for continuous integration and deployment. When you create a pull request, the following checks will run automatically:
+
+- **Test Suite**: Runs unit and integration tests across Python 3.8, 3.9, and 3.10
+- **Code Style**: Enforces code formatting with Black and isort
+- **Type Checking**: Verifies type hints with mypy
+- **Documentation**: Builds documentation to catch any errors
+- **Security**: Scans for vulnerabilities with Bandit and safety
+
+### Development Workflow
+
+1. **Create a feature branch** from the latest `develop` branch
+2. **Make your changes** following the coding standards
+3. **Run tests locally** before pushing:
+
+   ```bash
+   # Run all tests
+   pytest
+   
+   # Run tests with coverage
+   pytest --cov=msr605 tests/
+   
+   # Check code style
+   black .
+   isort .
+   flake8
+   ```
+
+4. **Commit your changes** with a descriptive message
+5. **Push to your fork** and create a pull request
+6. **Monitor the CI/CD pipeline** and address any failures
+
+### Branching Strategy
+
+- `main`: Production-ready code
+- `develop`: Integration branch for features
+- `feature/*`: New features
+- `bugfix/*`: Bug fixes
+- `release/*`: Release preparation
 
 ### 🐛 Reporting Bugs
 
@@ -55,44 +96,65 @@ By participating in this project, you agree to abide by our [Code of Conduct](CO
 
 ### Prerequisites
 
-- Python 3.10+ (3.13.5 recommended)
-- Rust toolchain (for cryptography package)
-- Git
-- MSR605 hardware (for hardware testing)
-- Windows 10/11 (for development and testing)
+- **Python**: 3.8, 3.9, 3.10, or 3.12 (3.10+ recommended)
+- **Rust Toolchain**: Required for cryptography package
+- **Git**: Version control
+- **MSR605 Hardware**: For hardware testing (recommended but not required for all contributions)
+- **Operating System**: 
+  - Windows 10/11 (fully supported)
+  - Linux (Ubuntu/Debian recommended)
+  - macOS (limited testing)
+- **Disk Space**: Minimum 200MB free
+- **Memory**: 4GB RAM minimum
 
 ### Environment Setup
 
 1. **Fork and Clone the Repository**:
+
    ```bash
    git clone https://github.com/your-username/MSR605.git
    cd MSR605
    ```
 
-2. **Set Up Virtual Environment**:
+2. **Set Up Development Environment**:
+
    ```bash
-   # Windows
+   # Create and activate virtual environment
    python -m venv venv
+   
+   # Windows
    .\venv\Scripts\activate
    
    # Linux/macOS
-   python3 -m venv venv
    source venv/bin/activate
-   ```
-
-3. **Install Dependencies**:
-   ```bash
-   # Install build dependencies
-   pip install --upgrade pip setuptools wheel
    
    # Install development dependencies
    pip install -r requirements-dev.txt
    
    # Install pre-commit hooks
    pre-commit install
+   
+   # Verify setup
+   pytest --version
+   black --version
+   mypy --version
+   ```
+
+3. **Run the Development Server**:
+
+   ```bash
+   # Start the application in development mode
+   python main.py --dev
+   
+   # Or run specific test cases
+   python -m pytest tests/test_specific_feature.py -v
+   
+   # For hardware testing
+   python -m pytest tests/hardware/ --hardware
    ```
 
 4. **Set Up Pre-commit Hooks**:
+
    ```bash
    pre-commit install
    ```
@@ -117,6 +179,7 @@ By participating in this project, you agree to abide by our [Code of Conduct](CO
 - Place tests in the `tests/` directory
 - Test on multiple Python versions (3.10+)
 - Run tests locally before pushing:
+
   ```bash
   # Run all tests
   pytest
@@ -140,6 +203,7 @@ By participating in this project, you agree to abide by our [Code of Conduct](CO
 ### Version Control
 
 1. **Create a Feature Branch**:
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
@@ -150,6 +214,7 @@ By participating in this project, you agree to abide by our [Code of Conduct](CO
    - Update documentation as needed
 
 3. **Run Checks Before Committing**:
+
    ```bash
    # Run linters
    black .
@@ -164,6 +229,7 @@ By participating in this project, you agree to abide by our [Code of Conduct](CO
    ```
 
 4. **Commit Your Changes**:
+
    ```bash
    git add .
    git commit -m "feat: add your feature"
@@ -183,6 +249,7 @@ By participating in this project, you agree to abide by our [Code of Conduct](CO
    - `revert:` for reverting commits
 
 5. **Push Your Changes**:
+
    ```bash
    git push origin feature/your-feature-name
    ```
@@ -263,7 +330,6 @@ If you have any questions or need help:
 
 3. **Ask for Help**:
    - Open a [new discussion](https://github.com/Nsfr750/MSR605/discussions)
-   - Join our [Discord server](https://discord.gg/BvvkUEP9)
    - Email: nsfr750@yandex.com
 
 ## 🔄 Release Process
@@ -272,6 +338,7 @@ If you have any questions or need help:
    - Update the version in `script/version.py`
    - Update `CHANGELOG.md` with the new version and changes
    - Create a git tag for the release:
+   
      ```bash
      git tag -a vX.Y.Z -m "Version X.Y.Z"
      git push origin vX.Y.Z

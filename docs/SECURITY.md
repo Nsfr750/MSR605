@@ -1,8 +1,16 @@
-# Security Policy
+# Security Policy - v2.4.5+
 
 ## 🛡️ Security
 
-This document outlines the security practices, policies, and guidelines for the MSR605 Card Reader/Writer project. We take security seriously and are committed to maintaining a secure application for handling sensitive card data.
+This document outlines the security practices, policies, and guidelines for the MSR605 Card Reader/Writer project (v2.4.5+). We take security seriously and are committed to maintaining a secure application for handling sensitive card data.
+
+### **Version 2.4.5 Security Highlights**
+
+- Enhanced CI/CD security scanning and validation
+- Updated cryptographic libraries and dependencies
+- Improved secure settings storage
+- Enhanced audit logging and monitoring
+- Strengthened build and deployment security
 
 ## 🔒 Security Overview
 
@@ -15,10 +23,12 @@ The MSR605 application handles magnetic stripe card data, which may contain sens
 
 ### Security Principles
 
-1. **Data Protection**: All sensitive data is encrypted both at rest and in transit
-2. **Least Privilege**: The application operates with minimal required permissions
-3. **Defense in Depth**: Multiple layers of security controls are implemented
+1. **Data Protection**: All sensitive data is encrypted both at rest and in transit using industry-standard algorithms
+2. **Least Privilege**: The application operates with minimal required permissions and capabilities
+3. **Defense in Depth**: Multiple layers of security controls are implemented throughout the application stack
 4. **Security by Design**: Security considerations are integrated throughout the development lifecycle
+5. **Continuous Security**: Automated security testing and monitoring in the CI/CD pipeline
+6. **Transparency**: Clear documentation of security features and practices
 
 ## 🚨 Reporting Security Vulnerabilities
 
@@ -30,7 +40,6 @@ We encourage responsible disclosure of security vulnerabilities. If you discover
 
 1. **Email**: [Nsfr750](mailto:nsfr750@yandex.com)
 2. **GitHub**: Create a private issue in the [MSR605 repository](https://github.com/Nsfr750/MSR605)
-3. **Discord**: Contact us on our [Discord server](https://discord.gg/ryqNeuRYjD)
 
 #### What to Include
 
@@ -53,35 +62,69 @@ We will acknowledge receipt of your report within **48 hours** and provide a det
 - We will fix the vulnerability and release a patch as soon as possible
 - We will publicly disclose the vulnerability after it has been fixed
 
-## 🔐 Security Features
+## 🔐 Security Features (v2.4.5+)
+
+### CI/CD Security
+
+- **Automated Security Scanning**: Integrated static application security testing (SAST) in the CI pipeline
+- **Dependency Analysis**: Regular scanning for vulnerable dependencies using Dependabot
+- **Build Verification**: Cryptographic verification of build artifacts
+- **Secrets Management**: Secure handling of sensitive credentials in CI/CD
+- **Reproducible Builds**: Ensures that the built artifacts match the source code
 
 ### Encryption
 
-- **AES-256**: Advanced Encryption Standard with 256-bit keys for data encryption
-- **DES/3DES**: Support for Data Encryption Standard and Triple DES for legacy compatibility
-- **End-to-End Encryption**: Data is encrypted from the moment it's read until it's stored or transmitted
-- **Hardware Acceleration**: Utilizes hardware acceleration for encryption operations when available
+- **AES-256-GCM**: Advanced Encryption Standard with Galois/Counter Mode for authenticated encryption
+- **Key Management**: Secure key storage using platform-specific keychains
+- **Secure Randomness**: Cryptographically secure random number generation for all cryptographic operations
+- **Hardware Security Modules (HSM)**: Support for HSM integration where available
+- **Key Rotation**: Automatic key rotation policies for sensitive data
+- **Algorithm Agility**: Ability to update cryptographic algorithms without application updates
 
 ### Data Storage
 
-- **Encrypted Database**: SQLite database with transparent encryption
-- **Secure File Storage**: All exported files are encrypted by default
-- **Temporary Files**: Secure deletion of temporary files and data
-- **Memory Management**: Secure memory handling to prevent data leakage
+- **Encrypted Database**: SQLite database with SQLCipher encryption
+- **Secure File Storage**: All exported files are encrypted with AES-256-GCM by default
+- **Temporary Files**: Secure deletion using DoD 5220.22-M standards
+- **Memory Protection**: Memory wiping of sensitive data after use
+- **Secure Memory Allocation**: Use of secure memory regions for sensitive data
+- **Anti-forensic Measures**: Protection against memory dumps and cold boot attacks
 
 ### Authentication and Authorization
 
-- **User Authentication**: Optional user authentication for sensitive operations
-- **Access Controls**: Granular access controls for different user roles
-- **Session Management**: Secure session handling with automatic timeout
-- **Audit Logging**: Comprehensive audit logging of all sensitive operations
+- **Multi-factor Authentication (MFA)**: Support for hardware security keys and TOTP
+- **Role-Based Access Control (RBAC)**: Fine-grained permission system
+- **Session Security**: Secure session tokens with configurable timeouts
+- **Audit Logging**: Tamper-evident logging of all security-relevant events
+- **Privilege Escalation Prevention**: Strict controls on privilege changes
+- **Password Policy**: Enforces strong password requirements
 
 ### Network Security
 
-- **Secure Communication**: All network communications use HTTPS/TLS
-- **Certificate Validation**: Proper certificate validation for all connections
-- **Data Integrity**: Verification of data integrity during transmission
-- **Update Security**: Secure update mechanism with signature verification
+- **TLS 1.3**: Latest protocol version for all network communications
+- **Certificate Pinning**: Protection against man-in-the-middle attacks
+- **Strict Transport Security**: Enforces secure connections
+- **Update Security**: Cryptographic verification of all updates
+- **Network Segmentation**: Isolation of sensitive network operations
+- **Firewall Integration**: Works with host-based firewalls
+
+## 🚀 Version 2.4.5 Security Improvements
+
+### Build and Deployment
+
+- **Reproducible Builds**: Ensures that the built artifacts match the source code
+- **SBOM Generation**: Software Bill of Materials for dependency tracking
+- **Code Signing**: All binaries are signed with a trusted certificate
+- **Dependency Pinning**: Exact version pinning for all dependencies
+- **Build Environment Hardening**: Minimal, containerized build environments
+
+### Runtime Security
+
+- **ASLR and DEP**: Address Space Layout Randomization and Data Execution Prevention
+- **Stack Canaries**: Protection against stack buffer overflows
+- **Sandboxing**: Application sandboxing where supported by the platform
+- **Privilege Dropping**: Runs with minimal required privileges
+- **Resource Limits**: Prevents resource exhaustion attacks
 
 ## 🛡️ Security Best Practices
 
@@ -95,11 +138,13 @@ We will acknowledge receipt of your report within **48 hours** and provide a det
 
 ### For Developers
 
-1. **Code Review**: All code changes undergo security review
-2. **Static Analysis**: Regular static code analysis for security vulnerabilities
-3. **Dependency Management**: Regular updates and security scanning of dependencies
-4. **Security Testing**: Regular security testing including penetration testing
-5. **Documentation**: Maintain up-to-date security documentation
+1. **Secure Development Lifecycle**: Security integrated throughout the development process
+2. **Code Review**: All changes require security review using automated and manual methods
+3. **Static and Dynamic Analysis**: Regular SAST and DAST scanning
+4. **Dependency Management**: Automated vulnerability scanning and updates
+5. **Threat Modeling**: Regular threat modeling sessions for new features
+6. **Security Testing**: Comprehensive security testing including fuzzing and penetration testing
+7. **Documentation**: Maintain up-to-date security documentation and runbooks
 
 ## 🔍 Threat Model
 
@@ -118,6 +163,24 @@ We will acknowledge receipt of your report within **48 hours** and provide a det
 3. **Code Signing**: Application binaries are signed to ensure integrity
 4. **Principle of Least Privilege**: Application runs with minimal required privileges
 5. **Input Validation**: All inputs are validated and sanitized
+
+## 🔍 Security Monitoring and Response
+
+### Logging and Monitoring
+
+- **Security Event Logging**: Comprehensive logging of security-relevant events
+- **Anomaly Detection**: Automated detection of suspicious activities
+- **Alerting**: Real-time alerts for security incidents
+- **Forensic Readiness**: Logs preserved for forensic analysis
+- **Compliance Reporting**: Automated generation of security compliance reports
+
+### Incident Response
+
+- **Incident Response Plan**: Documented procedures for security incidents
+- **Containment Strategies**: Pre-defined containment measures
+- **Forensic Analysis**: Tools and procedures for incident investigation
+- **Communication Plan**: Stakeholder notification procedures
+- **Post-Incident Review**: Analysis and improvement after incidents
 
 ## 📋 Security Checklist
 
@@ -163,14 +226,6 @@ We will acknowledge receipt of your report within **48 hours** and provide a det
 5. **Investigation**: Conduct thorough investigation to determine root cause
 6. **Prevention**: Implement measures to prevent recurrence
 
-### Contact Information
-
-For security incidents or emergencies:
-
-- **Email**: [Nsfr750](mailto:nsfr750@yandex.com)
-- **Discord**: [https://discord.gg/ryqNeuRYjD](https://discord.gg/ryqNeuRYjD)
-- **GitHub**: [https://github.com/Nsfr750/MSR605](https://github.com/Nsfr750/MSR605)
-
 ## 🔧 Security Configuration
 
 ### Recommended Settings
@@ -195,6 +250,23 @@ For security incidents or emergencies:
 - **Automatic Updates**: Enable automatic security updates when available
 - **Update Notifications**: Subscribe to security update notifications
 - **Update Testing**: Test updates in a non-production environment first
+
+## 🛠️ Security Tools and Integrations
+
+### Development Tools
+
+- **SAST Tools**: Integrated static analysis tools
+- **Dependency Scanners**: Automated vulnerability detection in dependencies
+- **Secrets Detection**: Prevents accidental commit of sensitive information
+- **Container Security**: Scanning of container images for vulnerabilities
+- **Infrastructure as Code**: Security scanning of infrastructure definitions
+
+### Compliance Standards
+
+- **OWASP Top 10**: Protection against common web vulnerabilities
+- **NIST Guidelines**: Alignment with NIST security recommendations
+- **GDPR Compliance**: Data protection and privacy controls
+- **PCI DSS**: Compliance with payment card industry standards
 
 ## 📚 Additional Resources
 

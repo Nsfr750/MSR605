@@ -17,6 +17,7 @@
   - [cURL Examples](#curl-examples)
 - [Webhooks](#webhooks)
 - [Troubleshooting](#troubleshooting)
+- [CI/CD Integration (v2.4.5+)](#ci-cd-integration-v245)
 
 ## Overview
 
@@ -501,6 +502,68 @@ Content-Type: application/json
   "secret": "your_webhook_secret"
 }
 ```
+
+## CI/CD Integration (v2.4.5+)
+
+### Overview
+The MSR605 project now includes a comprehensive CI/CD pipeline using GitHub Actions, enabling automated testing, building, and deployment.
+
+### Key Features
+- **Automated Testing**
+  - Runs on every push and pull request
+  - Tests across Python 3.8, 3.9, and 3.10
+  - Code coverage reporting via Codecov
+
+- **Automated Builds**
+  - Windows executable generation
+  - Version-based artifact naming
+  - Build artifact retention
+
+- **Release Management**
+  - Automatic release creation on version tags
+  - Release notes generation
+  - Pre-release support
+
+### Workflow Configuration
+The pipeline is configured in `.github/workflows/ci-cd.yml` and includes three main jobs:
+
+1. **Test Job**
+   - Runs unit and integration tests
+   - Generates code coverage reports
+   - Enforces code quality checks
+
+2. **Build Job**
+   - Creates Windows executables using PyInstaller
+   - Handles version information and assets
+   - Uploads build artifacts
+
+3. **Release Job**
+   - Triggers on version tags (v*.*.*)
+   - Creates GitHub releases
+   - Attaches build artifacts
+
+### Local Development
+To run the same checks locally:
+
+```bash
+# Run tests
+pytest tests/ --cov=msr605 --cov-report=xml
+
+# Build executable
+pyinstaller --onefile --name MSR605 --icon=assets/icon.ico main.py
+```
+
+### Monitoring
+- **Build Status**: [GitHub Actions](https://github.com/Nsfr750/MSR605/actions)
+- **Code Coverage**: [Codecov](https://codecov.io/gh/Nsfr750/MSR605)
+- **Releases**: [GitHub Releases](https://github.com/Nsfr750/MSR605/releases)
+
+### Best Practices
+1. Always create feature branches for new development
+2. Open pull requests for code review
+3. Ensure all tests pass before merging to main
+4. Use semantic versioning for releases
+5. Check build status before merging PRs
 
 ## Troubleshooting
 

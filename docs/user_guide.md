@@ -1,14 +1,37 @@
-# MSR605 Card Reader/Writer - User Guide
+# MSR605 Card Reader/Writer - User Guide (v2.4.5+)
 
 Welcome to the MSR605 Card Reader/Writer user guide! This document will help you get started with using the application to read from and write to magnetic stripe cards.
 
 ## Table of Contents
 
-1. [Installation](#installation)
-2. [Getting Started](#getting-started)
-3. [Reading Cards](#reading-cards)
-4. [Writing Cards](#writing-cards)
-5. [Configuration](#configuration)
+1. [What's New in v2.4.5](#whats-new-in-v245)
+2. [Installation](#installation)
+3. [Getting Started](#getting-started)
+4. [Reading Cards](#reading-cards)
+5. [Writing Cards](#writing-cards)
+6. [Card Format Support](#card-format-support)
+7. [Configuration](#configuration)
+8. [Troubleshooting](#troubleshooting)
+9. [Support](#support)
+
+## What's New in v2.4.5
+
+### Enhanced Stability and Performance
+- Improved device connection reliability
+- Faster card reading and writing operations
+- Reduced memory usage and optimized resource handling
+
+### New Features
+- Automatic update notifications
+- Enhanced error reporting with detailed logs
+- Improved logging system with rotation
+- Better handling of different card types and formats
+
+### CI/CD Integration
+- Automated testing for each release
+- More frequent and reliable updates
+- Improved issue tracking and resolution
+- Better dependency management
 
 ## Installation
 
@@ -16,8 +39,15 @@ Welcome to the MSR605 Card Reader/Writer user guide! This document will help you
 
 1. Download the latest installer from the [Releases](https://github.com/Nsfr750/MSR605/releases) page
 2. Run the installer and follow the on-screen instructions
-3. Connect your MSR605 device to an available USB port
-4. Launch the application from the Start Menu or desktop shortcut
+3. The installer will automatically:
+   - Install all required dependencies
+   - Set up device drivers (if needed)
+   - Create desktop and Start Menu shortcuts
+   - Configure file associations for project files
+4. Connect your MSR605 device to an available USB port
+5. Launch the application from the Start Menu or desktop shortcut
+
+> **Note**: On first launch, Windows may prompt for administrator privileges to install device drivers. This is normal and required for proper device communication.
 
 ### Linux/macOS
 
@@ -132,12 +162,39 @@ ISO 7813 is a subset of ISO 7811 specifically for financial transaction cards. K
 - **Start Minimized**: Launch the application minimized to system tray
 - **Save Logs**: Enable logging of operations to a file
 
+## Troubleshooting
+
+### Common Issues
+
+#### Device Not Detected
+1. Ensure the device is properly connected
+2. Check if the correct drivers are installed
+3. Try a different USB port
+4. Restart the application
+
+#### Card Read/Write Failures
+1. Verify the card is properly inserted
+2. Check if the card is write-protected
+3. Clean the card's magnetic stripe
+4. Try a different card if available
+
+### Logs and Diagnostics
+- Application logs are stored in `%APPDATA%\MSR605\logs` (Windows) or `~/.msr605/logs` (Linux/macOS)
+- Enable debug mode in Settings > Advanced for more detailed logging
+
 ## Support
 
 For additional help, please:
 
-- Check the [FAQ](FAQ.md)
+- Check the [FAQ](FAQ.md) for common questions
+- Review the [Troubleshooting Guide](TROUBLESHOOTING.md)
+- Search or open an issue on [GitHub Issues](https://github.com/Nsfr750/MSR605/issues)
 
-- Check the [Troubleshooting](TROUBLESHOOTING.md)
-
-- Search or open an issue on [GitHub](https://github.com/Nsfr750/MSR605/issues)
+## Version Information
+- **Current Version**: 2.4.5
+- **Release Date**: November 2025
+- **Minimum System Requirements**:
+  - Windows 10/11, macOS 10.15+, or Linux with Python 3.8+
+  - 2GB RAM (4GB recommended)
+  - 100MB free disk space
+  - USB 2.0+ port

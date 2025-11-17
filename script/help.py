@@ -18,8 +18,8 @@ class HelpDialog(QDialog):
         """
         super().__init__(parent)
         self.language_manager = language_manager
-        self.setWindowTitle(self.translate("dlg_help_title"))
-        self.setMinimumSize(600, 500)
+        self.setWindowTitle(f"{self.translate('dlg_help_title')} (v2.4.5)")
+        self.setMinimumSize(700, 600)  # Slightly larger to accommodate more content
 
         # Initialize UI
         self.setup_ui()
@@ -144,13 +144,22 @@ class HelpDialog(QDialog):
                 background-color: #252525;
             }
         </style>
-        <h2>MSR605 Card Reader - Help</h2>
+        <h2>MSR605 Card Reader - Help (v2.4.5)</h2>
+        
+        <h3>What's New in v2.4.5</h3>
+        <ul>
+            <li><b>CI/CD Integration</b>: Automated testing and deployment pipeline for more reliable updates</li>
+            <li><b>Enhanced Security</b>: Improved encryption and secure settings storage</li>
+            <li><b>Better Performance</b>: Optimized card reading and writing operations</li>
+            <li><b>Automatic Updates</b>: Get notified of new versions directly in the application</li>
+        </ul>
         
         <h3>Basic Usage:</h3>
         <ul>
             <li><b>Read Card</b>: Click the 'Read Card' button and swipe a card through the reader.</li>
             <li><b>Write Card</b>: Enter data in the track fields and click 'Write Card'.</li>
             <li><b>Clear Tracks</b>: Click 'Clear Tracks' to clear all track data.</li>
+            <li><b>Save Settings</b>: Connection settings are now saved automatically when changed.</li>
         </ul>
         
         <h3>Database Features:</h3>
@@ -158,15 +167,26 @@ class HelpDialog(QDialog):
             <li><b>View Database</b>: View all previously read cards in the database.</li>
             <li><b>Export to CSV</b>: Export the card database to a CSV file.</li>
             <li><b>Auto-save</b>: Enable auto-save to automatically save read cards to the database.</li>
+            <li><b>Search & Filter</b>: Quickly find specific cards in your database.</li>
         </ul>
         
-        <h3>Advanced:</h3>
+        <h3>Advanced Features:</h3>
         <ul>
-            <li><b>Coercivity</b>: Switch between high and low coercivity modes.</li>
+            <li><b>Coercivity Settings</b>: Switch between high and low coercivity modes.</li>
             <li><b>Auto-connect</b>: The application will automatically connect to the MSR605 reader on startup.</li>
+            <li><b>Custom Commands</b>: Send custom commands to the reader for advanced operations.</li>
+            <li><b>Logging</b>: Detailed logging for troubleshooting and debugging.</li>
         </ul>
         
-        <p>For more information, please refer to the documentation.</p>
+        <h3>Support & Resources</h3>
+        <ul>
+            <li><b>Documentation</b>: <a href='https://github.com/Nsfr750/MSR605/tree/main/docs'>Online Documentation</a></li>
+            <li><b>Report Issues</b>: <a href='https://github.com/Nsfr750/MSR605/issues'>GitHub Issues</a></li>
+            <li><b>Version</b>: 2.4.5 (November 2025)</li>
+            <li><b>System Requirements</b>: Windows 10/11, Linux, or macOS with Python 3.8+</li>
+        </ul>
+        
+        <p>For more detailed information, please refer to the full documentation.</p>
         """
 
     def translate(self, key, **kwargs):

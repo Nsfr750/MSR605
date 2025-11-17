@@ -1,4 +1,24 @@
-# Frequently Asked Questions (FAQ)
+# Frequently Asked Questions (FAQ) - v2.4.5+
+
+## Version 2.4.5 Updates
+
+### What's new in version 2.4.5?
+
+- **CI/CD Integration**: Automated testing and deployment pipeline
+- **Improved Stability**: Better error handling and recovery
+- **Enhanced Security**: Updated dependencies and security patches
+- **Better Performance**: Optimized card reading/writing operations
+- **Automatic Updates**: Notifications for new versions
+
+### How do I update to version 2.4.5?
+
+1. Download the latest version from the [Releases](https://github.com/Nsfr750/MSR605/releases) page
+2. Run the installer (it will automatically detect and update existing installations)
+3. Restart the application
+
+### Where can I find the changelog?
+
+The complete changelog is available in the [CHANGELOG.md](CHANGELOG.md) file.
 
 ## General Questions
 
@@ -22,10 +42,16 @@ You can download the latest release from our [GitHub Releases](https://github.co
 
 ### What are the system requirements?
 
-- Python 3.8 or higher
-- USB port for the card reader
-- 100MB free disk space
-- 2GB RAM minimum (4GB recommended)
+- **Operating System**:
+  - Windows 10/11 (64-bit)
+  - Linux (Ubuntu 20.04+ recommended)
+  - macOS 10.15+
+- **Python**: 3.8, 3.9, 3.10, or 3.12 (3.10+ recommended)
+- **Hardware**:
+  - USB 2.0+ port
+  - 2GB RAM minimum (4GB recommended)
+  - 200MB free disk space
+  - MSR605-compatible card reader/writer
 
 ### How do I install the required drivers?
 
@@ -94,6 +120,27 @@ The application supports standard magnetic stripe formats:
 3. Test with a different card
 4. Check if the write head needs cleaning
 
+## CI/CD and Updates
+
+### How does the CI/CD pipeline benefit me?
+
+- More frequent and reliable updates
+- Automated testing ensures higher quality releases
+- Faster bug fixes and security updates
+- Better tracking of changes and issues
+
+### How do I know when updates are available?
+
+The application will notify you in the status bar when a new version is available. You can also check manually in **Help** > **Check for Updates**.
+
+### How do I report an issue with the new version?
+
+Please include the following information when reporting issues:
+- Version number (2.4.5+)
+- Operating system and version
+- Steps to reproduce the issue
+- Any error messages from the log file
+
 ## Security
 
 ### Is my card data secure?
@@ -104,18 +151,35 @@ The application processes all data locally on your computer. No card data is tra
 
 Yes, the application supports encrypting card data before writing to the card. Enable this option in the settings.
 
-### What security features are available?
+### What security features are available in 2.4.5?
 
-- Data encryption
-- Password protection for saved files
-- Secure data wiping
-- Audit logging
+- **Enhanced Data Encryption**: Stronger encryption algorithms
+- **Secure Settings Storage**: Protected storage for connection settings
+- **Audit Logging**: Detailed operation logging
+- **Secure Data Wiping**: Multiple pass secure erase
+- **Dependency Updates**: All dependencies updated to their latest secure versions
+- **Automatic Security Patches**: Through the new update system
 
-## Development
+## Development and Contribution
+
+### How has the development process changed in 2.4.5?
+
+The project now uses GitHub Actions for continuous integration and deployment, which means:
+
+- Automated testing on multiple platforms
+- Automatic builds for each commit
+- Streamlined release process
+- Better code quality control
 
 ### How can I contribute to the project?
 
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for more information.
+We welcome contributions! Please see our updated [Contributing Guidelines](CONTRIBUTING.md) for information on:
+
+- Setting up a development environment
+- Submitting pull requests
+- Reporting issues
+- Code style and standards
+
 
 ### Is there an API available?
 
@@ -131,12 +195,22 @@ Please open an issue on our [GitHub Issues](https://github.com/Nsfr750/MSR605/is
 - Screenshots (if applicable)
 - System information
 
-## Support
+## Support and Troubleshooting
 
-### Where can I get help?
+### Where can I get help with version 2.4.5?
 
-- Check the [User Guide](user_guide.md) for detailed instructions
-- Search or post on our [GitHub Discussions](https://github.com/Nsfr750/MSR605/discussions)
+- Check the updated [User Guide](USER_GUIDE.md)
+- Review the [Troubleshooting Guide](TROUBLESHOOTING.md)
+- Search or post on [GitHub Discussions](https://github.com/Nsfr750/MSR605/discussions)
+- Check the [CI/CD Status](https://github.com/Nsfr750/MSR605/actions) for known issues
+
+### How do I enable debug logging?
+
+1. Go to **Settings** > **Advanced**
+2. Enable "Debug Mode"
+3. Restart the application
+4. Logs will be saved to the application data directory
+
 
 ## Legal
 
