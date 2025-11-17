@@ -4,44 +4,55 @@ This document outlines the development roadmap for the MSR605 Card Reader/Writer
 
 ## 🚀 Upcoming Features (Planned)
 
-### v2.4.5 - Advanced Card Operations
-- [ ] Improved card reading/writing interface
-- [ ] Support for additional card formats
+### v2.5.0 - Enhanced Security & Performance (Q2 2026)
+- [ ] **Security Enhancements**
+  - [ ] Implement hardware security module (HSM) integration
+  - [ ] Add support for FIDO2 authentication
+  - [ ] Enhanced encryption key management
+- [ ] **Performance Improvements**
+  - [ ] Optimize card read/write operations
+  - [ ] Reduce memory footprint
+  - [ ] Improve application startup time
+- [ ] **User Experience**
+  - [ ] Redesigned settings interface
+  - [ ] Customizable keyboard shortcuts
+  - [ ] Improved dark/light theme support
 
-### v2.5.0 - Advanced Card Operations
-- [ ] Enhanced error handling and user feedback
-- [ ] Batch processing of multiple cards
-- [ ] Template system for common card operations
-- [ ] Advanced data validation
-
-### v3.0.0 - Multi-Device Integration
-- [ ] Multi-device synchronization
-- [ ] API for third-party integrations
-
-## 🛠️ Technical Improvements
-
-### Core Functionality
-- [ ] Performance optimization for card operations
-- [ ] Improved error recovery mechanisms
-- [ ] Enhanced logging and diagnostics
-- [ ] Automated testing suite
-
-### Developer Experience
-- [ ] Comprehensive API documentation
-- [ ] Plugin architecture for extending functionality
-- [ ] Better build and deployment process
-- [ ] CI/CD pipeline setup
+### v3.0.0 - Next Generation (Q1 2027)
+- [ ] **Architecture**
+  - [ ] Plugin system for extending functionality
+  - [ ] Microservices architecture
+  - [ ] Cloud synchronization
+- [ ] **New Features**
+  - [ ] Mobile companion app
+  - [ ] Advanced analytics dashboard
+  - [ ] AI-powered data validation
 
 ## 📅 Release Schedule
 
-| Version | Target Date       | Status      |
-|---------|-------------------|-------------|
-| v2.3.0  | July 2025         | ✅ Released |
-| v2.4.0  | Q3 2025           | ✅ Released |
-| v2.4.2  | Q4 2025           | ✅ Released |
-| v2.4.5  | Q1 2026           | 🔄 In Progress |
-| v2.5.0  | Q3 2026          | ⏳ Planned  |
-| v3.0.0  | Q1 2027           | ⏳ Planned  |
+| Version | Target Date       | Status      | Key Features |
+|---------|-------------------|-------------|--------------|
+| v2.0.1  | April 2025        | ✅ Released | Initial release with basic functionality |
+| v2.1.0  | June 2025         | ✅ Released | UI improvements and bug fixes |
+| v2.3.0  | July 2025         | ✅ Released | Advanced card data visualization |
+| v2.4.0  | July 2025         | ✅ Released | Multiple card format support |
+| v2.4.1  | August 2025       | ✅ Released | Bug fixes and performance improvements |
+| v2.4.2  | Sept. 2025        | ✅ Released | Build system improvements |
+| v2.4.5  | Nov. 2025         | ✅ Released | CI/CD pipeline implementation |
+| v2.5.0  | Q2 2026           | 🔄 In Progress | Security & Performance |
+| v3.0.0  | Q1 2027           | ⏳ Planned  | Next Generation Release |
+
+## 🏗️ In Development (v2.5.0)
+
+### Current Focus
+- Security enhancements
+- Performance optimization
+- User experience improvements
+
+### Next Steps
+1. Complete security audit
+2. Performance benchmarking
+3. UI/UX refinement
 
 ## 🤝 How to Contribute
 

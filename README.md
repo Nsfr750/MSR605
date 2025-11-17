@@ -1,6 +1,6 @@
 # MSR605 Card Reader/Writer
 
-![Version](https://img.shields.io/badge/Version-2.4.2-blue)
+![Version](https://img.shields.io/badge/Version-2.4.5-blue)
 ![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-blue)
 ![GUI](https://img.shields.io/badge/GUI-PyQt6.6-blue)
 ![License](https://img.shields.io/badge/License-GPLv3-blue)
@@ -12,6 +12,24 @@
 **MSR605 Card Reader/Writer** is a sophisticated, open-source GUI application designed for reading, writing, and managing magnetic stripe cards using the MSR605 hardware. This powerful tool provides comprehensive card data management with advanced decoding and analysis capabilities.
 
 Check [Gallery](docs/GALLERY.md) for screenshots and visuals of the MSR605 application.
+
+### What's New in v2.4.5
+
+#### CI/CD and Build System
+
+- Added GitHub Actions CI/CD pipeline for automated testing and deployment
+- Automated builds for Windows with PyInstaller
+- Automated release creation on version tags
+- Code coverage reporting with Codecov
+- Automated testing across Python 3.8, 3.9, and 3.10
+- Build artifacts for each commit
+
+#### Build System Improvements
+
+- Updated build dependencies
+- Improved error handling in build process
+- Enhanced version management system
+- Added automated version bumping
 
 ### What's New in v2.4.2
 

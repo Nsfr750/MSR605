@@ -11,12 +11,22 @@ Description: This is an interface that allows manipulation of the MSR605 magneti
 import serial
 import time
 import sys
-from enum import Enum, auto
-from typing import List, Dict, Optional, Tuple, Union
-from dataclasses import dataclass
+import re
+import json
+from pathlib import Path
+from enum import Enum
+from typing import Dict, List, Optional, Tuple, Union, Any
 
-from . import cardReaderExceptions
+import asyncio
+import threading
+from concurrent.futures import ThreadPoolExecutor
+from typing import Dict, List, Optional, Tuple, Union, Any, Callable
+
 from .card_formats import CardFormat, CardFormatManager, TrackSpecification
+from .card_templates import TemplateManager, BatchProcessor, CardTemplate, TemplateType
+from .card_validation import CardValidator, DeviceSyncManager, ValidationLevel
+from .performance import LRUCache, measure_execution_time, memoize, CardOperationBatcher
+from .api import start_api_server
 from .isoStandardDictionary import iso_standard_track_check
 
 # These constants are from the MSR605 Programming Manual under 'Section 6 Command and Response'
@@ -57,15 +67,30 @@ HI_OR_LOW_CO = b"\x64"
 class CardReader:
     """Allows interfacing with the MSR605 using the serial module"""
 
-    def __init__(self, port=None, default_format=CardFormat.ISO_7811, baudrate=9600):
+    def __init__(
+        self,
+        port: str = "COM3",
+        baud_rate: int = 9600,
+        timeout: float = 1.0,
+        initial_format: CardFormat = CardFormat.ISO_7813,
+        template_dir: Optional[str] = None,
+        sync_enabled: bool = True,
+        validation_level: ValidationLevel = ValidationLevel.STRICT,
+        enable_api: bool = False,
+        api_host: str = "0.0.0.0",
+        api_port: int = 8000,
+        max_workers: int = 4,
+    ) -> None:
         """Initializes the CardReader instance.
 
         Args:
             port (str, optional): The COM port to connect to (e.g., 'COM5'). If None,
                                 the class will try to auto-detect the port.
-            default_format (CardFormat, optional): Default card format to use for operations.
-                                                Defaults to ISO_7811.
-            baudrate (int, optional): The baud rate for serial communication. Defaults to 9600.
+            baud_rate (int, optional): The baud rate for serial communication. Defaults to 9600.
+            timeout (float, optional): The timeout for serial communication. Defaults to 1.0.
+            initial_format (CardFormat, optional): Default card format to use for operations.
+                                                Defaults to ISO_7813.
+            template_dir (Optional[str], optional): Directory path for card templates. Defaults to None.
 
         Returns:
             Nothing
@@ -75,9 +100,33 @@ class CardReader:
         """
         self.__serialConn = None
         self.__port = port
-        self.__default_format = default_format
-        self.__current_format = default_format
-        self.__baudrate = baudrate
+        self.__default_format = initial_format
+        self.__current_format = initial_format
+        self.__last_written_tracks = ["", "", ""]  # For undo functionality
+        self.__validation_level = validation_level
+        
+        # Initialize managers
+        template_path = Path(template_dir) if template_dir else None
+        self.template_manager = TemplateManager(template_path)
+        self.batch_processor = BatchProcessor(self, self.template_manager)
+        self.validator = CardValidator()
+        
+        # Initialize sync if enabled
+        self.sync_manager = None
+        if sync_enabled:
+            self.sync_manager = DeviceSyncManager()
+            self.sync_manager.start()
+            self.sync_manager.register_callback(self._handle_sync_update)
+            
+        # Performance optimization
+        self._cache = LRUCache(max_size=1000, ttl=300)  # 5 minute TTL
+        self._executor = ThreadPoolExecutor(max_workers=max_workers)
+        self._operation_batcher = CardOperationBatcher(self)
+        
+        # API server
+        self._api_server = None
+        if enable_api:
+            self._start_api_server(api_host, api_port)
 
     def connect(self):
         """Connects to the MSR605 using the specified port or auto-detects it.
@@ -90,7 +139,7 @@ class CardReader:
         if self.__port:
             # Try to connect to the specified port
             try:
-                self.__serialConn = serial.Serial(self.__port, self.__baudrate)
+                self.__serialConn = serial.Serial(self.__port, 9600, timeout=1.0)
                 print(f"Connected to specified port: {self.__port}")
             except (serial.SerialException, OSError) as e:
                 raise cardReaderExceptions.MSR605ConnectError(
@@ -101,7 +150,7 @@ class CardReader:
             for x in range(1, 256):
                 port = f"COM{x}"
                 try:
-                    self.__serialConn = serial.Serial(port, self.__baudrate)
+                    self.__serialConn = serial.Serial(port, 9600, timeout=1.0)
                     print(f"Auto-connected to port: {port}")
                     self.__port = port
                     break
@@ -136,6 +185,108 @@ class CardReader:
             # Close the connection if initialization fails
             if self.__serialConn and self.__serialConn.is_open:
                 self.__serialConn.close()
+            raise
+
+    def _handle_sync_update(self, data: Dict) -> None:
+        """Handle sync updates from other devices.
+        
+        Args:
+            data: Dictionary containing sync data
+        """
+        try:
+            # Example: Update card format if needed
+            if 'card_format' in data:
+                try:
+                    self.set_card_format(CardFormat[data['card_format']])
+                    print(f"Synced card format to {data['card_format']}")
+                except (KeyError, ValueError):
+                    pass
+            
+            # Add more sync handling as needed
+            
+        except Exception as e:
+            print(f"Error handling sync update: {e}")
+    
+    def set_validation_level(self, level: ValidationLevel) -> None:
+        """Set the validation level for card data.
+        
+        Args:
+            level: Validation level to set
+        """
+        self.__validation_level = level
+    
+    def get_validation_level(self) -> ValidationLevel:
+        """Get the current validation level.
+        
+        Returns:
+            Current validation level
+        """
+        return self.__validation_level
+    
+    def validate_card_data(self, tracks: List[str], format: Optional[CardFormat] = None) -> Tuple[bool, Dict[int, List[str]]]:
+        """Validate card data against the current validation rules.
+        
+        Args:
+            tracks: List of track data (3 elements)
+            format: Optional format to validate against. If None, uses current format.
+            
+        Returns:
+            Tuple of (is_valid, error_dict) where error_dict maps track numbers to error messages
+        """
+        if format is None:
+            format = self.__current_format
+            
+        return self.validator.validate_card(tracks, format, self.__validation_level)
+    
+    def sync_data(self, data: Dict) -> None:
+        """Synchronize data with other devices.
+        
+        Args:
+            data: Dictionary containing data to sync
+        """
+        if self.sync_manager:
+            self.sync_manager.send_update(data)
+    
+    def _start_api_server(self, host: str, port: int) -> None:
+        """Start the API server in a separate thread."""
+        def run_server():
+            server = start_api_server(host=host, port=port)
+            server.run()
+            
+        self._api_thread = threading.Thread(target=run_server, daemon=True)
+        self._api_thread.start()
+        
+    def enable_api(self, host: str = "0.0.0.0", port: int = 8000) -> None:
+        """Enable the REST API server.
+        
+        Args:
+            host: Host to bind the API server to
+            port: Port to run the API server on
+        """
+        if not hasattr(self, '_api_thread') or not self._api_thread.is_alive():
+            self._start_api_server(host, port)
+    
+    def shutdown(self) -> None:
+        """Shut down the card reader and clean up resources."""
+        # Stop sync manager if running
+        if hasattr(self, 'sync_manager') and self.sync_manager:
+            self.sync_manager.stop()
+            
+        # Shutdown the operation batcher
+        if hasattr(self, '_operation_batcher'):
+            self._operation_batcher.shutdown()
+            
+        # Shutdown thread pool
+        if hasattr(self, '_executor'):
+            self._executor.shutdown(wait=True)
+            
+    def __del__(self):
+        """Clean up resources when the object is destroyed."""
+        self.shutdown()
+            
+        # Close serial connection
+        if hasattr(self, "_CardReader__serialConn") and self.__serialConn:
+            self.__serialConn.close()
             raise
 
     def set_leading_zero(self, track=1, enable=True):
@@ -330,7 +481,13 @@ class CardReader:
             self.__current_format, track_num, data
         )
 
-    def read_card(self, detect_format: bool = False) -> Dict[str, Union[str, Dict]]:
+    @measure_execution_time
+    def read_card(
+        self, 
+        detect_format: bool = False, 
+        validate: bool = True,
+        use_cache: bool = True
+    ) -> Dict[str, Union[str, Dict, bool, dict]]:
         """Read data from a magnetic stripe card.
 
         This command requests the MSR605 to read a swiped card and respond with
@@ -480,8 +637,6 @@ class CardReader:
             tracks[0] = self.read_until(ESCAPE, 1, True)
             print("TRACK 1: ", tracks[0])
 
-            # removes any ? and %, theses are part of the ISO standard and also have
-            # to be removed for writing to the card, the MSR605 adds the question marks automatically
             if len(tracks[0]) > 0:
                 if tracks[0][-1] == "?":
                     tracks[0] = tracks[0][:-1]
@@ -595,8 +750,48 @@ class CardReader:
 
         self._parse_track_data(result)
 
+        # Generate a cache key if caching is enabled
+        cache_key = None
+        if use_cache and any(tracks):
+            cache_key = f"read_card_{hash(tuple(tracks))}"
+            cached_result = self._cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+        
+        # Read the card data
+        result = {
+            "tracks": tracks,
+            "format": self.__current_format.name,
+            "valid": True,
+            "validation_errors": {},
+            "cached": False
+        }
+        
+        if detect_format:
+            detected_format = self._detect_card_format(tracks)
+            result["format"] = detected_format.name
+        else:
+            detected_format = self.__current_format
+            
+        # Validate the card data if requested
+        if validate and any(tracks):
+            is_valid, errors = self.validate_card_data(tracks, detected_format)
+            result["valid"] = is_valid
+            result["validation_errors"] = errors
+            
+            # If we have a sync manager, share the card format
+            if hasattr(self, 'sync_manager') and self.sync_manager and detect_format:
+                self.sync_data({"card_format": detected_format.name})
+        
+        # Cache the result if caching is enabled
+        if cache_key is not None and any(tracks):
+            self._cache.set(cache_key, result)
+
+        self._parse_track_data(result)
+
         return result
 
+    @memoize(max_size=1000, ttl=300)  # Cache results for 5 minutes
     def _detect_card_format(self, tracks: List[str]) -> CardFormat:
         """Attempt to detect the card format based on the track data.
 
@@ -665,13 +860,112 @@ class CardReader:
 
         return detected_format
 
+    def process_batch(self, operations: List[Dict], parallel: bool = True) -> List[Dict]:
+        """Process a batch of card operations.
+        
+        Args:
+            operations: List of operation dictionaries with 'type' and other parameters.
+                       Example operations:
+                       - Read operation: {'type': 'read', 'detect_format': True}
+                       - Write operation: {'type': 'write', 'tracks': ['%B123...', ';123...', ''], 'format': 'ISO_7813'}
+                       - Apply template: {'type': 'apply_template', 'template_name': 'my_template'}
+                       
+        Returns:
+            List of results for each operation.
+        """
+        return self.batch_processor.process_batch(operations)
+    
+    def save_template(self, name: str, description: str, template_type: str, 
+                     tracks: List[str], format: str, **metadata) -> bool:
+        """Save a card operation template.
+        
+        Args:
+            name: Name of the template
+            description: Description of the template
+            template_type: Type of template ('read', 'write', or 'batch')
+            tracks: List of track data (for write templates)
+            format: Card format as string (e.g., 'ISO_7813')
+            **metadata: Additional metadata for the template
+            
+        Returns:
+            True if template was saved successfully, False otherwise
+        """
+        try:
+            template = CardTemplate(
+                name=name,
+                description=description,
+                template_type=TemplateType[template_type.upper()],
+                tracks=tracks,
+                format=CardFormat[format],
+                metadata=metadata
+            )
+            self.template_manager.save_template(template)
+            return True
+        except Exception as e:
+            print(f"Error saving template: {e}")
+            return False
+    
+    def get_template(self, name: str) -> Optional[Dict]:
+        """Get a template by name.
+        
+        Args:
+            name: Name of the template to retrieve
+            
+        Returns:
+            Template dictionary if found, None otherwise
+        """
+        template = self.template_manager.get_template(name)
+        if template:
+            return template.to_dict()
+        return None
+    
+    def list_templates(self, template_type: Optional[str] = None) -> List[Dict]:
+        """List all available templates, optionally filtered by type.
+        
+        Args:
+            template_type: Optional filter for template type ('read', 'write', or 'batch')
+            
+        Returns:
+            List of template dictionaries
+        """
+        type_enum = TemplateType[template_type.upper()] if template_type else None
+        return [t.to_dict() for t in self.template_manager.list_templates(type_enum)]
+    
+    def delete_template(self, name: str) -> bool:
+        """Delete a template.
+        
+        Args:
+            name: Name of the template to delete
+            
+        Returns:
+            True if template was deleted, False otherwise
+        """
+        return self.template_manager.delete_template(name)
+    
+    def export_batch_results(self, output_file: str, format: str = 'json') -> bool:
+        """Export the results of the last batch operation.
+        
+        Args:
+            output_file: Path to the output file
+            format: Output format ('json' or 'csv')
+            
+        Returns:
+            True if export was successful, False otherwise
+        """
+        return self.batch_processor.export_results(output_file, format)
+    
+    @memoize(max_size=1000, ttl=300)  # Cache results for 5 minutes
     def _parse_track_data(self, result: Dict) -> None:
         """Parse the track data according to the current format.
 
         Args:
             result: The result dictionary from read_card()
+            
+        Returns:
+            The updated result dictionary with parsed data
         """
         parsed_data = {}
+        result['parsed_data'] = parsed_data
 
         for i, track in enumerate(result["tracks"]):
             track_num = i + 1
@@ -690,7 +984,8 @@ class CardReader:
 
         result["parsed"] = parsed_data
 
-    def write_card(self, tracks, status_byte_check=True, format_override=None):
+    @measure_execution_time
+    def write_card(self, tracks, status_byte_check=True, format_override=None, use_cache: bool = True):
         """Write data to a magnetic stripe card.
 
         This command requests the MSR605 to write the provided track data to a
@@ -774,11 +1069,29 @@ class CardReader:
                     f"Write failed with status: {status_code}", status_code
                 )
 
-        return {
+        # Generate a cache key if caching is enabled
+        cache_key = None
+        if use_cache and any(tracks):
+            cache_key = f"write_card_{hash(tuple(tracks))}"
+            cached_result = self._cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+                
+        # Store the tracks to be written for potential undo operation
+        self.__last_written_tracks = tracks["", "", ""]  # For undo functionality
+        
+        result = {
             "success": True,
-            "message": "Card written successfully",
+            "message": "Write command sent", 
             "format": write_format.name,
+            "cached": False
         }
+        
+        # Cache the result if caching is enabled
+        if cache_key is not None and any(tracks):
+            self._cache.set(cache_key, result)
+            
+        return result,
 
     def erase_card(self, trackSelect):
         """This command is used to erase the card data when card swipe.

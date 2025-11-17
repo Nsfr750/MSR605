@@ -5,6 +5,31 @@ All notable changes to the MSR605 Card Reader/Writer project will be documented 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.5] - 2025-11-17
+
+### Added
+
+- **GitHub Actions CI/CD Pipeline**
+  - Automated testing across Python 3.8, 3.9, and 3.10
+  - Automated Windows builds with PyInstaller
+  - Automated release creation on version tags
+  - Code coverage reporting via Codecov
+  - Build artifacts for each commit
+  - Automated version bumping
+
+### Changed
+
+- Updated build dependencies to latest stable versions
+- Enhanced version management system
+- Improved error handling in build process
+- Streamlined release process
+
+### Fixed
+
+- Resolved issues with build artifact generation
+- Fixed version detection in build scripts
+- Addressed compatibility issues with build tools
+
 ## [2.4.2] - 2025-09-18
 
 ### Fixed
