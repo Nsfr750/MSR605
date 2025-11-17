@@ -17,6 +17,9 @@ from pathlib import Path
 from enum import Enum
 from typing import Dict, List, Optional, Tuple, Union, Any
 
+# Import exceptions
+from . import cardReaderExceptions
+
 import asyncio
 import threading
 from concurrent.futures import ThreadPoolExecutor
@@ -1314,14 +1317,12 @@ class CardReader:
             # response/output from the MSR605
             if self.__serialConn.read() != ESCAPE:
                 raise cardReaderExceptions.CommunicationTestError(
-                    "COMMUNICATION ERROR, looking for " "ESCAPE(\x1b)",
-                    None,
+                    "COMMUNICATION ERROR, looking for ESCAPE(\x1b)"
                 )
 
             if self.__serialConn.read() != b"y":
                 raise cardReaderExceptions.CommunicationTestError(
-                    "COMMUNICATION ERROR, looking for " "y(\x79)",
-                    None,
+                    "COMMUNICATION ERROR, looking for y(\x79)"
                 )
 
             print("COMMUNICATION IS GOOD")
@@ -1357,24 +1358,48 @@ class CardReader:
             print("\nCHECK IF THE CARD SENSING CIRCUIT OF MSR605 IS WORKING")
             print("NOTE: A CARD NEEDS TO BE SWIPED FOR THIS TEST")
 
+            # Clear any existing input buffer
+            self.__serialConn.reset_input_buffer()
+            
             # command code for sensor test written to the MSR605
             self.__serialConn.write(ESCAPE + SENSOR_TEST)
             self.__serialConn.flush()
 
-            # response/output from the MSR605
-            if self.__serialConn.read() != ESCAPE:
+            # Add a small delay to allow the device to respond
+            time.sleep(0.1)
+            
+            # Read the response with a timeout
+            response = self.__serialConn.read(2)  # Read 2 bytes (ESC + status)
+            
+            if not response:
                 raise cardReaderExceptions.SensorTestError(
-                    "SENSOR TEST ERROR, looking for ESCAPE(\x1b)",
-                    None,
+                    "No response from device. Make sure a card is swiped through the reader."
+                )
+                
+            if len(response) < 2:
+                raise cardReaderExceptions.SensorTestError(
+                    f"Incomplete response from device. Expected 2 bytes, got {len(response)}: {response!r}"
+                )
+                
+            if response[0:1] != ESCAPE:
+                raise cardReaderExceptions.SensorTestError(
+                    f"Unexpected response start byte. Expected ESCAPE(\\x1b), got {response[0:1]!r}"
                 )
 
-            if self.__serialConn.read() != b"0":
-                raise cardReaderExceptions.SensorTestError(
-                    "SENSOR TEST ERROR, looking for 0(\x30)",
-                    None,
-                )
+            if response[1:2] != b"0":
+                error_code = response[1:2]
+                error_msg = f"Sensor test failed with status {error_code!r}."
+                if error_code == b"1":
+                    error_msg += " No card detected or read error."
+                elif error_code == b"2":
+                    error_msg += " Command format error."
+                elif error_code == b"4":
+                    error_msg += " Invalid command."
+                elif error_code == b"9":
+                    error_msg += " Invalid card swipe when in write mode."
+                raise cardReaderExceptions.SensorTestError(error_msg)
 
-            print("TESTS WERE SUCCESSFUL")
+            print("SENSOR TEST SUCCESSFUL")
 
         except cardReaderExceptions.MSR605ConnectError as e:
             raise cardReaderExceptions.SensorTestError(
@@ -1523,18 +1548,18 @@ class CardReader:
             self.read_until("0", 4, False)
 
             # after reading that weird response,i check if there is an ESCAPE character
-            if self.__serialConn.read() != ESCAPE:
+            response = self.__serialConn.read()
+            if response != ESCAPE:
                 raise cardReaderExceptions.SetCoercivityError(
-                    "SETTING THE DEVICE TO LOW-CO " "ERROR, looking for ESCAPE(\x1b)",
-                    "low",
+                    f"SETTING THE DEVICE TO LOW-CO ERROR, looking for ESCAPE(\x1b), got {response!r}",
+                    "low"
                 )
 
-        if self.__serialConn.read() != b"0":
+        response = self.__serialConn.read()
+        if response != b"0":
             raise cardReaderExceptions.SetCoercivityError(
-                "SETTING THE DEVICE TO LOW-CO ERROR, "
-                "looking for 0(\x30), Device might have "
-                "not been set to Low-Co",
-                "low",
+                f"SETTING THE DEVICE TO LOW-CO ERROR, looking for 0(\x30), got {response!r}, Device might not have been set to Low-Co",
+                "low"
             )
 
         print("SUCCESSFULLY SET THE MSR605 TO LOW-COERCIVITY")

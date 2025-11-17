@@ -1,7 +1,14 @@
 #!/usr/bin/env python3
 
 import sys
+import os
 import time
+
+# Add the project root directory to the Python path
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
 from script.cardReader import CardReader
 from script.cardReaderExceptions import (
     MSR605ConnectError,
@@ -14,26 +21,77 @@ from script.cardReaderExceptions import (
     GetCoercivityError
 )
 
+# Create an alias for the exceptions module for easier access
+import script.cardReaderExceptions as cardReaderExceptions
+import serial.tools.list_ports
+
+def list_serial_ports():
+    """Lists all available serial ports"""
+    ports = serial.tools.list_ports.comports()
+    if not ports:
+        print("No serial ports found!")
+        return []
+    print("\nAvailable COM ports:")
+    for i, port in enumerate(ports, 1):
+        print(f"{i}. {port.device} - {port.description}")
+    return [port.device for port in ports]
+
+# List available ports and let the user choose
+print("\nSCANNING FOR AVAILABLE PORTS...")
+ports = list_serial_ports()
+
+if not ports:
+    print("\nNo COM ports found. Please connect your MSR605 and try again.")
+    sys.exit(1)
+
+# If only one port, use it automatically
+if len(ports) == 1:
+    port = ports[0]
+    print(f"\nAutomatically connecting to {port}...")
+else:
+    # Let the user choose a port
+    while True:
+        try:
+            choice = input(f"\nEnter the number of the port to use (1-{len(ports)}), or 'q' to quit: ")
+            if choice.lower() == 'q':
+                print("Exiting...")
+                sys.exit(0)
+            choice = int(choice)
+            if 1 <= choice <= len(ports):
+                port = ports[choice - 1]
+                break
+            print(f"Please enter a number between 1 and {len(ports)}")
+        except ValueError:
+            print("Please enter a valid number")
+
 # INITIALIZE MSR605
 try:
-    print("INITIALIZING MSR605...")
-    msr = CardReader()
+    print(f"\nINITIALIZING MSR605 on {port}...")
+    msr = CardReader(port=port)
     print("MSR605 initialized successfully")
-except MSR605ConnectError as e:
-    print(f"Connection Error: {e}")
-    sys.exit()
-except CommunicationTestError as e:
-    print(f"Communication Test Error: {e}")
-    sys.exit()
-except Exception as e:
-    print(f"Unexpected error during initialization: {e}")
-    sys.exit()
-
-# Connect to the MSR605
-try:
+    
+    # Connect to the MSR605
     print("\nCONNECTING TO MSR605...")
     msr.connect()
     print("Successfully connected to MSR605")
+    
+except MSR605ConnectError as e:
+    print(f"\nConnection Error: {e}")
+    print("Please check the following:")
+    print("1. Is the MSR605 connected to your computer?")
+    print("2. Is the correct port selected?")
+    print("3. Is the MSR605 powered on?")
+    print("4. Is another program using the port?")
+    sys.exit(1)
+except CommunicationTestError as e:
+    print(f"\nCommunication Test Error: {e}")
+    print("The device might not be responding correctly.")
+    sys.exit(1)
+except Exception as e:
+    print(f"\nUnexpected error during initialization: {e}")
+    import traceback
+    traceback.print_exc()
+    sys.exit(1)
 except Exception as e:
     print(f"Error connecting to MSR605: {e}")
     sys.exit()
