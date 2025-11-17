@@ -15,8 +15,12 @@ from typing import Dict, List, Optional, Tuple
 class CardFormat(Enum):
     """Enumeration of supported card formats."""
 
-    ISO_7811 = auto()  # ISO 7811: Magnetic stripe cards
+    ISO_7811 = auto()  # ISO 7811: Magnetic stripe cards (basic)
     ISO_7813 = auto()  # ISO 7813: Financial transaction cards
+    AAMVA = auto()    # AAMVA: Driver's license/ID cards (North America)
+    IATA = auto()     # IATA: Airline industry standard
+    ABA = auto()      # ABA: American Bankers Association (track 2 format)
+    RAW = auto()      # RAW: Raw track data without format validation
 
 
 @dataclass
@@ -99,6 +103,98 @@ class CardFormatManager:
             max_length=107,
             allowed_chars="0123456789",
             lrc_required=True,
+        ),
+        # AAMVA Format (Driver's License/ID Cards)
+        (CardFormat.AAMVA, 1): TrackSpecification(
+            name="Track 1 (AAMVA)",
+            format_name="AAMVA",
+            start_sentinel="%",
+            end_sentinel="?",
+            field_separator="^",
+            max_length=80,
+            allowed_chars=(
+                "ABCDEFGHIJKLMNOPQRSTUVWXYZ "  # Uppercase letters and space
+                "0123456789"  # Numbers
+                "!\"#&'()*+,-./:;<=>?@[\\]^_"  # Special chars
+            ),
+            lrc_required=False,
+        ),
+        (CardFormat.AAMVA, 2): TrackSpecification(
+            name="Track 2 (AAMVA)",
+            format_name="AAMVA",
+            start_sentinel=";",
+            end_sentinel="?",
+            field_separator="=",
+            max_length=40,
+            allowed_chars="0123456789:;<=>?",
+            lrc_required=False,
+        ),
+        # IATA Format (Airline Industry)
+        (CardFormat.IATA, 1): TrackSpecification(
+            name="Track 1 (IATA)",
+            format_name="IATA",
+            start_sentinel="%",
+            end_sentinel="?",
+            field_separator="^",
+            max_length=81,
+            allowed_chars=(
+                "ABCDEFGHIJKLMNOPQRSTUVWXYZ "  # Uppercase letters and space
+                "0123456789"  # Numbers
+                "!\"#&'()*+,-./:;<=>?@[\\]^_"  # Special chars
+            ),
+            lrc_required=True,
+        ),
+        (CardFormat.IATA, 2): TrackSpecification(
+            name="Track 2 (IATA)",
+            format_name="IATA",
+            start_sentinel=";",
+            end_sentinel="?",
+            field_separator="=",
+            max_length=40,
+            allowed_chars="0123456789:;<=>?",
+            lrc_required=True,
+        ),
+        # ABA Format (Bank Cards - Track 2 only)
+        (CardFormat.ABA, 2): TrackSpecification(
+            name="Track 2 (ABA)",
+            format_name="ABA",
+            start_sentinel=";",
+            end_sentinel="?",
+            field_separator="=",
+            max_length=37,
+            allowed_chars="0123456789:;<=>?",
+            lrc_required=True,
+        ),
+        # RAW Format (No validation)
+        (CardFormat.RAW, 1): TrackSpecification(
+            name="Track 1 (RAW)",
+            format_name="RAW",
+            start_sentinel="",
+            end_sentinel="",
+            field_separator="",
+            max_length=200,  # Very generous maximum
+            allowed_chars="",  # No character validation
+            lrc_required=False,
+        ),
+        (CardFormat.RAW, 2): TrackSpecification(
+            name="Track 2 (RAW)",
+            format_name="RAW",
+            start_sentinel="",
+            end_sentinel="",
+            field_separator="",
+            max_length=100,  # Very generous maximum
+            allowed_chars="",  # No character validation
+            lrc_required=False,
+        ),
+        (CardFormat.RAW, 3): TrackSpecification(
+            name="Track 3 (RAW)",
+            format_name="RAW",
+            start_sentinel="",
+            end_sentinel="",
+            field_separator="",
+            max_length=200,  # Very generous maximum
+            allowed_chars="",  # No character validation
+            lrc_required=False,
         ),
     }
 

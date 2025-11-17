@@ -600,17 +600,18 @@ class CardReader:
     def _detect_card_format(self, tracks: List[str]) -> CardFormat:
         """Attempt to detect the card format based on the track data.
 
-        This is a simple heuristic that checks the track data against the expected
-        formats and returns the most likely match.
+        This method checks the track data against all supported formats and
+        returns the most specific format that matches the data.
 
         Args:
             tracks: List of track data (3 elements)
 
         Returns:
-            The detected CardFormat (ISO_7811 or ISO_7813)
+            The detected CardFormat (e.g., ISO_7813, AAMVA, IATA, etc.)
         """
         # Default to the current format
         detected_format = self.__current_format
+        format_scores = {fmt: 0 for fmt in CardFormat}
 
         # Check each track that has data
         for i, track in enumerate(tracks):
@@ -619,20 +620,48 @@ class CardReader:
 
             track_num = i + 1
 
-            # Try ISO 7813 first (more restrictive)
-            is_valid_7813, _ = CardFormatManager.validate_track_data(
-                CardFormat.ISO_7813, track_num, track
-            )
+            # Test against all supported formats
+            for fmt in CardFormat:
+                try:
+                    is_valid, _ = CardFormatManager.validate_track_data(
+                        fmt, track_num, track
+                    )
+                    if is_valid:
+                        format_scores[fmt] += 1
+                except ValueError:
+                    # Skip formats that don't support this track number
+                    continue
 
-            if is_valid_7813:
-                detected_format = CardFormat.ISO_7813
-            else:
-                # If any track doesn't match ISO 7813, fall back to ISO 7811
-                is_valid_7811, _ = CardFormatManager.validate_track_data(
-                    CardFormat.ISO_7811, track_num, track
-                )
-                if is_valid_7811:
-                    detected_format = CardFormat.ISO_7811
+        # Find the format with the highest score
+        if any(score > 0 for score in format_scores.values()):
+            # Get format with maximum score, with RAW as fallback
+            max_score = max(format_scores.values())
+            if max_score > 0:
+                # Prefer specific formats over RAW
+                candidate_formats = [
+                    fmt for fmt, score in format_scores.items()
+                    if score == max_score and fmt != CardFormat.RAW
+                ]
+                if candidate_formats:
+                    # If multiple formats have the same score, prefer more specific ones
+                    if len(candidate_formats) > 1:
+                        # Order of preference for formats with same score
+                        preference_order = [
+                            CardFormat.ISO_7813,
+                            CardFormat.ISO_7811,
+                            CardFormat.AAMVA,
+                            CardFormat.IATA,
+                            CardFormat.ABA,
+                            CardFormat.RAW
+                        ]
+                        for fmt in preference_order:
+                            if fmt in candidate_formats:
+                                detected_format = fmt
+                                break
+                    else:
+                        detected_format = candidate_formats[0]
+                else:
+                    detected_format = CardFormat.RAW
 
         return detected_format
 

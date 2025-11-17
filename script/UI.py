@@ -52,8 +52,11 @@ from PyQt6.QtWidgets import (
     QInputDialog,
     QPlainTextEdit,
     QTextBrowser,
+    QProgressDialog, 
+    QGraphicsOpacityEffect, 
+    QStyle,
 )
-from PyQt6.QtCore import Qt, QTimer, QByteArray, QSettings, QThread, pyqtSignal, QObject
+from PyQt6.QtCore import Qt, QTimer, QPropertyAnimation, QEasingCurve, QByteArray, QSettings, QThread, pyqtSignal, QObject
 
 # Import custom components
 from .app_menu import AppMenuBar
@@ -133,6 +136,14 @@ class GUI(QMainWindow):
                 f"Failed to initialize application: {str(e)}\n\nCheck the logs for more details.",
             )
             sys.exit(1)
+
+            # Add undo button
+            self.undo_button = QPushButton("Undo")
+            self.undo_button.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_ArrowUndo))
+            self.undo_button.setStyleSheet(button_style)
+            self.undo_button.setEnabled(False)  # Disabled by default
+            self.undo_button.clicked.connect(self.undo_last_write)
+            write_layout.addWidget(self.undo_button)
 
     def auto_connect(self):
         """Attempt to automatically connect to the MSR605 device on startup."""
@@ -831,39 +842,124 @@ class GUI(QMainWindow):
             QMessageBox.critical(self, "Error", f"Failed to set coercivity: {str(e)}")
 
     def read_card(self):
-        """Read data from a magnetic stripe card."""
+        """Read data from a magnetic stripe card with enhanced feedback."""
         if not self.__connected or self.__msr is None:
             QMessageBox.warning(
                 self, "Not Connected", "Please connect to the MSR605 first"
             )
             return
 
-        self.status_label.setText("Reading card...")
-        QApplication.processEvents()  # Update the UI
+        # Create and show progress dialog
+        progress = QProgressDialog("Reading card...", "Cancel", 0, 0, self)
+        progress.setWindowTitle("Reading Card")
+        progress.setWindowModality(Qt.WindowModality.WindowModal)
+        progress.setMinimumDuration(0)
+        progress.setCancelButton(None)  # Don't allow canceling
+        progress.setValue(0)
+        QApplication.processEvents()
+
+        # Store original cursor and set wait cursor
+        original_cursor = self.cursor()
+        self.setCursor(Qt.CursorShape.WaitCursor)
 
         try:
-            # Read the card
-            card_data = self.__msr.read_card()
-            tracks = card_data['tracks']
+            # Flash LED to indicate ready to read
+            self.__msr._CardReader__serialConn.write(ESCAPE + GREEN_LED_ON)
 
-            # Update the track displays
-            for i in range(3):
-                if i < len(tracks) and tracks[i]:
-                    self.track_displays[i].setPlainText(tracks[i])
-                    self.__tracks[i] = tracks[i]
-                else:
-                    self.track_displays[i].clear()
-                    self.__tracks[i] = ""
+            # Read the card with timeout
+            try:
+                progress.setLabelText("Reading card...")
+                QApplication.processEvents()
+                card_data = self.__msr.read_card()
+                tracks = card_data['tracks']
 
-            # Auto-save to database if enabled
-            if self.__auto_save_database and any(self.__tracks):
-                self.save_to_database()
+                # Update the track displays with animation
+                for i in range(3):
+                    progress.setLabelText(f"Processing track {i+1}...")
+                    QApplication.processEvents()
+                    
+                    if i < len(tracks) and tracks[i]:
+                        # Animate the text appearance
+                        self.animate_text(self.track_displays[i], tracks[i])
+                        self.__tracks[i] = tracks[i]
+                    else:
+                        self.track_displays[i].clear()
+                        self.__tracks[i] = ""
 
-            self.status_label.setText("Card read successfully!")
+                # Auto-save to database if enabled
+                if self.__auto_save_database and any(self.__tracks):
+                    progress.setLabelText("Saving to database...")
+                    QApplication.processEvents()
+                    self.save_to_database()
+
+                # Visual feedback for successful read
+                self.status_label.setText("✓ Card read successfully!")
+                self.status_label.setStyleSheet("color: green;")
+                QTimer.singleShot(3000, lambda: self.status_label.setStyleSheet(""))
+
+            except Exception as e:
+                # Handle errors during card reading
+                QMessageBox.critical(self, "Read Error", f"Error reading card: {str(e)}")
+                self.status_label.setText("✗ Error reading card")
+                self.status_label.setStyleSheet("color: red;")
+                return
+            
+            # Flash green LED to indicate success
+            self.__msr._CardReader__serialConn.write(ESCAPE + GREEN_LED_ON)
+            QTimer.singleShot(500, lambda: self.__msr._CardReader__serialConn.write(ESCAPE + ALL_LED_OFF))
+    
+        except Exception as e:
+            # Handle read errors
+            self.status_label.setText("✗ Read failed")
+            self.status_label.setStyleSheet("color: red;")
+            error_msg = str(e)
+            if "timeout" in error_msg.lower():
+                error_details = "• The read operation timed out\n• Please try swiping the card again"
+            else:
+                error_details = f"• Error: {error_msg}\n• Please ensure the card is properly swiped\n• Check the card orientation\n• Try swiping again"
+        
+            QMessageBox.critical(
+                self, 
+                "Read Error", 
+                f"Failed to read card:\n\n{error_details}"
+            )
+    
+            # Flash red LED to indicate error
+            self.__msr._CardReader__serialConn.write(ESCAPE + RED_LED_ON)
+            QTimer.singleShot(1000, lambda: self.__msr._CardReader__serialConn.write(ESCAPE + ALL_LED_OFF))
+            return
 
         except Exception as e:
-            self.status_label.setText("Error reading card")
-            QMessageBox.critical(self, "Read Error", f"Failed to read card: {str(e)}")
+            # Handle critical errors
+            self.status_label.setText("✗ Critical error")
+            self.status_label.setStyleSheet("color: red;")
+            QMessageBox.critical(
+                self, 
+                "Error", 
+                f"An unexpected error occurred:\n\n{str(e)}\n\nPlease check the connection and try again."
+            )
+
+        finally:
+            # Clean up
+            progress.close()
+            self.setCursor(original_cursor)
+            QTimer.singleShot(3000, lambda: self.status_label.setStyleSheet(""))
+            
+    def animate_text(self, text_edit, text):
+        """Animate text appearance in a QTextEdit."""
+        text_edit.clear()
+        text_edit.setPlainText("")
+        
+        # Show cursor and ensure it's visible
+        text_edit.setReadOnly(False)
+        text_edit.setFocus()
+    
+        # Type the text character by character
+        for i in range(len(text) + 1):
+            QTimer.singleShot(10 * i, lambda t=text[:i]: text_edit.setPlainText(t))
+    
+        # Make it read-only after animation
+        QTimer.singleShot(10 * (len(text) + 10), lambda: text_edit.setReadOnly(True))
 
     def open_advanced_functions(self):
         """Open the advanced functions dialog."""
@@ -894,7 +990,7 @@ class GUI(QMainWindow):
             )
 
     def write_card(self):
-        """Write data to a magnetic stripe card."""
+        """Write data to a magnetic stripe card with enhanced feedback and validation."""
         if not self.__connected or self.__msr is None:
             QMessageBox.warning(
                 self, "Not Connected", "Please connect to the MSR605 first"
@@ -902,43 +998,167 @@ class GUI(QMainWindow):
             return
 
         # Get track data from input fields
-        tracks = [text_edit.toPlainText() for text_edit in self.track_inputs]
+        tracks = [text_edit.toPlainText().strip() for text_edit in self.track_inputs]
 
+        # Validate track data
         if not any(tracks):
             QMessageBox.warning(
                 self, "No Data", "Please enter data for at least one track"
             )
             return
 
-        self.write_status_label.setText("Writing to card...")
-        QApplication.processEvents()  # Update the UI
+        # Create and show progress dialog
+        progress = QProgressDialog("Preparing to write card...", "Cancel", 0, 100, self)
+        progress.setWindowTitle("Writing to Card")
+        progress.setWindowModality(Qt.WindowModality.WindowModal)
+        progress.setMinimumDuration(0)
+        progress.setCancelButton(None)  # Don't allow canceling
+        progress.setValue(10)
+        QApplication.processEvents()
+
+        # Store original cursor and set wait cursor
+        original_cursor = self.cursor()
+        self.setCursor(Qt.CursorShape.WaitCursor)
 
         try:
-            # Write to the card
-            self.__msr.write_card(tracks)
+            # Validate track data format
+            progress.setLabelText("Validating track data...")
+            progress.setValue(20)
+            QApplication.processEvents()
+    
+            for i, track in enumerate(tracks):
+                if not track:
+                    continue
+            
+                track_num = i + 1
+                is_valid, error_msg = self.__msr.validate_track_data(track_num, track)
+                if not is_valid:
+                    raise ValueError(f"Invalid data for Track {track_num}: {error_msg}")
 
-            # Update the track displays to show what was written
+            # Flash LED to indicate ready to write
+            self.__msr._CardReader__serialConn.write(ESCAPE + YELLOW_LED_ON)
+            progress.setLabelText("Ready to write. Please swipe card when light turns green...")
+            progress.setValue(30)
+    
+            # Wait a moment for the user to see the message
+            QTimer.singleShot(1000, lambda: self.__msr._CardReader__serialConn.write(ESCAPE + GREEN_LED_ON))
+    
+            # Store current track data for undo
+            self.__last_written_tracks = self.__tracks.copy()
+    
+            # Perform the write operation
+            progress.setLabelText("Writing to card...")
+            progress.setValue(50)
+            QApplication.processEvents()
+        
+            self.__msr.write_card(tracks)
+    
+            # Update the track displays with animation
             for i in range(3):
                 if i < len(tracks) and tracks[i]:
-                    self.track_displays[i].setPlainText(tracks[i])
+                    self.animate_text(self.track_displays[i], tracks[i])
                     self.__tracks[i] = tracks[i]
-
-            self.write_status_label.setText("Card written successfully!")
-
+    
+            # Visual feedback for successful write
+            self.write_status_label.setText("✓ Card written successfully!")
+            self.write_status_label.setStyleSheet("color: green;")
+    
+            # Flash green LED to indicate success
+            self.__msr._CardReader__serialConn.write(ESCAPE + GREEN_LED_ON)
+            QTimer.singleShot(500, lambda: self.__msr._CardReader__serialConn.write(ESCAPE + ALL_LED_OFF))
+    
+            # Enable undo button
+            if hasattr(self, 'undo_button'):
+                self.undo_button.setEnabled(True)
+    
+            # Show success message
+            progress.setLabelText("✓ Write successful!")
+            progress.setValue(100)
+            QTimer.singleShot(1000, progress.close)
+            
         except Exception as e:
-            self.write_status_label.setText("Error writing to card")
+            self.write_status_label.setText("✗ Write failed")
+            self.write_status_label.setStyleSheet("color: red;")
+        
+            # Flash red LED to indicate error
+            if hasattr(self, '_CardReader__serialConn'):
+                self.__msr._CardReader__serialConn.write(ESCAPE + RED_LED_ON)
+                QTimer.singleShot(1000, lambda: self.__msr._CardReader__serialConn.write(ESCAPE + ALL_LED_OFF))
+        
             QMessageBox.critical(
-                self, "Write Error", f"Failed to write to card: {str(e)}"
+                self, 
+                "Write Error", 
+                f"Failed to write to card:\n\n{str(e)}\n\n"
+                "• Check the data format for each track\n"
+                "• Ensure the card is properly inserted\n"
+                "• Try again with a different card"
             )
+        finally:
+            self.setCursor(original_cursor)
+            QTimer.singleShot(3000, lambda: self.write_status_label.setStyleSheet(""))
+
+    def undo_last_write(self):
+        """Undo the last write operation if possible."""
+        if not hasattr(self, '__last_written_tracks') or not any(self.__last_written_tracks):
+            QMessageBox.information(self, "Nothing to Undo", "No previous write operation to undo.")
+            return
+        
+        reply = QMessageBox.question(
+            self,
+            "Undo Last Write",
+            "This will restore the previous track data. Continue?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No
+        )
+    
+        if reply == QMessageBox.StandardButton.Yes:
+            # Restore the previous tracks
+            for i, track in enumerate(self.__last_written_tracks):
+                if track:
+                    self.track_inputs[i].setPlainText(track)
+                    self.track_displays[i].setPlainText(track)
+                    self.__tracks[i] = track
+        
+            self.write_status_label.setText("✓ Previous track data restored")
+            self.write_status_label.setStyleSheet("color: green;")
+            QTimer.singleShot(3000, lambda: (self.write_status_label.setStyleSheet(""), 
+                                       setattr(self.write_status_label, 'setText', 'Ready')))
+        
+            # Disable undo button after use
+            if hasattr(self, 'undo_button'):
+                self.undo_button.setEnabled(False)            
 
     def clear_tracks(self):
-        """Clear all track input fields."""
-        for text_edit in self.track_inputs:
-            text_edit.clear()
-
-        for text_edit in self.track_displays:
-            text_edit.clear()
-
+        """Clear all track input fields with confirmation."""
+        if any(track.strip() for track in self.__tracks):
+            reply = QMessageBox.question(
+                self,
+                "Clear Tracks",
+                "Are you sure you want to clear all track data?\nThis cannot be undone.",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.No
+            )
+        
+        if reply == QMessageBox.StandardButton.No:
+            return
+    
+        # Animate clearing the fields
+        for i, (input_edit, display_edit) in enumerate(zip(self.track_inputs, self.track_displays)):
+            # Animate clearing with a fade effect
+            effect = QGraphicsOpacityEffect()
+            input_edit.setGraphicsEffect(effect)
+            display_edit.setGraphicsEffect(effect)
+        
+            animation = QPropertyAnimation(effect, b"opacity")
+            animation.setDuration(300)
+            animation.setStartValue(1.0)
+            animation.setEndValue(0.0)
+            animation.finished.connect(lambda i=i, e=effect: (self.track_inputs[i].clear(), 
+                                                       self.track_displays[i].clear(),
+                                                       self.track_inputs[i].setGraphicsEffect(None),
+                                                       self.track_displays[i].setGraphicsEffect(None)))
+            animation.start(QPropertyAnimation.DeletionPolicy.DeleteWhenStopped)
+    
         self.__tracks = ["", "", ""]
         self.write_status_label.setText("Tracks cleared")
 
