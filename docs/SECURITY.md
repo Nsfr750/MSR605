@@ -318,9 +318,10 @@ We will acknowledge receipt of your report within **48 hours** and provide a det
 
 ---
 
-**Last Updated**: September 18, 2025  
-**Version**: 2.4.2  
+**Last Updated**: December 4, 2025  
+**Version**: 2.4.5  
 **Maintainer**: Nsfr750  
 **Contact**: [Nsfr750](mailto:nsfr750@yandex.com)
+**Secutiry Report**: [Security](mailto:info@tuxxle.org)
 
 For questions or concerns about this security policy, please contact us using the information provided above.
