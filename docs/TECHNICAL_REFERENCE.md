@@ -199,8 +199,6 @@ classDiagram
 - CPU Usage: Low to Moderate
 - Disk Space: <500MB
 
-### Error Handling
-
 #### Error Categories
 
 - Hardware Errors
