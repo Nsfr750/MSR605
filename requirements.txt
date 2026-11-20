@@ -44,5 +44,8 @@ PyQt6-Qt6>=6.7.0,<6.8.0  # Qt6 runtime (ensure compatibility with matplotlib)
 setuptools>=70.0.0,<71.0.0  # Package building
 twine>=5.0.0,<6.0.0  # Package publishing
 wheel>=0.43.0,<0.44.0  # Built-package format
+nuitka>=4.3.0,<5.0.0  # Python to C++ compilation (INST/build_nuitka.py)
+ordered-set>=4.1.0,<5.0.0  # Required by Nuitka
+zstandard>=0.22.0,<1.0.0  # Required by Nuitka for onefile compression
 
 # Note: types-PyQt6 is not available on PyPI, using type comments for now
