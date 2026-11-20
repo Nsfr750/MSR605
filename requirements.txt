@@ -4,6 +4,7 @@
 # Core Dependencies
 pyserial>=3.5,<4.0  # For MSR605 communication
 cryptography>=45.0.0,<46.0.0  # For encryption/decryption (AES, DES, 3DES)
+pycryptodome>=3.21.0,<4.0  # Crypto.Cipher: DES/3DES/AES for PIN block and track decryption
 wand>=0.6.13,<0.7.0  # For image processing (Pillow alternative)
 pywin32>=306,<308; sys_platform == 'win32'  # For Windows-specific functionality
 qrcode>=7.4.0,<8.0.0  # For QR code generation

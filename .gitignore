@@ -125,3 +125,6 @@ clean_pycache.py
 clear_cache.py
 .windsurf/rules
 INST/
+COMPILER/build.conf
+/COMPILER
+/.build_venv
