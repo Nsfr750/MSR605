@@ -1,16 +1,18 @@
-# Frequently Asked Questions (FAQ) - v2.4.5+
+# Frequently Asked Questions (FAQ) - v2.5.0+
 
-## Version 2.4.5 Updates
+## Version 2.5.0 Updates
 
-### What's new in version 2.4.5?
+### What's new in version 2.5.0?
 
-- **CI/CD Integration**: Automated testing and deployment pipeline
-- **Improved Stability**: Better error handling and recovery
-- **Enhanced Security**: Updated dependencies and security patches
-- **Better Performance**: Optimized card reading/writing operations
-- **Automatic Updates**: Notifications for new versions
+- **PIN Block Decoding**: decode encrypted PIN blocks (ISO-0/1/3, VISA-1/3/4,
+  ECI-4) with DES/3DES keys in the new "PIN Decode" tab
+- **PIN Block display on read**: encrypted PIN blocks found in Track 2
+  discretionary data are shown after a card read
+- **Serial reliability fixes**: card reads now wait properly for the card
+  swipe; stale serial data no longer corrupts operations
+- **Configurable timeout**: serial timeout can be set in Connection Settings
 
-### How do I update to version 2.4.5?
+### How do I update to version 2.5.0?
 
 1. Download the latest version from the [Releases](https://github.com/Nsfr750/MSR605/releases) page
 2. Run the installer (it will automatically detect and update existing installations)
@@ -136,7 +138,7 @@ The application will notify you in the status bar when a new version is availabl
 ### How do I report an issue with the new version?
 
 Please include the following information when reporting issues:
-- Version number (2.4.5+)
+- Version number (2.5.0+)
 - Operating system and version
 - Steps to reproduce the issue
 - Any error messages from the log file
@@ -151,7 +153,7 @@ The application processes all data locally on your computer. No card data is tra
 
 Yes, the application supports encrypting card data before writing to the card. Enable this option in the settings.
 
-### What security features are available in 2.4.5?
+### What security features are available in 2.5.0?
 
 - **Enhanced Data Encryption**: Stronger encryption algorithms
 - **Secure Settings Storage**: Protected storage for connection settings
@@ -162,7 +164,7 @@ Yes, the application supports encrypting card data before writing to the card. E
 
 ## Development and Contribution
 
-### How has the development process changed in 2.4.5?
+### How has the development process changed in 2.5.0?
 
 The project now uses GitHub Actions for continuous integration and deployment, which means:
 
@@ -197,7 +199,7 @@ Please open an issue on our [GitHub Issues](https://github.com/Nsfr750/MSR605/is
 
 ## Support and Troubleshooting
 
-### Where can I get help with version 2.4.5?
+### Where can I get help with version 2.5.0?
 
 - Check the updated [User Guide](USER_GUIDE.md)
 - Review the [Troubleshooting Guide](TROUBLESHOOTING.md)

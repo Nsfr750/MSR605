@@ -26,7 +26,7 @@ Thank you for your interest in contributing to the MSR605 Card Reader/Writer pro
 
 By participating in this project, you agree to abide by our [Code of Conduct](CODE_OF_CONDUCT.md). Please read it before making any contributions.
 
-## 🚀 How to Contribute (v2.4.5+)
+## 🚀 How to Contribute (v2.5.0+)
 
 ### CI/CD Integration
 

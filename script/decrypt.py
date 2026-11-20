@@ -277,6 +277,42 @@ class DecryptionResult:
         return data_lines
 
 
+def extract_pin_block_from_track2(track2: str) -> Optional[str]:
+    """Extract an encrypted PIN block candidate from Track 2 data.
+
+    Some issuers store the encrypted PIN block in the Track 2
+    discretionary data field. The block is expected to be the last
+    16 hexadecimal characters of the discretionary field, i.e. the
+    portion of the track that follows the '=' separator after the
+    4-digit expiration and 3-digit service code.
+
+    Args:
+        track2: Track 2 data, with or without the ';' start sentinel
+                and '?' end sentinel
+
+    Returns:
+        The 16-hex-digit PIN block as an uppercase string, or None if
+        no candidate is present in the track data
+    """
+    if not track2:
+        return None
+
+    data = track2.strip().lstrip(";").rstrip("?")
+    if "=" not in data:
+        return None
+
+    # Everything after '=' is: expiry (4) + service code (3) + discretionary
+    fields = data.split("=", 1)[1]
+    discretionary = fields[7:] if len(fields) > 7 else ""
+    if len(discretionary) < 16:
+        return None
+
+    candidate = discretionary[-16:].upper()
+    if all(c in "0123456789ABCDEF" for c in candidate):
+        return candidate
+    return None
+
+
 class CardDataDecryptor:
     """
     Advanced card data decryptor supporting multiple encryption standards.

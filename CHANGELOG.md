@@ -19,6 +19,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Automatic PAN extraction from track data
   - Single DES, 3DES double-length and triple-length key support
   - Automatic PAN field enable/disable based on selected format
+- **Encrypted PIN Block extraction from Track 2**: after a card read, the
+  application extracts a 16-hex-digit PIN block candidate from the Track 2
+  discretionary data field (when present) and displays it in the Read tab;
+  the PIN Decode tab is auto-filled with the extracted block
+- **`diag_read.py`**: raw serial diagnostic script that dumps every byte
+  received after a READ command, for hardware/protocol troubleshooting
+- **Configurable serial timeout**: the Connection Settings timeout is now
+  honoured; dedicated swipe timeout (minimum 10 s) for read/write/erase
+  operations while the device waits for a physical card swipe
+- `pycryptodome` added to `requirements.txt` (required by `decrypt.py`)
 
 ### Fixed
 
@@ -26,6 +36,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed duplicate method definitions in `decrypt.py` that corrupted cipher and PAN preparation logic
 - Fixed PIN extraction reading bytes instead of nibbles, which produced incorrect PINs
 - Fixed invalid type annotations referencing non-existent pycryptodome cipher types
+- **Serial read reliability**: multiple issues that prevented card reads
+  - 1-second serial timeout was too short for a physical card swipe;
+    the device answers a read/write/erase command only after a swipe
+  - Stale response bytes in the RX buffer desynchronized the protocol;
+    the input buffer is now flushed before every command
+  - The read retry loop re-sent the READ command and flushed the buffer,
+    discarding valid responses from late swipes; the command is now sent
+    once and the reader stays armed until a swipe or timeout
+  - Track 3 "ESC +" empty-track marker was parsed as literal data
+- Fixed `NameError` on card read/write caused by missing LED command
+  constant imports (`ESCAPE`, `GREEN_LED_ON`, `RED_LED_ON`, etc.) in `UI.py`
+- Fixed `CardReader` ignoring its `timeout` constructor parameter
+- Fixed write validation rejecting tracks read back from a card:
+  `write_card` now normalizes start/end sentinels per format, and the
+  impossible host-side LRC check was removed (the device computes LRC)
+- Fixed RAW format track validation rejecting all data
+- Fixed `TypeError` in `write_card` when storing tracks for undo
+- Fixed `Object of type CardReader is not JSON serializable` error after
+  card reads, caused by `@memoize` serializing `self` into the cache key
+- Build: `COMPILER/build.conf` now targets the MSR605 application
+  (icon, version info, data dirs, Crypto hidden imports)
+- Build: `COMPILER/build_exe.sh` tolerates PyInstaller PE timestamp/checksum
+  post-processing failures caused by antivirus/filesystem locks on the
+  generated executable
 
 ## [2.4.5] - 2025-11-17
 

@@ -41,6 +41,14 @@
 - CRUD operations
 - Query management
 
+#### Decryption Module (`decrypt.py`)
+
+- PIN block decryption (DES/3DES) for ISO 9564-0/1/3, VISA-1/3/4 and
+  ECI-4 formats
+- Track data decryption helpers
+- `extract_pin_block_from_track2()` — extracts a 16-hex-digit encrypted
+  PIN block candidate from Track 2 discretionary data
+
 ## Communication Protocols
 
 ### Serial Communication
@@ -50,6 +58,17 @@
 - Stop Bits: 1
 - Parity: None
 - Flow Control: None
+
+### Command/Response Notes
+
+- Read (`ESC r`), write (`ESC w` + datablock) and erase (`ESC l`)
+  commands arm the device; it answers **only after a physical card
+  swipe**, so the application uses a dedicated swipe timeout
+  (minimum 10 s) for the first response byte — independent of the
+  configured command timeout
+- The RX buffer is flushed before every command to avoid stale response
+  bytes desynchronizing the protocol
+- Empty Track 3 responses use the `ESC +` end-of-data marker
 
 ## Card Format Implementation
 

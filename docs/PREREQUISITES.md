@@ -16,6 +16,10 @@ Install the required Python packages by running:
 pip install -r requirements.txt
 ```
 
+Key dependencies include PyQt6, pyserial, pycryptodome (PIN block and
+track decryption), cryptography, FastAPI/uvicorn (optional API server),
+qrcode and Wand (image handling).
+
 ## Hardware Requirements (if applicable)
 
 - MSR605 Magnetic Stripe Card Reader/Encoder

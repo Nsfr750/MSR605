@@ -17,7 +17,7 @@
   - [cURL Examples](#curl-examples)
 - [Webhooks](#webhooks)
 - [Troubleshooting](#troubleshooting)
-- [CI/CD Integration (v2.4.5+)](#ci-cd-integration-v245)
+- [CI/CD Integration (v2.5.0+)](#ci-cd-integration-v245)
 
 ## Overview
 
@@ -503,7 +503,7 @@ Content-Type: application/json
 }
 ```
 
-## CI/CD Integration (v2.4.5+)
+## CI/CD Integration (v2.5.0+)
 
 ### Overview
 The MSR605 project now includes a comprehensive CI/CD pipeline using GitHub Actions, enabling automated testing, building, and deployment.

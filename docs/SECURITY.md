@@ -1,10 +1,10 @@
-# Security Policy - v2.4.5+
+# Security Policy - v2.5.0+
 
 ## 🛡️ Security
 
-This document outlines the security practices, policies, and guidelines for the MSR605 Card Reader/Writer project (v2.4.5+). We take security seriously and are committed to maintaining a secure application for handling sensitive card data.
+This document outlines the security practices, policies, and guidelines for the MSR605 Card Reader/Writer project (v2.5.0+). We take security seriously and are committed to maintaining a secure application for handling sensitive card data.
 
-### **Version 2.4.5 Security Highlights**
+### **Version 2.5.0 Security Highlights**
 
 - Enhanced CI/CD security scanning and validation
 - Updated cryptographic libraries and dependencies
@@ -62,7 +62,7 @@ We will acknowledge receipt of your report within **48 hours** and provide a det
 - We will fix the vulnerability and release a patch as soon as possible
 - We will publicly disclose the vulnerability after it has been fixed
 
-## 🔐 Security Features (v2.4.5+)
+## 🔐 Security Features (v2.5.0+)
 
 ### CI/CD Security
 
@@ -108,7 +108,7 @@ We will acknowledge receipt of your report within **48 hours** and provide a det
 - **Network Segmentation**: Isolation of sensitive network operations
 - **Firewall Integration**: Works with host-based firewalls
 
-## 🚀 Version 2.4.5 Security Improvements
+## 🚀 Version 2.5.0 Security Improvements
 
 ### Build and Deployment
 
@@ -320,7 +320,7 @@ We will acknowledge receipt of your report within **48 hours** and provide a det
 
 **Last Updated**: December 4, 2025  
 
-**Version**: 2.4.5  
+**Version**: 2.5.0  
 
 **Maintainer**: Nsfr750  
 

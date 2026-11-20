@@ -1,4 +1,4 @@
-# Installation Guide for MSR605 Card Reader/Writer (v2.4.5+)
+# Installation Guide for MSR605 Card Reader/Writer (v2.5.0+)
 
 ## Prerequisites
 
@@ -97,7 +97,7 @@ python -m PyInstaller --onefile --name MSR605 --icon=assets/icon.ico main.py
 ./dist/MSR605
 ```
 
-## CI/CD Integration (v2.4.5+)
+## CI/CD Integration (v2.5.0+)
 
 The project includes a GitHub Actions workflow for automated testing and deployment:
 
@@ -107,7 +107,7 @@ The project includes a GitHub Actions workflow for automated testing and deploym
 - Runs tests across multiple Python versions
 
 ### Release Process
-1. Create a version tag (e.g., `v2.4.5`)
+1. Create a version tag (e.g., `v2.5.0`)
 2. Push the tag to trigger the release workflow
 3. GitHub Actions will:
    - Run all tests

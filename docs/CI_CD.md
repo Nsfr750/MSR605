@@ -1,4 +1,4 @@
-# CI/CD Pipeline Documentation (v2.4.5+)
+# CI/CD Pipeline Documentation (v2.5.0+)
 
 ## Table of Contents
 
@@ -28,7 +28,7 @@ The main workflow file is located at `.github/workflows/ci-cd.yml` and includes 
 
 - **Test Job**: Runs on all pushes and pull requests to `main` and `develop` branches
 - **Build Job**: Runs after successful test completion on `main` and `develop` branches
-- **Release Job**: Triggers when a new version tag is pushed (e.g., `v2.4.5`)
+- **Release Job**: Triggers when a new version tag is pushed (e.g., `v2.5.0`)
 
 ## Build Process
 
@@ -87,8 +87,8 @@ The main workflow file is located at `.github/workflows/ci-cd.yml` and includes 
 3. Create and push a version tag:
 
    ```bash
-   git tag -a v2.4.5 -m "Version 2.4.5"
-   git push origin v2.4.5
+   git tag -a v2.5.0 -m "Version 2.5.0"
+   git push origin v2.5.0
    ```
 
 4. The CI/CD pipeline will automatically:

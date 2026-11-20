@@ -4,16 +4,20 @@ This document outlines the development roadmap for the MSR605 Card Reader/Writer
 
 ## 🚀 Upcoming Features (Planned)
 
-### v2.5.0 - Enhanced Security & Performance (Q2 2026)
-- [ ] **Security Enhancements**
+### v2.5.0 - PIN Block Decoding & Serial Reliability (Nov 2026) ✅ Released
+- [x] **PIN Block Decoding**
+  - [x] ISO 9564 formats 0/1/3, VISA-1/3/4, ECI-4 support
+  - [x] DES/3DES key support with automatic PAN extraction
+  - [x] PIN block extraction from Track 2 discretionary data
+- [x] **Serial Communication Reliability**
+  - [x] Dedicated swipe timeout for card operations
+  - [x] Input buffer flushing before commands
+  - [x] Configurable serial timeout in Connection Settings
+- [ ] **Security Enhancements** (moved to v3.0.0)
   - [ ] Implement hardware security module (HSM) integration
   - [ ] Add support for FIDO2 authentication
   - [ ] Enhanced encryption key management
-- [ ] **Performance Improvements**
-  - [ ] Optimize card read/write operations
-  - [ ] Reduce memory footprint
-  - [ ] Improve application startup time
-- [ ] **User Experience**
+- [ ] **User Experience** (moved to v3.0.0)
   - [ ] Redesigned settings interface
   - [ ] Customizable keyboard shortcuts
   - [ ] Improved dark/light theme support
@@ -39,10 +43,10 @@ This document outlines the development roadmap for the MSR605 Card Reader/Writer
 | v2.4.1  | August 2025       | ✅ Released | Bug fixes and performance improvements |
 | v2.4.2  | Sept. 2025        | ✅ Released | Build system improvements |
 | v2.4.5  | Nov. 2025         | ✅ Released | CI/CD pipeline implementation |
-| v2.5.0  | Q2 2026           | 🔄 In Progress | Security & Performance |
+| v2.5.0  | Nov. 2026         | ✅ Released | PIN block decoding, serial reliability |
 | v3.0.0  | Q1 2027           | ⏳ Planned  | Next Generation Release |
 
-## 🏗️ In Development (v2.5.0)
+## 🏗️ In Development (v3.0.0)
 
 ### Current Focus
 - Security enhancements

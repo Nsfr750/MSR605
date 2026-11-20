@@ -60,6 +60,7 @@ class AdvancedFunctionsWidget(QWidget):
         self.decryption_result = None
 
         self._setup_ui()
+        self._autofill_pin_block_from_tracks()
 
     def _setup_ui(self):
         """Set up the user interface."""
@@ -412,6 +413,8 @@ class AdvancedFunctionsWidget(QWidget):
         """
         self.tracks = tracks or ["", "", ""]
 
+        self._autofill_pin_block_from_tracks()
+
         # Update visualization tab if available
         if hasattr(self, "visualization_widget"):
             self.visualization_widget.update_visualizations(self.tracks)
@@ -489,6 +492,25 @@ class AdvancedFunctionsWidget(QWidget):
         # Add raw data
         result.append(f"\nRaw Data: {track_data}")
         return "\n".join(result)
+
+    def set_encrypted_pin_block(self, pin_block_hex: str) -> None:
+        """Fill the encrypted PIN block field, e.g. after a card read.
+
+        Args:
+            pin_block_hex: The 16-hex-digit encrypted PIN block
+        """
+        self.pin_block_entry.setText(pin_block_hex)
+
+    def _autofill_pin_block_from_tracks(self):
+        """Auto-fill the PIN block field from Track 2 discretionary data."""
+        try:
+            from .decrypt import extract_pin_block_from_track2
+
+            pin_block = extract_pin_block_from_track2(self.tracks[1])
+            if pin_block:
+                self.set_encrypted_pin_block(pin_block)
+        except Exception as e:
+            logger.warning(f"Could not auto-fill PIN block: {e}")
 
     def fill_pan_from_tracks(self):
         """Fill the PAN field using the card number decoded from track data."""

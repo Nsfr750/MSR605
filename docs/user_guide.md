@@ -1,10 +1,10 @@
-# MSR605 Card Reader/Writer - User Guide (v2.4.5+)
+# MSR605 Card Reader/Writer - User Guide (v2.5.0+)
 
 Welcome to the MSR605 Card Reader/Writer user guide! This document will help you get started with using the application to read from and write to magnetic stripe cards.
 
 ## Table of Contents
 
-1. [What's New in v2.4.5](#whats-new-in-v245)
+1. [What's New in v2.5.0](#whats-new-in-v250)
 2. [Installation](#installation)
 3. [Getting Started](#getting-started)
 4. [Reading Cards](#reading-cards)
@@ -14,24 +14,31 @@ Welcome to the MSR605 Card Reader/Writer user guide! This document will help you
 8. [Troubleshooting](#troubleshooting)
 9. [Support](#support)
 
-## What's New in v2.4.5
+## What's New in v2.5.0
 
-### Enhanced Stability and Performance
-- Improved device connection reliability
-- Faster card reading and writing operations
-- Reduced memory usage and optimized resource handling
+### PIN Block Decoding
+- New "PIN Decode" tab in Advanced Functions: decode encrypted PIN
+  blocks with DES/3DES keys and the card PAN
+- Supported formats: ISO 9564-0 (ISO-0 / VISA-1), ISO 9564-1 (ISO-1 /
+  ECI-4), ISO 9564-3 (ISO-3), VISA-3 and VISA-4
+- Automatic PAN extraction from the loaded track data
+- After a card read, an encrypted PIN block found in Track 2
+  discretionary data is shown in the Read tab and auto-fills the PIN
+  Decode tab
 
-### New Features
-- Automatic update notifications
-- Enhanced error reporting with detailed logs
-- Improved logging system with rotation
-- Better handling of different card types and formats
+### Serial Communication Reliability
+- Fixed card reads timing out before the swipe: the device answers
+  read/write/erase commands only after a physical card swipe, so a
+  dedicated swipe timeout (10s+) is now used
+- Stale response bytes in the serial buffer are flushed before every
+  command (they previously desynchronized the protocol)
+- Configurable serial timeout from the Connection Settings tab
 
-### CI/CD Integration
-- Automated testing for each release
-- More frequent and reliable updates
-- Improved issue tracking and resolution
-- Better dependency management
+### Bug Fixes
+- Fixed crash on card read caused by missing LED command constants
+- Track data read back from a card can now be written directly
+  (sentinels are normalized automatically)
+- Empty Track 3 is parsed correctly
 
 ## Installation
 
@@ -191,7 +198,7 @@ For additional help, please:
 - Search or open an issue on [GitHub Issues](https://github.com/Nsfr750/MSR605/issues)
 
 ## Version Information
-- **Current Version**: 2.4.5
+- **Current Version**: 2.5.0
 - **Release Date**: November 2025
 - **Minimum System Requirements**:
   - Windows 10/11, macOS 10.15+, or Linux with Python 3.8+

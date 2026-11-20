@@ -24,6 +24,29 @@ Check [Gallery](docs/GALLERY.md) for screenshots and visuals of the MSR605 appli
 - Automatic PAN extraction from track data
 - Single DES, 3DES double-length and triple-length key support
 
+#### Encrypted PIN Block Display
+
+- After a card read, the encrypted PIN block is extracted from Track 2
+  discretionary data (when present) and shown in the Read tab
+- The PIN Decode tab is auto-filled with the extracted block
+
+#### Serial Communication Reliability
+
+- Fixed card reads failing silently: the device answers read/write/erase
+  commands only after a physical swipe — a dedicated swipe timeout (10s+)
+  now applies
+- Stale response bytes in the RX buffer are flushed before every command
+- Single READ command per read attempt (no destructive retries)
+- Configurable serial timeout from Connection Settings
+- New `diag_read.py` diagnostic script for raw serial troubleshooting
+
+#### Bug Fixes
+
+- `NameError` on card read/write (missing LED constants import)
+- Write validation now accepts tracks read back from cards
+- Track 3 empty-track marker correctly parsed
+- JSON serialization error after card reads
+
 ### What's New in v2.4.5
 
 #### CI/CD and Build System

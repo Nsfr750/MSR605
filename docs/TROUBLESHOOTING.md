@@ -73,10 +73,37 @@ This guide provides solutions to common issues you might encounter while using t
 ### Card swipe not detected
 
 **Solution:**
-1. Ensure the card is swiped in the correct direction (magnetic stripe down, stripe facing the device)
-2. Try different swipe speeds (not too fast, not too slow)
-3. Clean the card's magnetic stripe with a soft, dry cloth
-4. Check if the card is demagnetized by trying a different card
+1. Swipe **while the read/write dialog is open** — the device (LED on) only
+   answers after a physical swipe; swiping before clicking Read does nothing
+2. Ensure the card is swiped in the correct direction (magnetic stripe down, stripe facing the device)
+3. Try different swipe speeds (not too fast, not too slow)
+4. Clean the card's magnetic stripe with a soft, dry cloth
+5. Check if the card is demagnetized by trying a different card
+
+### "No card swipe detected" / `Expected ESCAPE, got b''`
+
+The reader is armed (LED on) but the application received no data.
+
+**Cause:** the device stays armed and answers the READ command only after
+a card is physically swiped. An empty response means no swipe was
+detected during the wait window.
+
+**Solution:**
+1. Click **Read**, then swipe the card immediately — do not swipe before
+   the dialog appears
+2. Increase the serial timeout in *Connection Settings* (10 s recommended)
+3. If reads were previously interrupted, reconnect (Connect) to clear the
+   device state — the application flushes stale serial data automatically
+4. Run the diagnostic script to verify the device responds at all:
+
+   ```bash
+   python diag_read.py COM3
+   # swipe a card within the 30-second window; any bytes received are printed
+   ```
+
+5. If the diagnostic also receives nothing, the issue is hardware:
+   wrong swipe direction, dead magnetic stripe, or a sensing circuit
+   problem (run the device *sensor test*)
 
 ### Write operation fails
 

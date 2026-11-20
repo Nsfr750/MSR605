@@ -3,6 +3,7 @@
 ## 📁 Root Directory
 
 - [main.py](cci:7://file:///x:/GitHub/MSR605/main.py:0:0-0:0) - Main application entry point
+- [diag_read.py](cci:7://file:///x:/GitHub/MSR605/diag_read.py:0:0-0:0) - Raw serial diagnostic script for card read troubleshooting
 - [README.md](cci:7://file:///x:/GitHub/MSR605/README.md:0:0-0:0) - Project overview and documentation
 - [CHANGELOG.md](cci:7://file:///x:/GitHub/MSR605/CHANGELOG.md:0:0-0:0) - Version history and changes
 - [LICENSE](cci:7://file:///x:/GitHub/MSR605/LICENSE:0:0-0:0) - GPLv3 License
@@ -48,6 +49,8 @@
 - Core application code
 - [UI.py](cci:7://file:///x:/GitHub/MSR605/script/UI.py:0:0-0:0) - Main user interface
 - [cardReader.py](cci:7://file:///x:/GitHub/MSR605/script/cardReader.py:0:0-0:0) - Card reading/writing logic
+- [decrypt.py](cci:7://file:///x:/GitHub/MSR605/script/decrypt.py:0:0-0:0) - PIN block and track data decryption
+- [advanced_functions.py](cci:7://file:///x:/GitHub/MSR605/script/advanced_functions.py:0:0-0:0) - Advanced functions (decode, PIN decode, decrypt, visualization)
 - [logger.py](cci:7://file:///x:/GitHub/MSR605/script/logger.py:0:0-0:0) - Logging functionality
 - [language_manager.py](cci:7://file:///x:/GitHub/MSR605/script/language_manager.py:0:0-0:0) - Internationalization
 - [updates.py](cci:7://file:///x:/GitHub/MSR605/script/updates.py:0:0-0:0) - Auto-update functionality

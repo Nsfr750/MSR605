@@ -895,6 +895,13 @@ class GUI(QMainWindow):
                         self.track_displays[i].clear()
                         self.__tracks[i] = ""
 
+                # Extract the encrypted PIN block from Track 2
+                # discretionary data, if present
+                from script.decrypt import extract_pin_block_from_track2
+
+                pin_block = extract_pin_block_from_track2(self.__tracks[1])
+                self.pin_block_display.setText(pin_block or "")
+
                 # Auto-save to database if enabled
                 if self.__auto_save_database and any(self.__tracks):
                     progress.setLabelText("Saving to database...")
@@ -1351,6 +1358,15 @@ class GUI(QMainWindow):
             group_layout.addWidget(text_edit)
             group.setLayout(group_layout)
             tracks_layout.addWidget(group)
+
+        # Encrypted PIN block extracted from Track 2 discretionary data
+        pin_row = QHBoxLayout()
+        pin_row.addWidget(QLabel("Encrypted PIN Block (hex):"))
+        self.pin_block_display = QLineEdit()
+        self.pin_block_display.setReadOnly(True)
+        self.pin_block_display.setPlaceholderText("Not found in Track 2")
+        pin_row.addWidget(self.pin_block_display)
+        tracks_layout.addLayout(pin_row)
 
         tracks_group.setLayout(tracks_layout)
         layout.addWidget(tracks_group)
