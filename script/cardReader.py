@@ -1036,6 +1036,25 @@ class CardReader:
             format_override if format_override is not None else self.__current_format
         )
 
+        # Normalize sentinels so tracks read back or entered without them
+        # can be written directly. The LRC is computed by the device itself.
+        normalized_tracks = []
+        for i, track in enumerate(tracks):
+            if not track:
+                normalized_tracks.append("")
+                continue
+            try:
+                spec = CardFormatManager.get_track_spec(write_format, i + 1)
+            except ValueError:
+                normalized_tracks.append(track)
+                continue
+            if spec.start_sentinel and not track.startswith(spec.start_sentinel):
+                track = spec.start_sentinel + track
+            if spec.end_sentinel and not track.endswith(spec.end_sentinel):
+                track = track + spec.end_sentinel
+            normalized_tracks.append(track)
+        tracks = normalized_tracks
+
         # Validate track data against the selected format
         for i, track in enumerate(tracks):
             if not track:

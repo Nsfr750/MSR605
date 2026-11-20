@@ -154,7 +154,7 @@ TRANSLATIONS = {
         "operating_system": "Operating System",
         "error_loading_system_info": "Error loading system information",
         "about_description": "This application is developed and maintained by a single developer.\nYour support helps keep the project alive and allows for new features and improvements.",
-        "copyright": " 2025 Nsfr750",
+        "copyright": "© 2024-2026 Nsfr750",
         "license": "Licensed under the GPLv3 License",
         # Sponsor dialog
         "support_title": "Support MSR605",
@@ -367,7 +367,7 @@ TRANSLATIONS = {
         "operating_system": "Sistema Operativo",
         "error_loading_system_info": "Errore nel caricamento delle informazioni di sistema",
         "about_description": "Questa applicazione è sviluppata e mantenuta da un singolo sviluppatore.\nIl tuo supporto aiuta a mantenere in vita il progetto e permette di aggiungere nuove funzionalità e miglioramenti.",
-        "copyright": " 2025 Nsfr750",
+        "copyright": "© 2024-2026 Nsfr750",
         "license": "Licenza GPLv3",
         # Sponsor dialog
         "support_title": "Supporta MSR605",

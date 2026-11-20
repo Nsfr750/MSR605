@@ -240,28 +240,18 @@ class CardFormatManager:
         if not data.startswith(spec.start_sentinel):
             return False, f"Track {track_num} must start with '{spec.start_sentinel}'"
 
-        # Check end sentinel and LRC if required
-        if spec.lrc_required:
-            if not data.endswith(spec.end_sentinel):
-                return False, f"Track {track_num} must end with '{spec.end_sentinel}'"
+        # Check end sentinel. The LRC is computed by the device itself when
+        # writing and is stripped on reads, so host-side data never contains
+        # it and cannot be checked here.
+        if spec.end_sentinel and not data.endswith(spec.end_sentinel):
+            return False, f"Track {track_num} must end with '{spec.end_sentinel}'"
 
-            # Extract data without sentinels for LRC check
-            data_without_sentinels = data[1:-1]
-
-            # Simple LRC check (XOR of all characters)
-            lrc = 0
-            for c in data_without_sentinels:
-                lrc ^= ord(c)
-
-            # The last character before the end sentinel should be the LRC
-            expected_lrc = data[-2:-1]
-            if expected_lrc and ord(expected_lrc) != lrc:
-                return False, f"Track {track_num} LRC check failed"
-
-        # Check allowed characters
-        for c in data[1:-1]:  # Skip sentinels for character validation
-            if c not in spec.allowed_chars:
-                return False, f"Track {track_num} contains invalid character: '{c}'"
+        # Check allowed characters. An empty allowed_chars means no
+        # character validation (e.g. RAW format).
+        if spec.allowed_chars:
+            for c in data[1:-1]:  # Skip sentinels for character validation
+                if c not in spec.allowed_chars:
+                    return False, f"Track {track_num} contains invalid character: '{c}'"
 
         return True, ""
 

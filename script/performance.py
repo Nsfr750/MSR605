@@ -103,18 +103,18 @@ def cache_result(max_size: int = 1000, ttl: Optional[float] = None) -> Callable[
         def wrapper(*args, **kwargs):
             # Create a cache key from function name and arguments
             key_parts = [func.__name__] + list(args) + [f"{k}={v}" for k, v in sorted(kwargs.items())]
-            key = hashlib.md5(json.dumps(key_parts, sort_keys=True).encode()).hexdigest()
-            
+            key = hashlib.md5(json.dumps(key_parts, sort_keys=True, default=repr).encode()).hexdigest()
+
             # Try to get from cache
             result = cache.get(key)
             if result is not None:
                 return result
-                
+
             # Call the function and cache the result
             result = func(*args, **kwargs)
             cache.set(key, result)
             return result
-            
+
         return cast(F, wrapper)
     return decorator
 
@@ -253,18 +253,18 @@ def memoize(max_size: int = 1000, ttl: Optional[float] = None) -> Callable[[F], 
         def wrapper(*args, **kwargs):
             # Create a cache key from function name and arguments
             key_parts = [func.__name__] + list(args) + [f"{k}={v}" for k, v in sorted(kwargs.items())]
-            key = hashlib.md5(json.dumps(key_parts, sort_keys=True).encode()).hexdigest()
-            
+            key = hashlib.md5(json.dumps(key_parts, sort_keys=True, default=repr).encode()).hexdigest()
+
             # Try to get from cache
             result = cache.get(key)
             if result is not None:
                 return result
-                
+
             # Call the function and cache the result
             result = func(*args, **kwargs)
             cache.set(key, result)
             return result
-            
+
         # Add cache management methods to the wrapper
         wrapper.cache_clear = cache.clear
         wrapper.cache_cleanup = cache.cleanup
