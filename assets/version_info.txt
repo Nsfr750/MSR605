@@ -32,12 +32,12 @@ VSVersionInfo(
         [
           StringStruct('CompanyName', 'Nsfr750'),
           StringStruct('FileDescription', 'MSR605 Card Reader/Writer'),
-          StringStruct('FileVersion', '2.4.5'),
+          StringStruct('FileVersion', '2.5.0'),
           StringStruct('InternalName', 'MSR605'),
-          StringStruct('LegalCopyright', '© Copyright 2024-2025 Nsfr750'),
+          StringStruct('LegalCopyright', '© Copyright 2024-2026 Nsfr750'),
           StringStruct('OriginalFilename', 'MSR605.exe'),
           StringStruct('ProductName', 'MSR605 Card Reader/Writer'),
-          StringStruct('ProductVersion', '2.4.5')
+          StringStruct('ProductVersion', '2.5.0')
         ])
       ]), 
     VarFileInfo([

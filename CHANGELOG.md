@@ -5,6 +5,28 @@ All notable changes to the MSR605 Card Reader/Writer project will be documented 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.0] - 2026-11-20
+
+### Added
+
+- **PIN Block Decoding**: New "PIN Decode" tab in Advanced Functions
+  - Decode encrypted PIN blocks using DES/3DES keys and PAN
+  - Support for ISO 9564 format 0 (ISO-0 / ANSI X9.8 / VISA-1)
+  - Support for ISO 9564 format 1 (ISO-1 / ECI-4, no PAN required)
+  - Support for ISO 9564 format 3 (ISO-3)
+  - Support for VISA-3 format (delimiter-based, no PAN required)
+  - Support for VISA-4 format (leftmost PAN digits)
+  - Automatic PAN extraction from track data
+  - Single DES, 3DES double-length and triple-length key support
+  - Automatic PAN field enable/disable based on selected format
+
+### Fixed
+
+- Fixed `decrypt.py` module import failure caused by missing `field` import from `dataclasses`
+- Removed duplicate method definitions in `decrypt.py` that corrupted cipher and PAN preparation logic
+- Fixed PIN extraction reading bytes instead of nibbles, which produced incorrect PINs
+- Fixed invalid type annotations referencing non-existent pycryptodome cipher types
+
 ## [2.4.5] - 2025-11-17
 
 ### Added

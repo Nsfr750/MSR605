@@ -19,7 +19,7 @@ import hmac
 import hashlib
 from enum import Enum
 from typing import Union, Optional, Dict, Any, Tuple, List
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 
 # Third-party imports
@@ -52,6 +52,19 @@ class PinBlockFormat(Enum):
     VISA3 = "VISA3"
     VISA4 = "VISA4"
     ECI4 = "ECI4"
+
+
+# Specification table for ISO-family PIN block formats.
+# Maps each format to: (format nibble, requires PAN, PAN digit selection)
+# PAN digit selection is "right" for the rightmost 12 digits of the PAN
+# (excluding the check digit) or "left" for the leftmost 12 digits.
+_PIN_BLOCK_SPECS: Dict[PinBlockFormat, Tuple[int, bool, str]] = {
+    PinBlockFormat.ISO9564_1: (0x0, True, "right"),  # ISO-0 / ANSI X9.8
+    PinBlockFormat.VISA1: (0x0, True, "right"),  # VISA-1, same as ISO-0
+    PinBlockFormat.VISA4: (0x0, True, "left"),  # ISO-0 layout, leftmost PAN digits
+    PinBlockFormat.ECI4: (0x1, False, "right"),  # ISO-1, random fill, no PAN
+    PinBlockFormat.ISO9564_3: (0x3, True, "right"),  # ISO-3, random A-F fill
+}
 
 
 @dataclass
@@ -384,9 +397,7 @@ class CardDataDecryptor:
         logger.info("KCV verification successful")
         return True
 
-    def _get_des_cipher(
-        self, mode: str = "ECB"
-    ) -> Union[DES.DES3Cipher, DES.DESCipher]:
+    def _get_des_cipher(self, mode: str = "ECB") -> Any:
         """Get the appropriate DES/3DES cipher based on key type.
 
         Args:
@@ -409,7 +420,7 @@ class CardDataDecryptor:
             ):
                 if self.key_type == KeyType.SINGLE_DES:
                     return DES.new(self.key[:8], DES.MODE_ECB)
-                return DES3.new(self.key, DES.MODE_ECB)
+                return DES3.new(self.key, DES3.MODE_ECB)
             else:
                 raise ValueError(
                     f"DES cipher not available for key type: {self.key_type}"
@@ -422,7 +433,7 @@ class CardDataDecryptor:
             ):
                 if self.key_type == KeyType.SINGLE_DES:
                     return DES.new(self.key[:8], DES.MODE_CBC, iv=iv)
-                return DES3.new(self.key, DES.MODE_CBC, iv=iv)
+                return DES3.new(self.key, DES3.MODE_CBC, iv=iv)
             else:
                 raise ValueError(
                     f"DES cipher not available for key type: {self.key_type}"
@@ -448,12 +459,15 @@ class CardDataDecryptor:
         return data + bytes([padding_length] * padding_length)
 
     @staticmethod
-    def _prepare_pan(pan: str, length: int = 12) -> bytes:
+    def _prepare_pan(pan: str, length: int = 12, from_left: bool = False) -> bytes:
         """Prepare PAN for PIN block calculation.
 
         Args:
             pan: Primary Account Number (PAN)
             length: Desired length of PAN part (default: 12)
+            from_left: If True, take the leftmost 'length' digits of the PAN
+                (VISA-4 style); otherwise take the rightmost 'length' digits
+                (ISO-0/ISO-3 style). The check digit is always excluded.
 
         Returns:
             Formatted PAN as bytes
@@ -471,8 +485,12 @@ class CardDataDecryptor:
 
         pan_without_check = pan_digits[:-1]  # Remove check digit
 
-        # Take rightmost 'length' digits or pad with zeros
-        pan_part = pan_without_check[-length:].zfill(length)
+        if from_left:
+            # Leftmost 'length' digits, padded on the right with zeros
+            pan_part = pan_without_check[:length].ljust(length, "0")
+        else:
+            # Rightmost 'length' digits, padded on the left with zeros
+            pan_part = pan_without_check[-length:].zfill(length)
 
         # Format: 0000 + pan_part (12 digits) = 16 hex digits (8 bytes)
         return bytes.fromhex(f"0000{pan_part}")
@@ -480,7 +498,7 @@ class CardDataDecryptor:
     def decrypt_pin_block(
         self,
         encrypted_pin_block: bytes,
-        pan: str,
+        pan: Optional[str] = None,
         pin_block_format: Union[PinBlockFormat, str] = PinBlockFormat.ISO9564_1,
     ) -> DecryptionResult:
         """
@@ -488,7 +506,8 @@ class CardDataDecryptor:
 
         Args:
             encrypted_pin_block: The encrypted PIN block
-            pan: Primary Account Number (PAN) for PIN block validation
+            pan: Primary Account Number (PAN) for PIN block validation.
+                Not required for formats that don't use it (VISA-3, ECI-4/ISO-1)
             pin_block_format: PIN block format (default: ISO9564-1)
 
         Returns:
@@ -507,9 +526,6 @@ class CardDataDecryptor:
                     f"encrypted_pin_block must be bytes, got {type(encrypted_pin_block).__name__}"
                 )
 
-            if not pan or not isinstance(pan, str) or not pan.isdigit():
-                raise ValueError("PAN must be a non-empty numeric string")
-
             # Convert string format to enum if needed
             if isinstance(pin_block_format, str):
                 try:
@@ -519,21 +535,23 @@ class CardDataDecryptor:
                         f"Unsupported PIN block format: {pin_block_format}"
                     ) from e
 
-            # Handle different PIN block formats
-            if pin_block_format == PinBlockFormat.ISO9564_1:
-                return self._decrypt_iso9564_1(encrypted_pin_block, pan, timestamp)
-            elif pin_block_format == PinBlockFormat.ISO9564_3:
-                return self._decrypt_iso9564_3(encrypted_pin_block, pan, timestamp)
-            elif pin_block_format in (
-                PinBlockFormat.VISA1,
-                PinBlockFormat.VISA3,
-                PinBlockFormat.VISA4,
+            # VISA-3 and ECI-4 (ISO-1) don't use the PAN
+            pan_required = (
+                pin_block_format in _PIN_BLOCK_SPECS
+                and _PIN_BLOCK_SPECS[pin_block_format][1]
+            )
+            if pan_required and (
+                not pan or not isinstance(pan, str) or not pan.isdigit()
             ):
-                return self._decrypt_visa_format(
+                raise ValueError("PAN must be a non-empty numeric string")
+
+            # Handle different PIN block formats
+            if pin_block_format == PinBlockFormat.VISA3:
+                return self._decrypt_visa3(encrypted_pin_block, timestamp)
+            elif pin_block_format in _PIN_BLOCK_SPECS:
+                return self._decrypt_iso_pin_format(
                     encrypted_pin_block, pan, pin_block_format, timestamp
                 )
-            elif pin_block_format == PinBlockFormat.ECI4:
-                return self._decrypt_eci4(encrypted_pin_block, pan, timestamp)
             else:
                 error_msg = f"Unsupported PIN block format: {pin_block_format}"
                 logger.error(error_msg)
@@ -558,29 +576,33 @@ class CardDataDecryptor:
                 error=error_msg,
             )
 
-    def _decrypt_iso9564_1(
-        self, encrypted_pin_block: bytes, pan: str, timestamp: str
+    def _decrypt_iso_pin_format(
+        self,
+        encrypted_pin_block: bytes,
+        pan: Optional[str],
+        pin_block_format: PinBlockFormat,
+        timestamp: str,
     ) -> DecryptionResult:
-        """Decrypt ISO 9564-1 (ISO-0) PIN block format."""
+        """
+        Decrypt an ISO-family PIN block (ISO-0, ISO-1/ECI-4, ISO-3, VISA-1, VISA-4).
+
+        Args:
+            encrypted_pin_block: The encrypted PIN block
+            pan: Primary Account Number, or None for formats that don't use it
+            pin_block_format: The requested PIN block format
+            timestamp: Timestamp string for the result
+
+        Returns:
+            DecryptionResult object containing the decrypted PIN or error information
+        """
+        format_nibble, requires_pan, pan_side = _PIN_BLOCK_SPECS[pin_block_format]
         try:
-            # Decrypt the PIN block
-            if len(encrypted_pin_block) % 8 != 0:
-                encrypted_pin_block = self._pad_pkcs7(encrypted_pin_block, 8)
-
-            cipher = self._get_des_cipher()
-            pin_block = cipher.decrypt(encrypted_pin_block)
-
-            # XOR with PAN to get clear PIN block
-            pan_data = self._prepare_pan(pan)
-            clear_pin_block = bytes(a ^ b for a, b in zip(pin_block, pan_data))
-
-            # Extract PIN (format: 0x0N P1 P2 P3 P4 F...F where N is PIN length)
-            pin_length = clear_pin_block[0] & 0x0F
-            if pin_length < 4 or pin_length > 12:
-                raise ValueError(f"Invalid PIN length: {pin_length}")
-
-            pin_digits = clear_pin_block[1 : 1 + pin_length]
-            pin = "".join(f"{d & 0x0F:01d}" for d in pin_digits)
+            pin = self._decode_iso_pin_block(
+                encrypted_pin_block,
+                pan if requires_pan else None,
+                format_nibble,
+                pan_side,
+            )
 
             return DecryptionResult(
                 success=True,
@@ -592,10 +614,14 @@ class CardDataDecryptor:
                 ),
                 key_type=self.key_type.value,
                 timestamp=timestamp,
+                metadata={
+                    "pin_block_format": pin_block_format.value,
+                    "pin_length": len(pin),
+                },
             )
 
         except Exception as e:
-            error_msg = f"ISO9564-1 decryption failed: {str(e)}"
+            error_msg = f"{pin_block_format.value} decryption failed: {str(e)}"
             logger.exception(error_msg)
             return DecryptionResult(
                 success=False,
@@ -606,17 +632,51 @@ class CardDataDecryptor:
                 error=error_msg,
             )
 
-    def _decrypt_iso9564_3(
-        self, encrypted_pin_block: bytes, pan: str, timestamp: str
+    def _decrypt_visa3(
+        self, encrypted_pin_block: bytes, timestamp: str
     ) -> DecryptionResult:
-        """Decrypt ISO 9564-3 (ISO-3) PIN block format."""
+        """
+        Decrypt a VISA-3 PIN block.
+
+        VISA-3 does not use a format or length field and does not involve the
+        PAN: the clear block is simply the PIN digits followed by an 'F'
+        delimiter and a uniform pad value.
+
+        Args:
+            encrypted_pin_block: The encrypted PIN block
+            timestamp: Timestamp string for the result
+
+        Returns:
+            DecryptionResult object containing the decrypted PIN or error information
+        """
         try:
-            # Implementation for ISO-3 format
-            # (Similar structure to _decrypt_iso9564_1 but with different format)
-            raise NotImplementedError("ISO9564-3 decryption not yet implemented")
+            if len(encrypted_pin_block) != 8:
+                raise ValueError(
+                    f"PIN block must be exactly 8 bytes (16 hex digits), "
+                    f"got {len(encrypted_pin_block)} bytes"
+                )
+
+            clear_pin_block = self._get_des_cipher().decrypt(encrypted_pin_block)
+            pin = self._extract_visa3_pin(clear_pin_block)
+
+            return DecryptionResult(
+                success=True,
+                data=pin,
+                algorithm=(
+                    "3DES_ECB"
+                    if self.key_type in (KeyType.DOUBLE_DES, KeyType.TRIPLE_DES)
+                    else "DES_ECB"
+                ),
+                key_type=self.key_type.value,
+                timestamp=timestamp,
+                metadata={
+                    "pin_block_format": PinBlockFormat.VISA3.value,
+                    "pin_length": len(pin),
+                },
+            )
 
         except Exception as e:
-            error_msg = f"ISO9564-3 decryption failed: {str(e)}"
+            error_msg = f"VISA-3 decryption failed: {str(e)}"
             logger.exception(error_msg)
             return DecryptionResult(
                 success=False,
@@ -627,53 +687,145 @@ class CardDataDecryptor:
                 error=error_msg,
             )
 
-    def _decrypt_visa_format(
+    def _decode_iso_pin_block(
         self,
         encrypted_pin_block: bytes,
-        pan: str,
-        format_type: PinBlockFormat,
-        timestamp: str,
-    ) -> DecryptionResult:
-        """Decrypt VISA format PIN blocks (VISA1, VISA3, VISA4)."""
-        try:
-            # Implementation for VISA formats
-            # (Similar structure to _decrypt_iso9564_1 but with VISA-specific logic)
-            raise NotImplementedError(
-                f"{format_type.value} decryption not yet implemented"
+        pan: Optional[str],
+        format_nibble: int,
+        pan_side: str = "right",
+    ) -> str:
+        """
+        Decrypt an ISO 9564-family PIN block and extract the PIN.
+
+        The block structure is:
+            C N P1 P2 ... Pn F F ... F
+        where C is the format code (0x0 for ISO-0/VISA-4, 0x1 for ISO-1,
+        0x3 for ISO-3), N is the PIN length, P1..Pn are the PIN digits and
+        F are fill digits (0xF for ISO-0, random 0x0-0xF for ISO-1, random
+        0xA-0xF for ISO-3). For formats using a PAN, the clear PIN block is
+        obtained by decrypting the block and XORing it with the PAN block.
+
+        Args:
+            encrypted_pin_block: The 8-byte encrypted PIN block
+            pan: Primary Account Number used for the XOR operation, or
+                None for formats that don't use the PAN (e.g. ISO-1)
+            format_nibble: Expected format nibble (0x0, 0x1 or 0x3)
+            pan_side: Which PAN digits to use: "right" for the rightmost
+                12 (ISO-0, ISO-3) or "left" for the leftmost 12 (VISA-4)
+
+        Returns:
+            The decoded PIN as a string of digits
+
+        Raises:
+            ValueError: If the block is malformed or the format is unexpected
+        """
+        if len(encrypted_pin_block) != 8:
+            raise ValueError(
+                f"PIN block must be exactly 8 bytes (16 hex digits), "
+                f"got {len(encrypted_pin_block)} bytes"
             )
 
-        except Exception as e:
-            error_msg = f"{format_type.value} decryption failed: {str(e)}"
-            logger.exception(error_msg)
-            return DecryptionResult(
-                success=False,
-                data=None,
-                algorithm=str(self.key_type),
-                key_type=self.key_type.value,
-                timestamp=timestamp,
-                error=error_msg,
+        cipher = self._get_des_cipher()
+        pin_block = cipher.decrypt(encrypted_pin_block)
+
+        if pan is not None:
+            # XOR with PAN to get the clear PIN block
+            pan_data = self._prepare_pan(pan, from_left=(pan_side == "left"))
+            clear_pin_block = bytes(a ^ b for a, b in zip(pin_block, pan_data))
+        else:
+            clear_pin_block = pin_block
+
+        return self._extract_pin_from_clear_block(clear_pin_block, format_nibble)
+
+    @staticmethod
+    def _extract_pin_from_clear_block(
+        clear_pin_block: bytes, format_nibble: int
+    ) -> str:
+        """
+        Extract the PIN digits from a clear (unencrypted) PIN block.
+
+        Args:
+            clear_pin_block: The 8-byte clear PIN block
+            format_nibble: Expected format nibble (0x0, 0x1 or 0x3)
+
+        Returns:
+            The decoded PIN as a string of digits
+
+        Raises:
+            ValueError: If the format, PIN length, or fill digits are invalid
+        """
+        block_hex = clear_pin_block.hex()
+
+        # Nibble 0 is the format code, nibble 1 is the PIN length
+        actual_format = int(block_hex[0], 16)
+        if actual_format != format_nibble:
+            raise ValueError(
+                f"Unexpected PIN block format: 0x{actual_format:X} "
+                f"(expected 0x{format_nibble:X})"
             )
 
-    def _decrypt_eci4(
-        self, encrypted_pin_block: bytes, pan: str, timestamp: str
-    ) -> DecryptionResult:
-        """Decrypt ECI-4 PIN block format."""
-        try:
-            # Implementation for ECI-4 format
-            # (Similar structure to _decrypt_iso9564_1 but with ECI-4 specific logic)
-            raise NotImplementedError("ECI-4 decryption not yet implemented")
+        pin_length = int(block_hex[1], 16)
+        if pin_length < 4 or pin_length > 12:
+            raise ValueError(f"Invalid PIN length: {pin_length}")
 
-        except Exception as e:
-            error_msg = f"ECI-4 decryption failed: {str(e)}"
-            logger.exception(error_msg)
-            return DecryptionResult(
-                success=False,
-                data=None,
-                algorithm=str(self.key_type),
-                key_type=self.key_type.value,
-                timestamp=timestamp,
-                error=error_msg,
+        pin = block_hex[2 : 2 + pin_length]
+        fill = block_hex[2 + pin_length :]
+
+        # Validate the fill digits: 0xF for ISO-0/VISA-4, 0xA-0xF for ISO-3.
+        # ISO-1 uses random 0x0-0xF fill digits which cannot be validated.
+        if format_nibble == 0x0:
+            if any(c != "f" for c in fill):
+                raise ValueError("Invalid fill digits in PIN block")
+        elif format_nibble == 0x3:
+            if any(c not in "abcdef" for c in fill):
+                raise ValueError("Invalid ISO-3 fill digits in PIN block")
+
+        return pin
+
+    @staticmethod
+    def _extract_visa3_pin(clear_pin_block: bytes) -> str:
+        """
+        Extract the PIN digits from a clear VISA-3 PIN block.
+
+        The VISA-3 layout is:
+            P1 P2 ... Pn F X X ... X
+        where P1..Pn are the PIN digits (4-12), F is an 'F' delimiter, and
+        X are pad digits which must all have the same value (0x0-0xF).
+
+        Args:
+            clear_pin_block: The 8-byte clear PIN block
+
+        Returns:
+            The decoded PIN as a string of digits
+
+        Raises:
+            ValueError: If the block is malformed
+        """
+        block_hex = clear_pin_block.hex()
+
+        # The PIN ends at the first non-decimal nibble, which must be the
+        # 'F' delimiter
+        delimiter_index = next(
+            (i for i, c in enumerate(block_hex) if c not in "0123456789"),
+            len(block_hex),
+        )
+        if delimiter_index == len(block_hex):
+            raise ValueError("Invalid VISA-3 PIN block: missing 'F' delimiter")
+        if block_hex[delimiter_index] != "f":
+            raise ValueError(
+                f"Invalid VISA-3 delimiter: 0x{block_hex[delimiter_index].upper()} "
+                "(expected 'F')"
             )
+
+        pin = block_hex[:delimiter_index]
+        if len(pin) < 4 or len(pin) > 12:
+            raise ValueError(f"Invalid PIN length: {len(pin)}")
+
+        pad = block_hex[delimiter_index + 1 :]
+        if pad and len(set(pad)) != 1:
+            raise ValueError("Invalid VISA-3 pad digits: all pad digits must be equal")
+
+        return pin
 
     def decrypt_track_data(
         self, encrypted_data: bytes, algorithm: str = "3DES_CBC"
@@ -719,32 +871,6 @@ class CardDataDecryptor:
         except Exception as e:
             raise ValueError(f"Track data decryption failed: {str(e)}")
 
-    def _get_des_cipher(self):
-        """Get the appropriate DES/3DES cipher based on key type."""
-        if self.key_type == "single":
-            return DES.new(self.key[:8], DES.MODE_ECB)
-        elif self.key_type == "double":
-            # Double-length 3DES: K1, K2, K1
-            key = self.key + self.key[:8]
-            return DES3.new(key, DES3.MODE_ECB)
-        else:  # triple
-            return DES3.new(self.key, DES3.MODE_ECB)
-
-    @staticmethod
-    def _prepare_pan(pan: str) -> bytes:
-        """Prepare PAN for PIN block calculation."""
-        # Take rightmost 12 digits of PAN, excluding check digit
-        pan_digits = pan[-13:-1] if len(pan) > 12 else pan
-        pan_digits = pan_digits.zfill(12)
-        # Format: 0000 + pan_digits
-        return binascii.unhexlify("0000" + pan_digits)
-
-    @staticmethod
-    def _pad_pkcs7(data: bytes, block_size: int) -> bytes:
-        """Pad data using PKCS#7 padding."""
-        padding_length = block_size - (len(data) % block_size)
-        return data + bytes([padding_length] * padding_length)
-
 
 # Example usage
 if __name__ == "__main__":
@@ -758,11 +884,13 @@ if __name__ == "__main__":
     pan = "1234567890123456"  # Example PAN
 
     try:
-        decryptor = CardDataDecryptor(SAMPLE_KEY, key_type="double")
+        decryptor = CardDataDecryptor(SAMPLE_KEY, key_type=KeyType.DOUBLE_DES)
 
         # Example: Decrypt PIN
-        pin = decryptor.decrypt_pin_block(encrypted_pin, pan, "ISO9564-1")
-        print(f"Decrypted PIN: {pin}")
+        result = decryptor.decrypt_pin_block(
+            encrypted_pin, pan, PinBlockFormat.ISO9564_1
+        )
+        print(f"Decrypted PIN: {result.data}")
 
         # Example: Decrypt track data
         # encrypted_track = b'...'  # Actual encrypted track data

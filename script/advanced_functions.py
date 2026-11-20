@@ -73,6 +73,7 @@ class AdvancedFunctionsWidget(QWidget):
 
         # Create tabs
         self.setup_decode_tab()
+        self.setup_pin_decode_tab()
         self.setup_decrypt_tab()
 
         # Add visualization tab if available
@@ -151,6 +152,139 @@ class AdvancedFunctionsWidget(QWidget):
 
         # Add tab
         self.tab_widget.addTab(decode_tab, "Decode Card")
+
+    def setup_pin_decode_tab(self):
+        """Set up the PIN block decode tab."""
+        # Create PIN decode tab widget
+        pin_tab = QWidget()
+        pin_layout = QVBoxLayout(pin_tab)
+
+        # PIN block input
+        block_group = QGroupBox("PIN Block")
+        block_layout = QVBoxLayout()
+
+        # Encrypted PIN block (hex)
+        block_row = QWidget()
+        block_row_layout = QHBoxLayout(block_row)
+        block_row_layout.setContentsMargins(0, 0, 0, 0)
+
+        block_row_layout.addWidget(QLabel("Encrypted PIN block (hex):"))
+        self.pin_block_entry = QLineEdit()
+        self.pin_block_entry.setPlaceholderText("16 hex digits, e.g. BAFB0C0F6A2C7DEE")
+        block_row_layout.addWidget(self.pin_block_entry)
+        block_layout.addWidget(block_row)
+
+        # PAN input with auto-fill from track data
+        pan_row = QWidget()
+        pan_row_layout = QHBoxLayout(pan_row)
+        pan_row_layout.setContentsMargins(0, 0, 0, 0)
+
+        pan_row_layout.addWidget(QLabel("PAN (card number):"))
+        self.pin_pan_entry = QLineEdit()
+        self.pin_pan_entry.setPlaceholderText("Primary Account Number from track data")
+        pan_row_layout.addWidget(self.pin_pan_entry)
+
+        self.pin_pan_btn = QPushButton("Use Track PAN")
+        self.pin_pan_btn.clicked.connect(self.fill_pan_from_tracks)
+        pan_row_layout.addWidget(self.pin_pan_btn)
+        block_layout.addWidget(pan_row)
+
+        block_group.setLayout(block_layout)
+        pin_layout.addWidget(block_group)
+
+        # Key and format parameters
+        params_group = QGroupBox("Decryption Parameters")
+        params_layout = QVBoxLayout()
+
+        key_row = QWidget()
+        key_row_layout = QHBoxLayout(key_row)
+        key_row_layout.setContentsMargins(0, 0, 0, 0)
+
+        key_row_layout.addWidget(QLabel("PIN key (hex):"))
+        self.pin_key_entry = QLineEdit()
+        self.pin_key_entry.setPlaceholderText("8/16/24 bytes (DES/3DES)")
+        key_row_layout.addWidget(self.pin_key_entry)
+        params_layout.addWidget(key_row)
+
+        fmt_row = QWidget()
+        fmt_row_layout = QHBoxLayout(fmt_row)
+        fmt_row_layout.setContentsMargins(0, 0, 0, 0)
+
+        fmt_row_layout.addWidget(QLabel("Key type:"))
+        self.pin_key_type_combo = QComboBox()
+        self.pin_key_type_combo.addItems(
+            [
+                "Single DES (8 bytes)",
+                "3DES double-length (16 bytes)",
+                "3DES triple-length (24 bytes)",
+            ]
+        )
+        self.pin_key_type_combo.setCurrentIndex(1)
+        fmt_row_layout.addWidget(self.pin_key_type_combo)
+
+        fmt_row_layout.addWidget(QLabel("PIN block format:"))
+        self.pin_format_combo = QComboBox()
+        self.pin_format_combo.addItems(
+            [
+                "ISO 9564 format 0 (ISO-0)",
+                "ISO 9564 format 1 (ISO-1 / ECI-4)",
+                "ISO 9564 format 3 (ISO-3)",
+                "VISA-1",
+                "VISA-3",
+                "VISA-4",
+            ]
+        )
+        self.pin_format_combo.currentIndexChanged.connect(self._on_pin_format_changed)
+        fmt_row_layout.addWidget(self.pin_format_combo)
+        fmt_row_layout.addStretch()
+        params_layout.addWidget(fmt_row)
+
+        params_group.setLayout(params_layout)
+        pin_layout.addWidget(params_group)
+
+        # Decode button
+        decode_pin_btn = QPushButton("Decode PIN")
+        decode_pin_btn.clicked.connect(self.decode_pin)
+        decode_pin_btn.setStyleSheet(
+            """
+            QPushButton {
+                padding: 8px;
+                background-color: #28a745;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #218838;
+            }
+            QPushButton:pressed {
+                background-color: #1e7e34;
+            }
+        """
+        )
+        pin_layout.addWidget(decode_pin_btn)
+
+        # Results area
+        pin_layout.addWidget(QLabel("<b>PIN Decode Result:</b>"))
+
+        self.pin_result_text = QTextEdit()
+        self.pin_result_text.setReadOnly(True)
+        self.pin_result_text.setStyleSheet(
+            """
+            QTextEdit {
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                padding: 5px;
+                font-family: monospace;
+                background-color: #f8f9fa;
+            }
+        """
+        )
+        pin_layout.addWidget(self.pin_result_text)
+
+        # Add to tab widget
+        self.tab_widget.addTab(pin_tab, "PIN Decode")
 
     def setup_decrypt_tab(self):
         """Set up the decrypt tab."""
@@ -355,6 +489,136 @@ class AdvancedFunctionsWidget(QWidget):
         # Add raw data
         result.append(f"\nRaw Data: {track_data}")
         return "\n".join(result)
+
+    def fill_pan_from_tracks(self):
+        """Fill the PAN field using the card number decoded from track data."""
+        pan = self._extract_pan_from_tracks()
+        if pan:
+            self.pin_pan_entry.setText(pan)
+        else:
+            QMessageBox.information(
+                self,
+                "No PAN Found",
+                "No card number could be decoded from the loaded track data.",
+            )
+
+    def _extract_pan_from_tracks(self) -> str:
+        """Extract the PAN from the loaded track data.
+
+        Prefers Track 2 (;PAN=...) and falls back to Track 1 (%BPAN^...).
+
+        Returns:
+            The card number as a string of digits, or an empty string
+        """
+        if len(self.tracks) > 1 and "=" in self.tracks[1]:
+            return self.tracks[1].lstrip(";").split("=")[0].strip()
+        if (
+            len(self.tracks) > 0
+            and self.tracks[0].startswith("%B")
+            and "^" in self.tracks[0]
+        ):
+            return self.tracks[0][2:].split("^")[0].strip()
+        return ""
+
+    def _on_pin_format_changed(self, index: int):
+        """Enable the PAN field only for PIN block formats that use it.
+
+        Args:
+            index: Selected index in the PIN block format combo
+        """
+        # ECI-4 (ISO-1) at index 1 and VISA-3 at index 4 don't use the PAN
+        pan_needed = index not in (1, 4)
+        self.pin_pan_entry.setEnabled(pan_needed)
+        self.pin_pan_btn.setEnabled(pan_needed)
+
+    def decode_pin(self):
+        """Decode the encrypted PIN block using the provided key and PAN."""
+        pin_block_hex = self.pin_block_entry.text().strip().replace(" ", "")
+        pan = self.pin_pan_entry.text().strip()
+        key_hex = self.pin_key_entry.text().strip().replace(" ", "")
+
+        try:
+            from .decrypt import CardDataDecryptor, KeyType, PinBlockFormat
+        except ImportError as e:
+            QMessageBox.critical(
+                self,
+                "Decryption Unavailable",
+                f"The decryption module could not be loaded:\n{str(e)}",
+            )
+            return
+
+        pin_formats = [
+            PinBlockFormat.ISO9564_1,
+            PinBlockFormat.ECI4,
+            PinBlockFormat.ISO9564_3,
+            PinBlockFormat.VISA1,
+            PinBlockFormat.VISA3,
+            PinBlockFormat.VISA4,
+        ]
+        pin_block_format = pin_formats[self.pin_format_combo.currentIndex()]
+
+        # ECI-4 (ISO-1) and VISA-3 don't use the PAN
+        pan_needed = pin_block_format not in (
+            PinBlockFormat.ECI4,
+            PinBlockFormat.VISA3,
+        )
+
+        if not pin_block_hex or not key_hex or (pan_needed and not pan):
+            QMessageBox.warning(
+                self,
+                "Missing Input",
+                "Encrypted PIN block, key"
+                + (" and PAN" if pan_needed else "")
+                + " are required.",
+            )
+            return
+
+        try:
+            pin_block = bytes.fromhex(pin_block_hex)
+        except ValueError:
+            QMessageBox.critical(
+                self,
+                "Invalid Input",
+                "The encrypted PIN block must be a hexadecimal string "
+                "(16 hex digits).",
+            )
+            return
+
+        try:
+            key = bytes.fromhex(key_hex)
+        except ValueError:
+            QMessageBox.critical(
+                self,
+                "Invalid Input",
+                "The key must be a hexadecimal string.",
+            )
+            return
+
+        key_type = [
+            KeyType.SINGLE_DES,
+            KeyType.DOUBLE_DES,
+            KeyType.TRIPLE_DES,
+        ][self.pin_key_type_combo.currentIndex()]
+
+        try:
+            decryptor = CardDataDecryptor(key, key_type=key_type)
+        except ValueError as e:
+            QMessageBox.critical(self, "Invalid Key", str(e))
+            return
+
+        result = decryptor.decrypt_pin_block(pin_block, pan, pin_block_format)
+
+        if result.success:
+            self.pin_result_text.setPlainText(
+                f"Decoded PIN : {result.data}\n\n"
+                f"PIN length  : {result.metadata.get('pin_length', '')}\n"
+                f"Format      : {result.metadata.get('pin_block_format', '')}\n"
+                f"Algorithm   : {result.algorithm}\n"
+                f"Key type    : {result.key_type}\n"
+                f"Timestamp   : {result.timestamp}"
+            )
+        else:
+            self.pin_result_text.setPlainText(f"PIN decoding failed:\n{result.error}")
 
     def decrypt_data(self):
         """Decrypt the provided data using the specified key and algorithm."""

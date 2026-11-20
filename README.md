@@ -1,6 +1,6 @@
 # MSR605 Card Reader/Writer
 
-![Version](https://img.shields.io/badge/Version-2.4.5-blue)
+![Version](https://img.shields.io/badge/Version-2.5.0-blue)
 ![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-blue)
 ![GUI](https://img.shields.io/badge/GUI-PyQt6.6-blue)
 ![License](https://img.shields.io/badge/License-GPLv3-blue)
@@ -12,6 +12,18 @@
 **MSR605 Card Reader/Writer** is a sophisticated, open-source GUI application designed for reading, writing, and managing magnetic stripe cards using the MSR605 hardware. This powerful tool provides comprehensive card data management with advanced decoding and analysis capabilities.
 
 Check [Gallery](docs/GALLERY.md) for screenshots and visuals of the MSR605 application.
+
+### What's New in v2.5.0
+
+#### PIN Block Decoding
+
+- New "PIN Decode" tab in Advanced Functions for decoding encrypted PIN blocks
+- Support for ISO 9564 format 0 (ISO-0 / ANSI X9.8 / VISA-1)
+- Support for ISO 9564 format 1 (ISO-1 / ECI-4, no PAN required)
+- Support for ISO 9564 format 3 (ISO-3)
+- Support for VISA-3 and VISA-4 PIN block formats
+- Automatic PAN extraction from track data
+- Single DES, 3DES double-length and triple-length key support
 
 ### What's New in v2.4.5
 
@@ -343,8 +355,8 @@ MSR605 Card Reader/Writer is licensed under the GNU General Public License v3.0.
 
 ## 🏷️ Version Information
 
-Current Version: 2.4.2 (Stable)
-Release Date: September 18, 2025
+Current Version: 2.5.0 (Stable)
+Release Date: November 20, 2026
 
 ### System Requirements
 
