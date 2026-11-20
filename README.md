@@ -6,7 +6,6 @@
 ![License](https://img.shields.io/badge/License-GPLv3-blue)
 [![Issues](https://img.shields.io/github/issues/Nsfr750/MSR605)](https://github.com/Nsfr750/MSR605/issues)
 
-
 ## 🌟 Overview
 
 **MSR605 Card Reader/Writer** is a sophisticated, open-source GUI application designed for reading, writing, and managing magnetic stripe cards using the MSR605 hardware. This powerful tool provides comprehensive card data management with advanced decoding and analysis capabilities.
@@ -45,7 +44,7 @@ Check [Gallery](docs/GALLERY.md) for screenshots and visuals of the MSR605 appli
 
 ### What's New in v2.4.2
 
-#### Build System Improvements
+#### Build System Improvements (2.4.2)
 
 - Fixed Nuitka compilation issues by excluding PIL modules and explicitly including Wand
 - Resolved Scons C backend compilation errors in build process
@@ -168,8 +167,6 @@ Check [Gallery](docs/GALLERY.md) for screenshots and visuals of the MSR605 appli
 - **Display**: 1366x768 resolution minimum
 
 ## Installation
-
-### Prerequisites
 
 - Python 3.10, 3.11, or 3.12
 - MSR605 Hardware Reader
@@ -337,7 +334,7 @@ MSR605 Card Reader/Writer is licensed under the GNU General Public License v3.0.
 
 ## Support & Community
 
-### Getting Help
+### Help
 
 - 📖 [Documentation](https://github.com/Nsfr750/MSR605/wiki)
 - 🐛 [Report a Bug](https://github.com/Nsfr750/MSR605/issues/new?template=bug_report.md)
@@ -357,10 +354,3 @@ MSR605 Card Reader/Writer is licensed under the GNU General Public License v3.0.
 
 Current Version: 2.5.0 (Stable)
 Release Date: November 20, 2026
-
-### System Requirements
-
-- Python 3.10, 3.11, or 3.12
-- Windows 10/11 or Linux
-- MSR605 Hardware Reader
-- Prolific USB to Serial Driver (can be find on releases page)
