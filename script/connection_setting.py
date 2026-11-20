@@ -113,7 +113,7 @@ class ConnectionSettingsWidget(QWidget):
         self.timeout_combo = QComboBox()
         timeouts = ['0.1', '0.5', '1.0', '2.0', '5.0', '10.0']
         self.timeout_combo.addItems(timeouts)
-        self.timeout_combo.setCurrentText('1.0')  # Default timeout in seconds
+        self.timeout_combo.setCurrentText('10.0')  # Default timeout in seconds
         self.timeout_combo.currentTextChanged.connect(self.on_settings_changed)
         conn_layout.addRow("Timeout (s):", self.timeout_combo)
         

@@ -74,7 +74,7 @@ class CardReader:
         self,
         port: str = "COM3",
         baud_rate: int = 9600,
-        timeout: float = 1.0,
+        timeout: float = 10.0,
         initial_format: CardFormat = CardFormat.ISO_7813,
         template_dir: Optional[str] = None,
         sync_enabled: bool = True,
@@ -90,7 +90,7 @@ class CardReader:
             port (str, optional): The COM port to connect to (e.g., 'COM5'). If None,
                                 the class will try to auto-detect the port.
             baud_rate (int, optional): The baud rate for serial communication. Defaults to 9600.
-            timeout (float, optional): The timeout for serial communication. Defaults to 1.0.
+            timeout (float, optional): The timeout for serial communication. Defaults to 10.0.
             initial_format (CardFormat, optional): Default card format to use for operations.
                                                 Defaults to ISO_7813.
             template_dir (Optional[str], optional): Directory path for card templates. Defaults to None.
@@ -103,6 +103,11 @@ class CardReader:
         """
         self.__serialConn = None
         self.__port = port
+        self.__timeout = timeout
+        # The device answers a read/write command only after a card is
+        # physically swiped, so the swipe wait needs a long timeout
+        # regardless of the configured command timeout.
+        self.__swipe_timeout = max(timeout, 10.0)
         self.__default_format = initial_format
         self.__current_format = initial_format
         self.__last_written_tracks = ["", "", ""]  # For undo functionality
@@ -142,7 +147,9 @@ class CardReader:
         if self.__port:
             # Try to connect to the specified port
             try:
-                self.__serialConn = serial.Serial(self.__port, 9600, timeout=1.0)
+                self.__serialConn = serial.Serial(
+                    self.__port, 9600, timeout=self.__timeout
+                )
                 print(f"Connected to specified port: {self.__port}")
             except (serial.SerialException, OSError) as e:
                 raise cardReaderExceptions.MSR605ConnectError(
@@ -153,7 +160,9 @@ class CardReader:
             for x in range(1, 256):
                 port = f"COM{x}"
                 try:
-                    self.__serialConn = serial.Serial(port, 9600, timeout=1.0)
+                    self.__serialConn = serial.Serial(
+                        port, 9600, timeout=self.__timeout
+                    )
                     print(f"Auto-connected to port: {port}")
                     self.__port = port
                     break
@@ -169,6 +178,9 @@ class CardReader:
         try:
             # Initialize the MSR605
             print("\nINITIALIZING THE MSR605")
+
+            # Clear any stale bytes left in the RX buffer
+            self.__serialConn.reset_input_buffer()
 
             # Reset the device
             self.reset()
@@ -484,9 +496,25 @@ class CardReader:
             self.__current_format, track_num, data
         )
 
+    def _read_swipe_response(self) -> bytes:
+        """Read the first response byte while waiting for a card swipe.
+
+        The device answers a read/write/erase command only after a card is
+        physically swiped, so the read uses the swipe timeout and then the
+        configured command timeout is restored.
+
+        Returns:
+            The response bytes read from the device.
+        """
+        self.__serialConn.timeout = self.__swipe_timeout
+        try:
+            return self.__serialConn.read()
+        finally:
+            self.__serialConn.timeout = self.__timeout
+
     @measure_execution_time
     def read_card(
-        self, 
+        self,
         detect_format: bool = False, 
         validate: bool = True,
         use_cache: bool = True
@@ -560,68 +588,44 @@ class CardReader:
             CardReadError: If an error occurs while reading the card
             StatusError: If the device reports an error status
         """
-        max_retries = 3
-        for attempt in range(max_retries):
-            try:
-                print(f"\nATTEMPTING TO READ FROM CARD (SWIPE NOW) - Attempt {attempt + 1}")
-                # read in track data will be stored in this array
-                tracks = ["", "", ""]
+        print("\nATTEMPTING TO READ FROM CARD (SWIPE NOW)")
+        # read in track data will be stored in this array
+        tracks = ["", "", ""]
 
-                # command code for reading written to the MSR605
-                self.__serialConn.write(ESCAPE + READ)
-                self.__serialConn.flush()
+        # Discard stale response bytes from previous commands so the
+        # response we read below belongs to this read command
+        self.__serialConn.reset_input_buffer()
 
-                # Give the device a moment to process
-                time.sleep(0.1)
+        # command code for reading written to the MSR605
+        self.__serialConn.write(ESCAPE + READ)
+        self.__serialConn.flush()
 
-                # response/output from the MSR605 - with retry logic
-                response = self.__serialConn.read()
-                if response != ESCAPE:
-                    print(f"Attempt {attempt + 1}: Expected ESCAPE, got {response}")
-                    if attempt < max_retries - 1:
-                        print("Retrying...")
-                        time.sleep(0.5)
-                        continue
-                    else:
-                        raise cardReaderExceptions.CardReadError(
-                            "[Datablock] READ ERROR, R/W Data Field, looking for ESCAPE(\\x1b)", None
-                        )
+        # Give the device a moment to process
+        time.sleep(0.1)
 
-                response = self.__serialConn.read()
-                if response != b"s":
-                    print(f"Attempt {attempt + 1}: Expected 's', got {response}")
-                    if attempt < max_retries - 1:
-                        print("Retrying...")
-                        time.sleep(0.5)
-                        continue
-                    else:
-                        raise cardReaderExceptions.CardReadError(
-                            "[Datablock] READ ERROR, R/W Data Field, looking for s (\\x73)", None
-                        )
+        # The device stays armed until a card is swiped and only then sends
+        # its response, so we wait for the swipe without re-sending the
+        # command on a timeout.
+        response = self._read_swipe_response()
+        if response != ESCAPE:
+            raise cardReaderExceptions.CardReadError(
+                "[Datablock] READ ERROR, R/W Data Field, looking for ESCAPE(\\x1b)",
+                None,
+            )
 
-                response = self.__serialConn.read()
-                if response != ESCAPE:
-                    print(f"Attempt {attempt + 1}: Expected ESCAPE, got {response}")
-                    if attempt < max_retries - 1:
-                        print("Retrying...")
-                        time.sleep(0.5)
-                        continue
-                    else:
-                        raise cardReaderExceptions.CardReadError(
-                            "[Carddata] READ ERROR, R/W Data Field, looking for ESCAPE(\\x1b)", None
-                        )
+        response = self.__serialConn.read()
+        if response != b"s":
+            raise cardReaderExceptions.CardReadError(
+                "[Datablock] READ ERROR, R/W Data Field, looking for s (\\x73)",
+                None,
+            )
 
-                # If we got here, the initial response was correct, continue with normal reading
-                break
-
-            except Exception as e:
-                print(f"Attempt {attempt + 1}: Error during read: {e}")
-                if attempt < max_retries - 1:
-                    print("Retrying...")
-                    time.sleep(0.5)
-                    continue
-                else:
-                    raise e
+        response = self.__serialConn.read()
+        if response != ESCAPE:
+            raise cardReaderExceptions.CardReadError(
+                "[Carddata] READ ERROR, R/W Data Field, looking for ESCAPE(\\x1b)",
+                None,
+            )
 
         # track one data will be read in, this isn't raising an exception because the card
         # might not have track 1 data
@@ -704,6 +708,11 @@ class CardReader:
                 # Successfully got END_OF_TEXT, now read Track 3 data
                 tracks[2] = self.read_until(FILE_SEPERATOR, 3, True)
                 print("TRACK 3: ", tracks[2])
+
+                # The device sends "ESC +" as end-of-data marker when
+                # track 3 has no data (the ESC is skipped by read_until)
+                if tracks[2].startswith("+"):
+                    tracks[2] = ""
 
                 if len(tracks[2]) > 0:
                     if tracks[2][-1] != "?":
@@ -1056,6 +1065,9 @@ class CardReader:
         # Add the end of the data block
         data_block += b"?" + FILE_SEPERATOR + ESCAPE + b"0"
 
+        # Discard stale response bytes before issuing the command
+        self.__serialConn.reset_input_buffer()
+
         # Write the command code for writing to a card
         self.__serialConn.write(ESCAPE + WRITE)
 
@@ -1064,7 +1076,7 @@ class CardReader:
 
         # Check the status byte if requested
         if status_byte_check:
-            status_byte = self.__serialConn.read(1)
+            status_byte = self._read_swipe_response()
 
             if status_byte != b"0":
                 status_code = int.from_bytes(status_byte, byteorder="big")
@@ -1081,7 +1093,7 @@ class CardReader:
                 return cached_result
                 
         # Store the tracks to be written for potential undo operation
-        self.__last_written_tracks = tracks["", "", ""]  # For undo functionality
+        self.__last_written_tracks = list(tracks)  # For undo functionality
         
         result = {
             "success": True,
@@ -1145,12 +1157,15 @@ class CardReader:
 
         print("\nERASING CARD (SWIPE NOW)")
 
+        # Discard stale response bytes before issuing the command
+        self.__serialConn.reset_input_buffer()
+
         # command code for erasing a magstripe card
         self.__serialConn.write(ESCAPE + ERASE_CARD + (str(trackSelect)).encode())
         self.__serialConn.flush()
 
         # response/output from the MSR605
-        if self.__serialConn.read() != ESCAPE:
+        if self._read_swipe_response() != ESCAPE:
             raise cardReaderExceptions.EraseCardError(
                 "ERASE CARD ERROR, looking for ESCAPE(\x1b)"
             )
@@ -1309,6 +1324,9 @@ class CardReader:
             self._check_connection()
             
             print("\nCHECK COMMUNICATION LINK BETWEEN THE COMPUTER AND THE MSR605")
+
+            # Discard stale response bytes before issuing the command
+            self.__serialConn.reset_input_buffer()
 
             # command code for testing the MSR605 Communication with the Computer
             self.__serialConn.write(ESCAPE + COMMUNICATIONS_TEST)
@@ -1477,6 +1495,7 @@ class CardReader:
         max_retries = 3
         for attempt in range(max_retries):
             try:
+                self.__serialConn.reset_input_buffer()
                 self.__serialConn.write(ESCAPE + HI_CO)
                 self.__serialConn.flush()
 
@@ -1533,6 +1552,9 @@ class CardReader:
         """
 
         print("\nSETTING THE MSR605 TO LOW-COERCIVITY")
+
+        # Discard stale response bytes before issuing the command
+        self.__serialConn.reset_input_buffer()
 
         # command code for setting the MSR605 to Low-Coercivity
         self.__serialConn.write(ESCAPE + LOW_CO)

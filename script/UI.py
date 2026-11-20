@@ -65,7 +65,14 @@ from PyQt6.QtGui import QIcon, QAction, QFont, QTextCursor, QPixmap, QColor, QPa
 # Import local modules
 import sys
 import os
-from script.cardReader import CardReader
+from script.cardReader import (
+    CardReader,
+    ESCAPE,
+    ALL_LED_OFF,
+    GREEN_LED_ON,
+    YELLOW_LED_ON,
+    RED_LED_ON,
+)
 from script import cardReaderExceptions
 from script.version import get_version, get_version_info
 from script.language_manager import LanguageManager
@@ -765,6 +772,7 @@ class GUI(QMainWindow):
             return
 
         # If no port specified, try to get it from the connection settings widget
+        timeout = 10.0
         if port is None:
             # Find the connection settings tab
             for i in range(self.tabs.count()):
@@ -772,6 +780,7 @@ class GUI(QMainWindow):
                 if isinstance(tab, ConnectionSettingsWidget):
                     port = tab.get_port()
                     baudrate = tab.get_baudrate()
+                    timeout = tab.get_serial_settings().get("timeout", 10.0)
                     break
 
         if not port or port == "No ports found":
@@ -781,7 +790,7 @@ class GUI(QMainWindow):
             return
 
         try:
-            self.__msr = CardReader(port, baud_rate=baudrate)
+            self.__msr = CardReader(port, baud_rate=baudrate, timeout=timeout)
             self.__msr.connect()
             self.__connected = True
             self.statusBar().showMessage(f"Connected to {port} at {baudrate} baud")
@@ -868,7 +877,7 @@ class GUI(QMainWindow):
 
             # Read the card with timeout
             try:
-                progress.setLabelText("Reading card...")
+                progress.setLabelText("Swipe the card now...")
                 QApplication.processEvents()
                 card_data = self.__msr.read_card()
                 tracks = card_data['tracks']
@@ -899,7 +908,14 @@ class GUI(QMainWindow):
 
             except Exception as e:
                 # Handle errors during card reading
-                QMessageBox.critical(self, "Read Error", f"Error reading card: {str(e)}")
+                error_msg = str(e)
+                if "READ ERROR" in error_msg:
+                    error_msg = (
+                        "No card swipe detected.\n\n"
+                        "Swipe the card while the reader is waiting "
+                        "(green LED on)."
+                    )
+                QMessageBox.critical(self, "Read Error", f"Error reading card: {error_msg}")
                 self.status_label.setText("✗ Error reading card")
                 self.status_label.setStyleSheet("color: red;")
                 return

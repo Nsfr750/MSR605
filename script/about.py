@@ -72,7 +72,7 @@ class AboutDialog(QDialog):
         # Update copyright
         if hasattr(self, "copyright_label"):
             self.copyright_label.setText(
-                self.translate("copyright", year="2025", author="Nsfr750")
+                self.translate("copyright", year="2024-2026", author="Nsfr750")
             )
 
         # Update buttons
@@ -175,7 +175,7 @@ class AboutDialog(QDialog):
         )
         self.github_btn.clicked.connect(
             lambda: QDesktopServices.openUrl(
-                QUrl("https://github.com/Nsfr750/Images-Deduplicator")
+                QUrl("https://github.com/Nsfr750/MSR605")
             )
         )
 
